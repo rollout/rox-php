@@ -1,0 +1,220 @@
+<?php
+
+namespace Rox\Core\Roxx;
+
+use Exception;
+use Rox\Core\Context\ContextInterface;
+use Rox\Core\Context\DummyContext;
+
+class Parser implements ParserInterface
+{
+    /**
+     * @var array $_operatorsMap
+     */
+    private $_operatorsMap = [];
+
+    /**
+     * Parser constructor.
+     * @throws Exception
+     */
+    public function __construct()
+    {
+        $this->_setBasicOperators();
+    }
+
+    /**
+     * @param string $name
+     * @param callable $operation
+     */
+    public function addOperator($name, $operation)
+    {
+        $this->_operatorsMap[$name] = $operation;
+    }
+
+    private function _setBasicOperators()
+    {
+        $this->addOperator("isUndefined",
+            function (ParserInterface $parser, StackInterface $stack, ContextInterface $context) {
+                $op1 = $stack->pop();
+                if (!($op1 instanceof TokenType)) {
+                    $stack->push(false);
+                    return;
+                }
+                $stack->push($op1 == TokenTypes::getInstance()->getUndefined());
+            });
+
+        $this->addOperator("now", function (ParserInterface $parser, StackInterface $stack, ContextInterface $context) {
+            $stack->push(floor(microtime(true) * 1000));
+        });
+
+        $this->addOperator("and",
+            function (ParserInterface $parser, StackInterface $stack, ContextInterface $context) {
+
+                $op1 = $stack->pop();
+                $op2 = $stack->pop();
+
+                if (!is_bool($op1) && $op1 === TokenTypes::getInstance()->getUndefined()) {
+                    $op1 = false;
+                }
+
+                if (!is_bool($op2) && $op2 === TokenTypes::getInstance()->getUndefined()) {
+                    $op2 = false;
+                }
+
+                $stack->push((boolean)$op1 && (boolean)$op2);
+            });
+
+        $this->addOperator("or",
+            function (ParserInterface $parser, StackInterface $stack, ContextInterface $context) {
+                $op1 = $stack->pop();
+                $op2 = $stack->pop();
+
+                if (!is_bool($op1) && $op1 === TokenTypes::getInstance()->getUndefined()) {
+                    $$op1 = false;
+                }
+
+                if (!is_bool($op2) && $op2 === TokenTypes::getInstance()->getUndefined()) {
+                    $op2 = false;
+                }
+
+                $stack->push((boolean)$op1 || (boolean)$op2);
+            });
+
+        $this->addOperator("ne", function (ParserInterface $parser, StackInterface $stack, ContextInterface $context) {
+            $op1 = $stack->pop();
+            $op2 = $stack->pop();
+
+            if (!is_bool($op1) && $op1 === TokenTypes::getInstance()->getUndefined()) {
+                $op1 = false;
+            }
+
+            if (!is_bool($op2) && $op2 === TokenTypes::getInstance()->getUndefined()) {
+                $op2 = false;
+            }
+
+            $stack->push($op1 !== $op2);
+        });
+
+        $this->addOperator("eq", function (ParserInterface $parser, StackInterface $stack, ContextInterface $context) {
+            $op1 = $stack->pop();
+            $op2 = $stack->pop();
+
+            if (!is_bool($op1) && $op1 === TokenTypes::getInstance()->getUndefined()) {
+                $op1 = false;
+            }
+
+            if (!is_bool($op2) && $op2 === TokenTypes::getInstance()->getUndefined()) {
+                $op2 = false;
+            }
+
+            $stack->push($op1 == $op2);
+        });
+
+        $this->addOperator("not",
+            function (ParserInterface $parser, StackInterface $stack, ContextInterface $context) {
+                $op1 = $stack->pop();
+                if (!is_bool($op1) && $op1 === TokenTypes::getInstance()->getUndefined()) {
+                    $op1 = false;
+                }
+                $stack->push(!(boolean)$op1);
+            });
+
+        $this->addOperator("ifThen", function (ParserInterface $parser, StackInterface $stack, ContextInterface $context) {
+            $conditionExpression = (boolean)$stack->pop();
+            $trueExpression = $stack->pop();
+            $falseExpression = $stack->pop();
+            $stack->push($conditionExpression ? $trueExpression : $falseExpression);
+        });
+
+        $this->addOperator("inArray", function (ParserInterface $parser, StackInterface $stack, ContextInterface $context) {
+            $op1 = $stack->pop();
+            $op2 = $stack->pop();
+
+            if (!is_array($op2)) {
+                $stack->push(false);
+                return;
+            }
+
+            $stack->push(!!array_filter($op2, function ($e) use ($op1) {
+                return $e === $op1;
+            }));
+        });
+
+        $this->addOperator("md5", function (ParserInterface $parser, StackInterface $stack, ContextInterface $context) {
+            $op1 = $stack->pop();
+            if (!is_string($op1)) {
+                $stack->push(TokenTypes::getInstance()->getUndefined());
+                return;
+            }
+            $stack->push(md5($op1));
+        });
+
+        $this->addOperator("concat", function (ParserInterface $parser, StackInterface $stack, ContextInterface $context) {
+            $op1 = $stack->pop();
+            $op2 = $stack->pop();
+            if (!is_string($op1) || !is_string($op2)) {
+                $stack->push(TokenTypes::getInstance()->getUndefined());
+                return;
+            }
+
+            $stack->push($op1 . $op2);
+        });
+
+        $this->addOperator("b64d", function (ParserInterface $parser, StackInterface $stack, ContextInterface $context) {
+            $op1 = $stack->pop();
+            if (!is_string($op1)) {
+                $stack->push(TokenTypes::getInstance()->getUndefined());
+                return;
+            }
+
+            $stack->push(base64_decode($op1));
+        });
+
+        (new ValueCompareExtensions($this))->extend();
+        (new RegularExpressionExtensions($this))->extend();
+    }
+
+    /**
+     * @param string $expression
+     * @param ContextInterface $context
+     * @return EvaluationResult
+     */
+    public function evaluateExpression($expression, $context = null)
+    {
+        if ($context == null) {
+            $context = new DummyContext(); // Don't pass nulls anywhere, it's a bad practice.
+        }
+
+        $stack = new CoreStack();
+        $tokens = (new TokenizedExpression($expression, array_keys($this->_operatorsMap)))->getTokens();
+        $result = null;
+
+        $reverseTokens = array_reverse($tokens);
+
+        try {
+            foreach ($reverseTokens as $token) {
+                $node = $token;
+
+                if ($node->type == Node::TYPE_RAND) {
+                    $stack->push($node->value);
+                } else if ($node->type == Node::TYPE_RATOR) {
+                    $key = (string)$node->value;
+                    if (array_key_exists($key, $this->_operatorsMap)) {
+                        $this->_operatorsMap[$key]($this, $stack, $context);
+                    }
+                } else {
+                    return new EvaluationResult($result);
+                }
+            }
+
+            $result = $stack->pop();
+
+        } catch (Exception $exception) {
+
+            // FIXME: use some logging framework here?
+            error_log("Roxx Exception: Failed evaluate expression ${expression}: ${exception}");
+        }
+
+        return new EvaluationResult($result);
+    }
+}
