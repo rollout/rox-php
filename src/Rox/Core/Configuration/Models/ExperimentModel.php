@@ -45,11 +45,11 @@ class ExperimentModel
      * @param string $name
      * @param string $condition
      * @param bool $archived
-     * @param string[] $flags
-     * @param string[] $labels
+     * @param string[]|null $flags
+     * @param string[]|null $labels
      * @param bool $stickinessProperty
      */
-    public function __construct($id, $name, $condition, $archived, array $flags, array $labels, $stickinessProperty)
+    public function __construct($id, $name, $condition, $archived, $flags, $labels, $stickinessProperty)
     {
         $this->_id = $id;
         $this->_name = $name;

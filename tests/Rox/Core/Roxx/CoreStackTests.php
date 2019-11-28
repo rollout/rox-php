@@ -17,7 +17,7 @@ final class CoreStackTests extends TestCase
         $stack = new CoreStack();
         $stack->Push($testString);
 
-        $poppedItem = $stack->Pop();
+        $poppedItem = $stack->pop();
         $this->assertSame($testString, $poppedItem);
     }
 
@@ -26,7 +26,7 @@ final class CoreStackTests extends TestCase
         $testInt = 5;
         $stack = new CoreStack();
         $stack->Push($testInt);
-        $poppedItem = $stack->Pop();
+        $poppedItem = $stack->pop();
         $this->assertSame($poppedItem, $testInt);
     }
 
@@ -37,8 +37,8 @@ final class CoreStackTests extends TestCase
         $stack = new CoreStack();
         $stack->Push($testInt);
         $stack->Push($testString);
-        $poppedItemFirst = $stack->Pop();
-        $poppedItemSec = $stack->Pop();
+        $poppedItemFirst = $stack->pop();
+        $poppedItemSec = $stack->pop();
         $this->assertSame($poppedItemFirst, $testString);
         $this->assertSame($poppedItemSec, $testInt);
     }

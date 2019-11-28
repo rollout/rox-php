@@ -10,11 +10,11 @@ class EvaluationResult
 
     /**
      * EvaluationResult constructor.
-     * @param mixed $_value
+     * @param mixed $value
      */
-    public function __construct($_value)
+    public function __construct($value)
     {
-        $this->_value = $_value;
+        $this->_value = $value;
     }
 
     /**
