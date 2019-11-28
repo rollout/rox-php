@@ -9,14 +9,14 @@ class Node
     const TYPE_UNKNOWN = 3;
 
     /**
-     * @var int $type
+     * @var int $_type
      */
-    public $type;
+    private $_type;
 
     /**
-     * @var mixed $value
+     * @var mixed $_value
      */
-    public $value;
+    private $_value;
 
     /**
      * Node constructor.
@@ -25,7 +25,23 @@ class Node
      */
     public function __construct($type, $value)
     {
-        $this->type = $type;
-        $this->value = $value;
+        $this->_type = $type;
+        $this->_value = $value;
+    }
+
+    /**
+     * @return int
+     */
+    public function getType()
+    {
+        return $this->_type;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getValue()
+    {
+        return $this->_value;
     }
 }

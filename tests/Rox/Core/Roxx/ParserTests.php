@@ -23,10 +23,10 @@ class ParserTests extends TestCase
         $tokens = (new TokenizedExpression("eq(false, lt(-123, \"123\"))", $operators))->getTokens();
 
         $this->assertSame(5, count($tokens));
-        $this->assertSame(Node::TYPE_RATOR, $tokens[0]->type);
-        $this->assertSame(false, $tokens[1]->value);
-        $this->assertSame(-123, $tokens[3]->value);
-        $this->assertSame("123", $tokens[4]->value);
+        $this->assertSame(Node::TYPE_RATOR, $tokens[0]->getType());
+        $this->assertSame(false, $tokens[1]->getValue());
+        $this->assertSame(-123, $tokens[3]->getValue());
+        $this->assertSame("123", $tokens[4]->getValue());
     }
 
     public function testTokenType()

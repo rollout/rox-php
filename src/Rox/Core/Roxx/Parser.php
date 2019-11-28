@@ -195,10 +195,10 @@ class Parser implements ParserInterface
             foreach ($reverseTokens as $token) {
                 $node = $token;
 
-                if ($node->type == Node::TYPE_RAND) {
-                    $stack->push($node->value);
-                } else if ($node->type == Node::TYPE_RATOR) {
-                    $key = (string)$node->value;
+                if ($node->getType() == Node::TYPE_RAND) {
+                    $stack->push($node->getValue());
+                } else if ($node->getType() == Node::TYPE_RATOR) {
+                    $key = (string)$node->getValue();
                     if (array_key_exists($key, $this->_operatorsMap)) {
                         $this->_operatorsMap[$key]($this, $stack, $context);
                     }

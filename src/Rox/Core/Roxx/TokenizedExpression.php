@@ -112,14 +112,14 @@ class TokenizedExpression
     private function _pushNode($node)
     {
         if ($this->_dictAccumulator !== null && $this->_dictKey === null) {
-            $this->_dictKey = (string)$node->value;
+            $this->_dictKey = (string)$node->getValue();
         } else if ($this->_dictAccumulator !== null && $this->_dictKey !== null) {
             if (!isset($this->_dictAccumulator[$this->_dictKey])) {
-                $this->_dictAccumulator[$this->_dictKey] = $node->value;
+                $this->_dictAccumulator[$this->_dictKey] = $node->getValue();
                 $this->_dictKey = null;
             }
         } else if ($this->_arrayAccumulator !== null) {
-            array_push($this->_arrayAccumulator, $node->value);
+            array_push($this->_arrayAccumulator, $node->getValue());
         } else {
             array_push($this->_resultList, $node);
         }
