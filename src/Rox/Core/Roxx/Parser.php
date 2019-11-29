@@ -40,7 +40,7 @@ class Parser implements ParserInterface
                     $stack->push(false);
                     return;
                 }
-                $stack->push($op1 == TokenTypes::getInstance()->getUndefined());
+                $stack->push($op1 == TokenType::getUndefined());
             });
 
         $this->addOperator("now", function (ParserInterface $parser, StackInterface $stack, ContextInterface $context) {
@@ -53,11 +53,11 @@ class Parser implements ParserInterface
                 $op1 = $stack->pop();
                 $op2 = $stack->pop();
 
-                if (!is_bool($op1) && $op1 === TokenTypes::getInstance()->getUndefined()) {
+                if (!is_bool($op1) && $op1 === TokenType::getUndefined()) {
                     $op1 = false;
                 }
 
-                if (!is_bool($op2) && $op2 === TokenTypes::getInstance()->getUndefined()) {
+                if (!is_bool($op2) && $op2 === TokenType::getUndefined()) {
                     $op2 = false;
                 }
 
@@ -69,11 +69,11 @@ class Parser implements ParserInterface
                 $op1 = $stack->pop();
                 $op2 = $stack->pop();
 
-                if (!is_bool($op1) && $op1 === TokenTypes::getInstance()->getUndefined()) {
+                if (!is_bool($op1) && $op1 === TokenType::getUndefined()) {
                     $$op1 = false;
                 }
 
-                if (!is_bool($op2) && $op2 === TokenTypes::getInstance()->getUndefined()) {
+                if (!is_bool($op2) && $op2 === TokenType::getUndefined()) {
                     $op2 = false;
                 }
 
@@ -84,11 +84,11 @@ class Parser implements ParserInterface
             $op1 = $stack->pop();
             $op2 = $stack->pop();
 
-            if (!is_bool($op1) && $op1 === TokenTypes::getInstance()->getUndefined()) {
+            if (!is_bool($op1) && $op1 === TokenType::getUndefined()) {
                 $op1 = false;
             }
 
-            if (!is_bool($op2) && $op2 === TokenTypes::getInstance()->getUndefined()) {
+            if (!is_bool($op2) && $op2 === TokenType::getUndefined()) {
                 $op2 = false;
             }
 
@@ -99,11 +99,11 @@ class Parser implements ParserInterface
             $op1 = $stack->pop();
             $op2 = $stack->pop();
 
-            if (!is_bool($op1) && $op1 === TokenTypes::getInstance()->getUndefined()) {
+            if (!is_bool($op1) && $op1 === TokenType::getUndefined()) {
                 $op1 = false;
             }
 
-            if (!is_bool($op2) && $op2 === TokenTypes::getInstance()->getUndefined()) {
+            if (!is_bool($op2) && $op2 === TokenType::getUndefined()) {
                 $op2 = false;
             }
 
@@ -113,7 +113,7 @@ class Parser implements ParserInterface
         $this->addOperator("not",
             function (ParserInterface $parser, StackInterface $stack, ContextInterface $context) {
                 $op1 = $stack->pop();
-                if (!is_bool($op1) && $op1 === TokenTypes::getInstance()->getUndefined()) {
+                if (!is_bool($op1) && $op1 === TokenType::getUndefined()) {
                     $op1 = false;
                 }
                 $stack->push(!(boolean)$op1);
@@ -143,7 +143,7 @@ class Parser implements ParserInterface
         $this->addOperator("md5", function (ParserInterface $parser, StackInterface $stack, ContextInterface $context) {
             $op1 = $stack->pop();
             if (!is_string($op1)) {
-                $stack->push(TokenTypes::getInstance()->getUndefined());
+                $stack->push(TokenType::getUndefined());
                 return;
             }
             $stack->push(md5($op1));
@@ -153,7 +153,7 @@ class Parser implements ParserInterface
             $op1 = $stack->pop();
             $op2 = $stack->pop();
             if (!is_string($op1) || !is_string($op2)) {
-                $stack->push(TokenTypes::getInstance()->getUndefined());
+                $stack->push(TokenType::getUndefined());
                 return;
             }
 
@@ -163,7 +163,7 @@ class Parser implements ParserInterface
         $this->addOperator("b64d", function (ParserInterface $parser, StackInterface $stack, ContextInterface $context) {
             $op1 = $stack->pop();
             if (!is_string($op1)) {
-                $stack->push(TokenTypes::getInstance()->getUndefined());
+                $stack->push(TokenType::getUndefined());
                 return;
             }
 

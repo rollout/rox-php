@@ -31,22 +31,22 @@ class ParserTests extends TestCase
 
     public function testTokenType()
     {
-        $this->assertSame(TokenTypes::getInstance()->getNumber(), TokenTypes::getInstance()->fromToken("123"));
-        $this->assertSame(TokenTypes::getInstance()->getNumber(), TokenTypes::getInstance()->fromToken("-123"));
-        $this->assertSame(TokenTypes::getInstance()->getNumber(), TokenTypes::getInstance()->fromToken("-123.23"));
-        $this->assertSame(TokenTypes::getInstance()->getNumber(), TokenTypes::getInstance()->fromToken("123.23"));
+        $this->assertSame(TokenType::getNumber(), TokenType::fromToken("123"));
+        $this->assertSame(TokenType::getNumber(), TokenType::fromToken("-123"));
+        $this->assertSame(TokenType::getNumber(), TokenType::fromToken("-123.23"));
+        $this->assertSame(TokenType::getNumber(), TokenType::fromToken("123.23"));
 
-        $this->assertNotSame(TokenTypes::getInstance()->getString(), TokenTypes::getInstance()->fromToken("-123"));
-        $this->assertSame(TokenTypes::getInstance()->getString(), TokenTypes::getInstance()->fromToken("\"-123\""));
-        $this->assertSame(TokenTypes::getInstance()->getString(), TokenTypes::getInstance()->fromToken("\"undefined\""));
-        $this->assertNotSame(TokenTypes::getInstance()->getString(), TokenTypes::getInstance()->fromToken("undefined"));
+        $this->assertNotSame(TokenType::getString(), TokenType::fromToken("-123"));
+        $this->assertSame(TokenType::getString(), TokenType::fromToken("\"-123\""));
+        $this->assertSame(TokenType::getString(), TokenType::fromToken("\"undefined\""));
+        $this->assertNotSame(TokenType::getString(), TokenType::fromToken("undefined"));
 
-        $this->assertSame(TokenTypes::getInstance()->getBoolean(), TokenTypes::getInstance()->fromToken("false"));
-        $this->assertSame(TokenTypes::getInstance()->getBoolean(), TokenTypes::getInstance()->fromToken("true"));
-        $this->assertNotSame(TokenTypes::getInstance()->getBoolean(), TokenTypes::getInstance()->fromToken("undefined"));
+        $this->assertSame(TokenType::getBoolean(), TokenType::fromToken("false"));
+        $this->assertSame(TokenType::getBoolean(), TokenType::fromToken("true"));
+        $this->assertNotSame(TokenType::getBoolean(), TokenType::fromToken("undefined"));
 
-        $this->assertSame(TokenTypes::getInstance()->getUndefined(), TokenTypes::getInstance()->fromToken("undefined"));
-        $this->assertNotSame(TokenTypes::getInstance()->getUndefined(), TokenTypes::getInstance()->fromToken("false"));
+        $this->assertSame(TokenType::getUndefined(), TokenType::fromToken("undefined"));
+        $this->assertNotSame(TokenType::getUndefined(), TokenType::fromToken("false"));
     }
 
     public function testSimpleExpressionEvaluation()

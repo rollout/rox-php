@@ -84,13 +84,13 @@ class TokenizedExpression
             return new Node(Node::TYPE_RATOR, $o);
         } else if (is_string($o)) {
             $s = (string)$o;
-            $tokenType = TokenTypes::getInstance()->fromToken($s);
+            $tokenType = TokenType::fromToken($s);
             if ($s == Symbols::RoxxTrue) return new Node(Node::TYPE_RAND, true);
             if ($s == Symbols::RoxxFalse) return new Node(Node::TYPE_RAND, false);
-            if ($s == Symbols::RoxxUndefined) return new Node(Node::TYPE_RAND, TokenTypes::getInstance()->getUndefined());
-            if ($tokenType === TokenTypes::getInstance()->getString())
+            if ($s == Symbols::RoxxUndefined) return new Node(Node::TYPE_RAND, TokenType::getUndefined());
+            if ($tokenType === TokenType::getString())
                 return new Node(Node::TYPE_RAND, substr($s, 1, strlen($s) - 1));
-            if ($tokenType === TokenTypes::getInstance()->getNumber()) {
+            if ($tokenType === TokenType::getNumber()) {
                 if (is_numeric($s)) {
                     if (strpos($s, ".") !== false) {
                         return new Node(Node::TYPE_RAND, floatval($s));
@@ -99,7 +99,7 @@ class TokenizedExpression
                     }
                 } else {
                     throw new RuntimeException(sprintf("Excepted Number, got '%s' (%s)", $s,
-                        TokenTypes::getInstance()->fromToken($s)));
+                        TokenType::fromToken($s)));
                 }
             }
         }

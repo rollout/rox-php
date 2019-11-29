@@ -61,14 +61,14 @@ class PropertiesExtensions
                             }
                         }
                     }
-                    $stack->push(TokenTypes::getInstance()->getUndefined());
+                    $stack->push(TokenType::getUndefined());
                     return;
                 }
 
                 if ($property->getType() === CustomPropertyType::getString()) {
                     $value = $property->getValue()->generate($context);
                     if ($value == null) {
-                        $stack->push(TokenTypes::getInstance()->getUndefined());
+                        $stack->push(TokenType::getUndefined());
                     }
                     if ($value != null) {
                         $stack->push($value);
@@ -86,7 +86,7 @@ class PropertiesExtensions
                     return;
                 }
 
-                $stack->push(TokenTypes::getInstance()->getUndefined());
+                $stack->push(TokenType::getUndefined());
             });
     }
 }
