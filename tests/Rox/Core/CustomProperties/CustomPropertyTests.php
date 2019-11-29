@@ -84,20 +84,20 @@ class CustomPropertyTests extends TestCase
         $this->assertEquals($propSemver->getValue()->generate(null), "1.2.3");
     }
 
-    public function TestWillPassContext()
+    public function testWillPassContext()
     {
         $context = (new ContextBuilder())->build([
             "a" => 1
         ]);
 
-        $contextFromFunc = [];
-        $propString = new CustomProperty("prop1", CustomPropertyType::getString(), function (ContextInterface $c) {
-            array_push($contextFromFunc, $c);
+        $contextFromFunc = [null];
+        $propString = new CustomProperty("prop1", CustomPropertyType::getString(), function (ContextInterface $c) use (&$contextFromFunc) {
+            $contextFromFunc[0] = $c;
             return "123";
         });
 
-        $this->assertEquals($propString->getValue()($context), "123");
-        $this->assertEquals($contextFromFunc[0]['a'], 1);
+        $this->assertEquals($propString->getValue()->generate($context), "123");
+        $this->assertEquals($contextFromFunc[0]->get('a'), 1);
     }
 
     public function testDevicePropWilAddRoxToTheName()
