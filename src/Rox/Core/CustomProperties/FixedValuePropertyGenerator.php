@@ -27,6 +27,10 @@ class FixedValuePropertyGenerator implements CustomPropertyGeneratorInterface
      */
     function generate($context)
     {
+        if (is_callable($this->_value)) {
+            $func = $this->_value;
+            return $func($context);
+        }
         return $this->_value;
     }
 }
