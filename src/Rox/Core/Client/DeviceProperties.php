@@ -2,14 +2,15 @@
 
 namespace Rox\Core\Client;
 
+use Rox\Core\Consts\Build;
+use Rox\Core\Consts\Environment;
+use Rox\Core\Consts\PropertyType;
+
 class DeviceProperties implements DevicePropertiesInterface
 {
     const DEFAULT_LIB_VERSION = '1.0.0';
     const DEFAULT_DISTINCT_ID = 'stam'; // FIXME: what?
-    const ENV_VAR_NAME = 'ROLLOUT_MODE';
-    const ENV_PRODUCTION = 'PRODUCTION';
-    const ENV_QA = 'QA';
-    const ENV_LOCAL = 'LOCAL';
+    const BUILD_NUMBER = "50";
 
     /**
      * @var SdkSettingsInterface $_sdkSettings
@@ -26,7 +27,9 @@ class DeviceProperties implements DevicePropertiesInterface
      * @param SdkSettingsInterface $sdkSettings
      * @param RoxOptionsInterface $roxOptions
      */
-    public function __construct(SdkSettingsInterface $sdkSettings, RoxOptionsInterface $roxOptions)
+    public function __construct(
+        SdkSettingsInterface $sdkSettings,
+        RoxOptionsInterface $roxOptions)
     {
         $this->_sdkSettings = $sdkSettings;
         $this->_roxOptions = $roxOptions;
@@ -37,7 +40,32 @@ class DeviceProperties implements DevicePropertiesInterface
      */
     function GetAllProperties()
     {
-        // TODO: Implement GetAllProperties() method.
+        return [
+
+            PropertyType::getLibVersion()->getName() =>
+                $this->getLibVersion(),
+
+            PropertyType::getRolloutBuild()->getName() =>
+                self::BUILD_NUMBER, // TODO: fix the build number
+
+            PropertyType::getApiVersion()->getName() =>
+                Build::API_VERSION,
+
+            PropertyType::getAppRelease()->getName() =>
+                $this->_roxOptions->getVersion(), // used for the version filter
+
+            PropertyType::getDistinctId()->getName() =>
+                $this->getDistinctId(),
+
+            PropertyType::getAppKey()->getName() =>
+                $this->_sdkSettings->getApiKey(),
+
+            PropertyType::getPlatform()->getName() =>
+                Build::PLATFORM,
+
+            PropertyType::getDevModeSecret()->getName() =>
+                $this->_roxOptions->getDevModeKey()
+        ];
     }
 
     /**
@@ -45,9 +73,9 @@ class DeviceProperties implements DevicePropertiesInterface
      */
     function getRolloutEnvironment()
     {
-        $env = $_ENV[self::ENV_VAR_NAME];
-        if ($env != self::ENV_QA && $env != self::ENV_LOCAL) {
-            return self::ENV_PRODUCTION;
+        $env = $_ENV[Environment::ENV_VAR_NAME];
+        if ($env != Environment::QA && $env != Environment::LOCAL) {
+            return Environment::PRODUCTION;
         }
         return $env;
     }
@@ -73,6 +101,6 @@ class DeviceProperties implements DevicePropertiesInterface
      */
     function getRolloutKey()
     {
-        // TODO: Implement getRolloutKey() method.
+        return $this->getAllProperties()[PropertyType::getAppKey()->getName()];
     }
 }
