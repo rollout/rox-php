@@ -5,10 +5,10 @@ namespace Rox\Core\Context;
 class ContextBuilder
 {
     /**
-     * @param array $map
+     * @param array|null $map
      * @return ContextImp
      */
-    public function build(array $map)
+    public function build($map)
     {
         return new ContextImp($map);
     }

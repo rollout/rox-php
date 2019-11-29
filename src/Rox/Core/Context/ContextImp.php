@@ -31,6 +31,9 @@ class ContextImp implements ContextInterface
         if (!$key) {
             return null;
         }
-        return $this->_map[$key];
+        if (array_key_exists($key, $this->_map)) {
+            return $this->_map[$key];
+        }
+        return null;
     }
 }
