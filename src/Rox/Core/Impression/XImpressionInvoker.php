@@ -38,18 +38,18 @@ class XImpressionInvoker implements ImpressionInvokerInterface
 
     /**
      * XImpressionInvoker constructor.
-     * @param InternalFlagsInterface $_internalFlags
-     * @param CustomPropertyRepositoryInterface|null $_customPropertyRepository
-     * @param ClientInterface|null $_analyticsClient
+     * @param InternalFlagsInterface $internalFlags
+     * @param CustomPropertyRepositoryInterface|null $customPropertyRepository
+     * @param ClientInterface|null $analyticsClient
      */
     public function __construct(
-        InternalFlagsInterface $_internalFlags,
-        $_customPropertyRepository,
-        $_analyticsClient)
+        InternalFlagsInterface $internalFlags,
+        $customPropertyRepository,
+        $analyticsClient)
     {
-        $this->_customPropertyRepository = $_customPropertyRepository;
-        $this->_internalFlags = $_internalFlags;
-        $this->_analyticsClient = $_analyticsClient;
+        $this->_customPropertyRepository = $customPropertyRepository;
+        $this->_internalFlags = $internalFlags;
+        $this->_analyticsClient = $analyticsClient;
     }
 
     /**
