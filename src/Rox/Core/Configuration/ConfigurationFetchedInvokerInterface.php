@@ -21,7 +21,7 @@ interface ConfigurationFetchedInvokerInterface
     function invokeWithError($error);
 
     /**
-     * @param ConfigurationFetchedEventHandlerInterface $handler
+     * @param callable $handler
      */
-    function register(ConfigurationFetchedEventHandlerInterface $handler);
+    function register(callable $handler);
 }

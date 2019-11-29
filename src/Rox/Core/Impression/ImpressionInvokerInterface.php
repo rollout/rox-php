@@ -9,9 +9,9 @@ use Rox\Core\Impression\Models\ReportingValue;
 interface ImpressionInvokerInterface
 {
     /**
-     * @param ImpressionEventHandlerInterface $handler
+     * @param callable $handler
      */
-    function register(ImpressionEventHandlerInterface $handler);
+    function register(callable $handler);
 
     /**
      * @param ReportingValue $value

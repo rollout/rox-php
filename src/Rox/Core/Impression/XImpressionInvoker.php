@@ -32,7 +32,7 @@ class XImpressionInvoker implements ImpressionInvokerInterface
     private $_analyticsClient;
 
     /**
-     * @var ImpressionEventHandlerInterface[] $_eventHandlers
+     * @var callable[] $_eventHandlers
      */
     private $_eventHandlers = [];
 
@@ -53,9 +53,9 @@ class XImpressionInvoker implements ImpressionInvokerInterface
     }
 
     /**
-     * @param ImpressionEventHandlerInterface $handler
+     * @param callable $handler
      */
-    function register(ImpressionEventHandlerInterface $handler)
+    function register(callable $handler)
     {
         if ($handler == null) {
             return;
@@ -110,7 +110,7 @@ class XImpressionInvoker implements ImpressionInvokerInterface
     private function _fireImpression(ImpressionArgs $args)
     {
         foreach ($this->_eventHandlers as $handler) {
-            $handler->handleEvent($args);
+            $handler($this, $args);
         }
     }
 }

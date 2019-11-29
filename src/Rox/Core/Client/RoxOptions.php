@@ -2,10 +2,8 @@
 
 namespace Rox\Core\Client;
 
-use Rox\Core\Configuration\ConfigurationFetchedEventHandlerInterface;
 use Rox\Core\CustomProperties\DefaultDynamicPropertiesRule;
 use Rox\Core\CustomProperties\DynamicPropertiesRuleInterface;
-use Rox\Core\Impression\ImpressionEventHandlerInterface;
 
 class RoxOptions implements RoxOptionsInterface
 {
@@ -25,12 +23,12 @@ class RoxOptions implements RoxOptionsInterface
     private $_fetchInterval;
 
     /**
-     * @var ImpressionEventHandlerInterface|null
+     * @var callable|null
      */
     private $_impressionHandler;
 
     /**
-     * @var ConfigurationFetchedEventHandlerInterface|null $_configurationFetchedHandler
+     * @var callable|null
      */
     private $_configurationFetchedHandler;
 
@@ -78,7 +76,7 @@ class RoxOptions implements RoxOptionsInterface
     }
 
     /**
-     * @return ImpressionEventHandlerInterface|null
+     * @return callable|null
      */
     function getImpressionHandler()
     {
@@ -86,7 +84,7 @@ class RoxOptions implements RoxOptionsInterface
     }
 
     /**
-     * @return ConfigurationFetchedEventHandlerInterface|null
+     * @return callable|null
      */
     function getConfigurationFetchedHandler()
     {

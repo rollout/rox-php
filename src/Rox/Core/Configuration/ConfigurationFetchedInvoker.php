@@ -7,7 +7,7 @@ use DateTime;
 class ConfigurationFetchedInvoker implements ConfigurationFetchedInvokerInterface
 {
     /**
-     * @var ConfigurationFetchedEventHandlerInterface[] $_eventHandlers
+     * @var callable[] $_eventHandlers
      */
     private $_eventHandlers = [];
 
@@ -36,11 +36,13 @@ class ConfigurationFetchedInvoker implements ConfigurationFetchedInvokerInterfac
     }
 
     /**
-     * @param ConfigurationFetchedEventHandlerInterface $handler
+     * @param callable $handler
      */
-    function register(ConfigurationFetchedEventHandlerInterface $handler)
+    function register(callable $handler)
     {
-        $this->addEventHandler($handler);
+        if (array_search($handler, $this->_eventHandlers) === false) {
+            array_push($this->_eventHandlers, $handler);
+        }
     }
 
     /**
@@ -49,28 +51,7 @@ class ConfigurationFetchedInvoker implements ConfigurationFetchedInvokerInterfac
     private function _fireConfigurationFetched(ConfigurationFetchedArgs $args)
     {
         foreach ($this->_eventHandlers as $eventHandler) {
-            $eventHandler->handleEvent($args);
-        }
-    }
-
-    /**
-     * @param ConfigurationFetchedEventHandlerInterface $eventHandler
-     */
-    private function addEventHandler(ConfigurationFetchedEventHandlerInterface $eventHandler)
-    {
-        if (array_search($eventHandler, $this->_eventHandlers) === false) {
-            array_push($this->_eventHandlers, $eventHandler);
-        }
-    }
-
-    /**
-     * @param ConfigurationFetchedEventHandlerInterface $eventHandler
-     */
-    private function removeEventHandler(ConfigurationFetchedEventHandlerInterface $eventHandler)
-    {
-        $index = array_search($eventHandler, $this->_eventHandlers);
-        if ($index !== false) {
-            array_splice($this->_eventHandlers, $index, 1);
+            $eventHandler($this, $args);
         }
     }
 }
