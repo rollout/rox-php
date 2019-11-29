@@ -3,8 +3,8 @@
 namespace Rox\Core\Roxx;
 
 use Exception;
+use Rox\Core\Context\ContextBuilder;
 use Rox\Core\Context\ContextInterface;
-use Rox\Core\Context\DummyContext;
 
 class Parser implements ParserInterface
 {
@@ -182,7 +182,7 @@ class Parser implements ParserInterface
     public function evaluateExpression($expression, $context = null)
     {
         if ($context == null) {
-            $context = new DummyContext(); // Don't pass nulls anywhere, it's a bad practice.
+            $context = (new ContextBuilder())->build(); // Don't pass nulls anywhere, it's a bad practice.
         }
 
         $stack = new CoreStack();
