@@ -3,6 +3,7 @@
 namespace Rox\Core\Repositories;
 
 use Rox\Core\CustomProperties\FlagAddedCallbackInterface;
+use Rox\Core\Entities\Flag;
 use Rox\Core\Entities\Variant;
 
 interface FlagRepositoryInterface

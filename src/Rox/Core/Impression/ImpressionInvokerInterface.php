@@ -9,15 +9,15 @@ use Rox\Core\Impression\Models\ReportingValue;
 interface ImpressionInvokerInterface
 {
     /**
+     * @param ImpressionEventHandlerInterface $handler
+     */
+    function register(ImpressionEventHandlerInterface $handler);
+
+    /**
      * @param ReportingValue $value
      * @param ExperimentModel $experiment
      * @param ContextInterface $context
      * @return mixed
      */
     function invoke(ReportingValue $value, ExperimentModel $experiment, ContextInterface $context);
-
-    /**
-     * @param ImpressionEventHandlerInterface $handler
-     */
-    function register(ImpressionEventHandlerInterface $handler);
 }

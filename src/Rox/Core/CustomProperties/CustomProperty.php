@@ -63,7 +63,6 @@ class CustomProperty implements CustomPropertyInterface
      */
     public function __toString()
     {
-        // TODO: add ext-json to composer.json?
         return json_encode([
             "name" => $this->_name,
             "type" => $this->_type,

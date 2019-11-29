@@ -9,7 +9,7 @@ use Rox\Core\Entities\Variant;
 class FlagRepository implements FlagRepositoryInterface
 {
     /**
-     * @var Variant[] $_variants
+     * @var array $_variants
      */
     private $_variants = [];
 
@@ -30,7 +30,7 @@ class FlagRepository implements FlagRepositoryInterface
         }
 
         $this->_variants[$name] = $variant;
-        $this->fireFlagAdded($variant);
+        $this->_fireFlagAdded($variant);
     }
 
     /**
@@ -58,13 +58,13 @@ class FlagRepository implements FlagRepositoryInterface
      */
     function addFlagAddedCallback($callback)
     {
-        array_push($_callbacks, $callback);
+        array_push($this->_callbacks, $callback);
     }
 
     /**
      * @param Variant $variant
      */
-    private function fireFlagAdded($variant)
+    private function _fireFlagAdded($variant)
     {
         foreach ($this->_callbacks as $callback) {
             $callback->onFlagAdded($this, new FlagAddedCallbackArgs($variant));

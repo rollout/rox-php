@@ -35,7 +35,7 @@ class ExperimentModel
     private $_labels;
 
     /**
-     * @var bool $_stickinessProperty
+     * @var string $_stickinessProperty
      */
     private $_stickinessProperty;
 
@@ -47,7 +47,7 @@ class ExperimentModel
      * @param bool $archived
      * @param string[]|null $flags
      * @param string[]|null $labels
-     * @param bool $stickinessProperty
+     * @param string $stickinessProperty
      */
     public function __construct($id, $name, $condition, $archived, $flags, $labels, $stickinessProperty)
     {
@@ -109,9 +109,9 @@ class ExperimentModel
     }
 
     /**
-     * @return bool
+     * @return string
      */
-    public function isStickinessProperty()
+    public function getStickinessProperty()
     {
         return $this->_stickinessProperty;
     }

@@ -11,5 +11,5 @@ interface FlagAddedCallbackInterface
      * @param FlagAddedCallbackArgs $args
      * @return void
      */
-    function onFlagAdded($repository, $args);
+    function onFlagAdded(FlagRepositoryInterface $repository, FlagAddedCallbackArgs $args);
 }

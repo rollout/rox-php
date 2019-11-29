@@ -26,9 +26,11 @@ class ExperimentRepository implements ExperimentRepositoryInterface
      */
     function getExperimentByFlag($flagName)
     {
-        return array_filter($this->_experiments, function (ExperimentModel $e) use ($flagName) {
-            return array_search($flagName, $e->getFlags()) >= 0;
-        })[0];
+        $exp = array_filter($this->_experiments, function (ExperimentModel $e) use ($flagName) {
+            $index = array_search($flagName, $e->getFlags());
+            return $index !== false && $index >= 0;
+        });
+        return count($exp) > 0 ? $exp[0] : null;
     }
 
     /**

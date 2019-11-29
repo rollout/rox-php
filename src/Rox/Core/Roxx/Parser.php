@@ -5,6 +5,7 @@ namespace Rox\Core\Roxx;
 use Exception;
 use Rox\Core\Context\ContextBuilder;
 use Rox\Core\Context\ContextInterface;
+use Rox\Core\Utils\TimeUtils;
 
 class Parser implements ParserInterface
 {
@@ -44,7 +45,7 @@ class Parser implements ParserInterface
             });
 
         $this->addOperator("now", function (ParserInterface $parser, StackInterface $stack, ContextInterface $context) {
-            $stack->push(floor(microtime(true) * 1000));
+            $stack->push(TimeUtils::currentTimeMillis());
         });
 
         $this->addOperator("and",
@@ -70,7 +71,7 @@ class Parser implements ParserInterface
                 $op2 = $stack->pop();
 
                 if (!is_bool($op1) && $op1 === TokenType::getUndefined()) {
-                    $$op1 = false;
+                    $op1 = false;
                 }
 
                 if (!is_bool($op2) && $op2 === TokenType::getUndefined()) {

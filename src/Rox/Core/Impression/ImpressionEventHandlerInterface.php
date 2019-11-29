@@ -5,7 +5,7 @@ namespace Rox\Core\Impression;
 interface ImpressionEventHandlerInterface
 {
     /**
-     * @param ImpressionEventHandlerArgs $args
+     * @param ImpressionArgs $args
      */
-    function handleEvent(ImpressionEventHandlerArgs $args);
+    function handleEvent(ImpressionArgs $args);
 }

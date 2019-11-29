@@ -6,7 +6,7 @@ use Rox\Core\Context\ContextInterface;
 use Rox\Core\Impression\Models\Experiment;
 use Rox\Core\Impression\Models\ReportingValue;
 
-class ImpressionEventHandlerArgs
+class ImpressionArgs
 {
     /**
      * @var ReportingValue $_reportingValue
@@ -24,7 +24,7 @@ class ImpressionEventHandlerArgs
     private $_context;
 
     /**
-     * ImpressionEventHandlerArgs constructor.
+     * ImpressionArgs constructor.
      * @param ReportingValue $_reportingValue
      * @param Experiment $_experiment
      * @param ContextInterface $_context
