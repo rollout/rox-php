@@ -3,7 +3,7 @@
 namespace Rox\Core\Roxx;
 
 use Rox\Core\Context\ContextInterface;
-use Rox\Core\CustomProperties\CustomPropertyTypes;
+use Rox\Core\CustomProperties\CustomPropertyType;
 use Rox\Core\CustomProperties\DynamicPropertiesInterface;
 use Rox\Core\Repositories\CustomPropertyRepositoryInterface;
 
@@ -65,7 +65,7 @@ class PropertiesExtensions
                     return;
                 }
 
-                if ($property->getType() === CustomPropertyTypes::getInstance()->getString()) {
+                if ($property->getType() === CustomPropertyType::getString()) {
                     $value = $property->getValue()->generate($context);
                     if ($value == null) {
                         $stack->push(TokenTypes::getInstance()->getUndefined());
@@ -76,9 +76,9 @@ class PropertiesExtensions
                     return;
                 }
 
-                if ($property->getType() === CustomPropertyTypes::getInstance()->getInt() ||
-                    $property->getType() === CustomPropertyTypes::getInstance()->getDouble() ||
-                    $property->getType() === CustomPropertyTypes::getInstance()->getBool()) {
+                if ($property->getType() === CustomPropertyType::getInt() ||
+                    $property->getType() === CustomPropertyType::getDouble() ||
+                    $property->getType() === CustomPropertyType::getBool()) {
                     $value = $property->getValue()->generate($context);
                     if ($value != null) {
                         $stack->push($value);

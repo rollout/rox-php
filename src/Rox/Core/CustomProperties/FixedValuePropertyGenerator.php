@@ -22,7 +22,7 @@ class FixedValuePropertyGenerator implements CustomPropertyGeneratorInterface
     }
 
     /**
-     * @param ContextInterface $context
+     * @param ContextInterface|null $context
      * @return mixed
      */
     function generate($context)

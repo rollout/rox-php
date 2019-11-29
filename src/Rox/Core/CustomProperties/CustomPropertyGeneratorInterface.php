@@ -7,7 +7,7 @@ use Rox\Core\Context\ContextInterface;
 interface CustomPropertyGeneratorInterface
 {
     /**
-     * @param ContextInterface $context
+     * @param ContextInterface|null $context
      * @return mixed
      */
     function generate($context);
