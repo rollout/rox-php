@@ -8,8 +8,7 @@ PHP 5.5 or later.
 
 ## Development
 
-### Composer
-
+### Prerequisites
 
 Install composer using these guidelines: https://getcomposer.org/doc/00-intro.md.
 
