@@ -7,7 +7,7 @@ interface DevicePropertiesInterface
     /**
      * @return array
      */
-    function GetAllProperties();
+    function getAllProperties();
 
     /**
      * @return string

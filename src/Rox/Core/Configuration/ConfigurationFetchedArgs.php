@@ -24,7 +24,7 @@ class ConfigurationFetchedArgs
 
     /**
      * @var int $_errorDetails
-     * @see FetchedError
+     * @see FetcherError
      */
     private $_errorDetails;
 
@@ -36,7 +36,7 @@ class ConfigurationFetchedArgs
      * @param bool $_hasChanges
      */
     public function __construct(
-        $_errorDetails = FetchedError::NoError,
+        $_errorDetails = FetcherError::NoError,
         $_fetcherStatus = FetcherStatus::ErrorFetchedFailed,
         DateTime $_creationDate = null,
         $_hasChanges = false)

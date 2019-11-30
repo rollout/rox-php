@@ -20,7 +20,7 @@ class ConfigurationFetchedInvoker implements ConfigurationFetchedInvokerInterfac
     function invoke($fetcherStatus, DateTime $creationDate, $hasChanges)
     {
         $this->_fireConfigurationFetched(new ConfigurationFetchedArgs(
-            FetchedError::NoError,
+            FetcherError::NoError,
             $fetcherStatus,
             $creationDate,
             $hasChanges));
@@ -28,7 +28,7 @@ class ConfigurationFetchedInvoker implements ConfigurationFetchedInvokerInterfac
 
     /**
      * @param int $error
-     * @see FetchedError
+     * @see FetcherError
      */
     function invokeWithError($error)
     {

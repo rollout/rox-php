@@ -16,7 +16,7 @@ interface ConfigurationFetchedInvokerInterface
 
     /**
      * @param int $error
-     * @see FetchedError
+     * @see FetcherError
      */
     function invokeWithError($error);
 

@@ -38,7 +38,7 @@ class DeviceProperties implements DevicePropertiesInterface
     /**
      * @return array
      */
-    function GetAllProperties()
+    function getAllProperties()
     {
         return [
 

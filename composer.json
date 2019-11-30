@@ -1,19 +1,34 @@
 {
   "autoload": {
+    "psr-4": {
+      "\\": "src/"
+    },
     "classmap": [
       "src/"
     ]
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "\\": "tests/"
+    }
   },
   "config": {
     "platform": {
       "php": "5.5"
     }
   },
+  "require": {
+    "php": ">=5.5",
+    "ext-json": "*",
+    "guzzlehttp/guzzle": "^6.4",
+    "psr/http-message": "^1.0"
+  },
   "require-dev": {
     "phpunit/phpunit": "^4",
     "mockery/mockery": "^0.9.11"
   },
-  "require": {
-    "ext-json": "*"
+  "scripts": {
+    "test": "SHELL_INTERACTIVE=1 \"vendor/bin/phpunit\" --coverage-text ",
+    "test-ci": "\"vendor/bin/phpunit\" --stop-on-failure --coverage-clover=build/coverage.xml"
   }
 }
