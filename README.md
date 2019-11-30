@@ -17,11 +17,7 @@ After installation proceed to the project root directory and run
 
 ```
 composer update
-```
-
-NOTE: this command generates `vendor/autoload.php` script from the project sources. 
-So each time some new class is added to the project you should run this command 
-before executing tests (see below).  
+```  
 
 ### Tests
 
