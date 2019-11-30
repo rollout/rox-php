@@ -46,7 +46,7 @@ class Event
         $this->_experimentVersion = '0';
         $this->_type = 'IMPRESSION';
         $time = TimeUtils::currentTimeMillis();
-        $ms = $_ENV['rox.analytics.ms'];
+        $ms = isset($_ENV['rox.analytics.ms']) ? $_ENV['rox.analytics.ms'] : null;
         if ($ms) {
             $time = floatval($ms);
         }
@@ -68,6 +68,7 @@ class Event
     public function setFlag($flag)
     {
         $this->_flag = $flag;
+        return $this;
     }
 
     /**

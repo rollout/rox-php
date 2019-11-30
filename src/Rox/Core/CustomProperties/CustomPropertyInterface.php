@@ -18,7 +18,7 @@ interface CustomPropertyInterface
     function getType();
 
     /**
-     * @return CustomPropertyGeneratorInterface
+     * @return callable
      */
     function getValue();
 }

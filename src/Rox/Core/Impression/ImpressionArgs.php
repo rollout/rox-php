@@ -26,13 +26,13 @@ class ImpressionArgs
     /**
      * ImpressionArgs constructor.
      * @param ReportingValue $_reportingValue
-     * @param Experiment $_experiment
-     * @param ContextInterface $_context
+     * @param Experiment|null $_experiment
+     * @param ContextInterface|null $_context
      */
     public function __construct(
         ReportingValue $_reportingValue,
-        Experiment $_experiment,
-        ContextInterface $_context)
+        $_experiment,
+        $_context)
     {
         $this->_reportingValue = $_reportingValue;
         $this->_experiment = $_experiment;

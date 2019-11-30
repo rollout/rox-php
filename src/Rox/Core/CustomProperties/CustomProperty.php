@@ -15,7 +15,7 @@ class CustomProperty implements CustomPropertyInterface
     private $_name;
 
     /**
-     * @var CustomPropertyGeneratorInterface $_value
+     * @var callable $_value
      */
     private $_value;
 
@@ -23,15 +23,17 @@ class CustomProperty implements CustomPropertyInterface
      * CustomProperty constructor.
      * @param string $name
      * @param CustomPropertyType $type
-     * @param CustomPropertyGeneratorInterface|mixed $generator
+     * @param callable|mixed $value
      */
-    public function __construct($name, CustomPropertyType $type, $generator)
+    public function __construct($name, CustomPropertyType $type, $value)
     {
         $this->_type = $type;
         $this->_name = $name;
-        $this->_value = ($generator instanceof CustomPropertyGeneratorInterface)
-            ? $generator
-            : new FixedValuePropertyGenerator($generator);
+        $this->_value = is_callable($value)
+            ? $value
+            : function ($context) use ($value) {
+                return $value;
+            };
     }
 
     /**
@@ -51,7 +53,7 @@ class CustomProperty implements CustomPropertyInterface
     }
 
     /**
-     * @return CustomPropertyGeneratorInterface
+     * @return callable
      */
     public function getValue()
     {

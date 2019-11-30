@@ -40,5 +40,40 @@ class Experiment
         $this->_labels = (new ArrayObject($experiment->getLabels()))->getArrayCopy();
     }
 
+    /**
+     * @return string
+     */
+    public function getName()
+    {
+        return $this->_name;
+    }
 
+    /**
+     * @return string
+     */
+    public function getIdentifier()
+    {
+        return $this->_identifier;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isArchived()
+    {
+        return $this->_archived;
+    }
+
+    /**
+     * @return string[]
+     */
+    public function getLabels()
+    {
+        return $this->_labels;
+    }
+
+    public function __toString()
+    {
+        return $this->_name;
+    }
 }

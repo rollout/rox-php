@@ -67,10 +67,10 @@ class XImpressionInvoker implements ImpressionInvokerInterface
 
     /**
      * @param ReportingValue $value
-     * @param ExperimentModel $experiment
-     * @param ContextInterface $context
+     * @param ExperimentModel|null $experiment
+     * @param ContextInterface|null $context
      */
-    function invoke(ReportingValue $value, ExperimentModel $experiment, ContextInterface $context)
+    function invoke(ReportingValue $value, $experiment, $context)
     {
         try {
             $internalExperiment = $this->_internalFlags->isEnabled('rox.internal.analytics');
@@ -81,7 +81,7 @@ class XImpressionInvoker implements ImpressionInvokerInterface
                 }
                 $distinctId = '(null_distinct_id';
                 if ($prop != null && $prop->getType() === CustomPropertyType::getString()) {
-                    $propDistinctId = $prop->getValue()->generate($context);
+                    $propDistinctId = $prop->getValue()($context);
                     if ($propDistinctId !== null) {
                         $distinctId = $propDistinctId;
                     }
