@@ -28,5 +28,5 @@ From the project root run
 
 ```
 composer update
-php vendor/phpunit/phpunit/phpunit --test-suffix Tests.php --no-configuration tests
+composer test
 ```

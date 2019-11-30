@@ -28,7 +28,6 @@
     "mockery/mockery": "^0.9.11"
   },
   "scripts": {
-    "test": "SHELL_INTERACTIVE=1 \"vendor/bin/phpunit\" --coverage-text ",
-    "test-ci": "\"vendor/bin/phpunit\" --stop-on-failure --coverage-clover=build/coverage.xml"
+    "test": "phpunit"
   }
 }
