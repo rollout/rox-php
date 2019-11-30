@@ -6,9 +6,10 @@ Rox SDK for PHP
 
 PHP 5.5 or later.
 
-## Installation
+## Development
 
 ### Composer
+
 
 Install composer using these guidelines: https://getcomposer.org/doc/00-intro.md.
 
@@ -22,7 +23,7 @@ NOTE: this command generates `vendor/autoload.php` script from the project sourc
 So each time some new class is added to the project you should run this command 
 before executing tests (see below).  
 
-## Tests
+### Tests
 
 From the project root run
 
