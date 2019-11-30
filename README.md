@@ -10,7 +10,7 @@ PHP 5.5 or later.
 
 ### Prerequisites
 
-Install composer using these guidelines: https://getcomposer.org/doc/00-intro.md.
+Install `composer` using these guidelines: https://getcomposer.org/doc/00-intro.md.
 
 After installation proceed to the project root directory and run
 
