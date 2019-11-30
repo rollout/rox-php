@@ -9,6 +9,12 @@ use Rox\Core\Client\SdkSettingsInterface;
 
 class CoreTests extends TestCase
 {
+    protected function tearDown()
+    {
+        parent::tearDown();
+        \Mockery::close();
+    }
+
     public function testWillCheckNullApiKey()
     {
         $mockedSdkSettings = \Mockery::mock(SdkSettingsInterface::class);

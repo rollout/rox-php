@@ -11,6 +11,12 @@ use Rox\Core\Roxx\ParserInterface;
 
 class VariantTests extends TestCase
 {
+    protected function tearDown()
+    {
+        parent::tearDown();
+        \Mockery::close();
+    }
+
     public function testWillNotAddDefaultToOptionsIfExists()
     {
         $variant = new Variant('1', ['1', '2', '3']);

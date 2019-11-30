@@ -12,6 +12,12 @@ use Rox\Core\Roxx\ParserInterface;
 
 class InternalFlagsTests extends TestCase
 {
+    protected function tearDown()
+    {
+        parent::tearDown();
+        \Mockery::close();
+    }
+
     public function testWillReturnFalseWhenNoExperiment()
     {
         $parser = \Mockery::mock(ParserInterface::class);

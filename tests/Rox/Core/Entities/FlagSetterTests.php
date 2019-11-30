@@ -13,6 +13,12 @@ use Rox\Core\Roxx\ParserInterface;
 
 class FlagSetterTests extends TestCase
 {
+    protected function tearDown()
+    {
+        parent::tearDown();
+        \Mockery::close();
+    }
+
     public function testWillSetFlagData()
     {
         $flagRepo = new FlagRepository();
