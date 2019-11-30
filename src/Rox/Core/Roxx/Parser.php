@@ -3,12 +3,19 @@
 namespace Rox\Core\Roxx;
 
 use Exception;
+use Psr\Log\LoggerInterface;
 use Rox\Core\Context\ContextBuilder;
 use Rox\Core\Context\ContextInterface;
+use Rox\Core\Logging\LoggerFactory;
 use Rox\Core\Utils\TimeUtils;
 
 class Parser implements ParserInterface
 {
+    /**
+     * @var LoggerInterface
+     */
+    private $_log;
+
     /**
      * @var array $_operatorsMap
      */
@@ -20,6 +27,7 @@ class Parser implements ParserInterface
      */
     public function __construct()
     {
+        $this->_log = LoggerFactory::getInstance()->createLogger(self::class);
         $this->_setBasicOperators();
     }
 
@@ -212,8 +220,9 @@ class Parser implements ParserInterface
 
         } catch (Exception $exception) {
 
-            // FIXME: use some logging framework here?
-            error_log("Roxx Exception: Failed evaluate expression ${expression}: ${exception}");
+            $this->_log->warning("Roxx Exception: Failed evaluate expression ${expression}", [
+                'exception' => $exception
+            ]);
         }
 
         return new EvaluationResult($result);

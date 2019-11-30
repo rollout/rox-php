@@ -2,8 +2,6 @@
 
 namespace Rox\Core\Network;
 
-use Psr\Http\Message\ResponseInterface;
-
 /**
  * HTTP client abstraction. Would help to avoid
  * direct dependencies on Guzzle for example.
@@ -14,20 +12,20 @@ interface HttpClientInterface
 {
     /**
      * @param RequestData $requestData
-     * @return ResponseInterface
+     * @return HttpResponseInterface
      */
     function sendGet(RequestData $requestData);
 
     /**
      * @param RequestData $requestData
-     * @return ResponseInterface
+     * @return HttpResponseInterface
      */
     function sendPost(RequestData $requestData);
 
     /**
      * @param string $uri
      * @param StringContent $content
-     * @return ResponseInterface
+     * @return HttpResponseInterface
      */
     function postContent($uri, StringContent $content);
 }

@@ -11,13 +11,13 @@ class ConfigurationFetchResult
     private $_source;
 
     /**
-     * @var object $_parsedData
+     * @var array $_parsedData
      */
     private $_parsedData;
 
     /**
      * ConfigurationFetchResult constructor.
-     * @param object $parsedData
+     * @param array $parsedData
      * @param int $source
      */
     public function __construct($parsedData, $source)
@@ -35,7 +35,7 @@ class ConfigurationFetchResult
     }
 
     /**
-     * @return object
+     * @return array
      */
     public function getParsedData()
     {

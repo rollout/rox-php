@@ -2,19 +2,13 @@
 
 namespace Rox\Core;
 
-use PHPUnit\Framework\TestCase;
 use Rox\Core\Client\DevicePropertiesInterface;
 use Rox\Core\Client\RoxOptionsInterface;
 use Rox\Core\Client\SdkSettingsInterface;
+use Rox\RoxTestCase;
 
-class CoreTests extends TestCase
+class CoreTests extends RoxTestCase
 {
-    protected function tearDown()
-    {
-        parent::tearDown();
-        \Mockery::close();
-    }
-
     public function testWillCheckNullApiKey()
     {
         $mockedSdkSettings = \Mockery::mock(SdkSettingsInterface::class);

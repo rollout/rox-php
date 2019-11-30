@@ -2,19 +2,19 @@
 
 namespace Rox\Core\Roxx;
 
-use PHPUnit\Framework\TestCase;
 use Rox\Core\CustomProperties\CustomPropertyRepository;
 use Rox\Core\CustomProperties\DynamicProperties;
 use Rox\Core\Repositories\ExperimentRepository;
 use Rox\Core\Repositories\FlagRepository;
 use Rox\Core\Repositories\TargetGroupRepository;
+use Rox\RoxTestCase;
 
 /**
  * Class ParserTest
  * @package Rox\Core\Roxx
  * @covers Parser
  */
-class ParserTests extends TestCase
+class ParserTests extends RoxTestCase
 {
     public function testSimpleTokenization()
     {

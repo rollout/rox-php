@@ -2,9 +2,9 @@
 
 namespace Rox\Core\Context;
 
-use PHPUnit\Framework\TestCase;
+use Rox\RoxTestCase;
 
-class ContextImpTests extends TestCase
+class ContextImpTests extends RoxTestCase
 {
     public function testContextWillReturnValue()
     {

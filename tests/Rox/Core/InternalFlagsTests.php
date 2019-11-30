@@ -2,22 +2,16 @@
 
 namespace Rox\Core;
 
-use PHPUnit\Framework\TestCase;
 use Rox\Core\Client\InternalFlags;
 use Rox\Core\Configuration\Models\ExperimentModel;
 use Rox\Core\Entities\Flag;
 use Rox\Core\Repositories\ExperimentRepositoryInterface;
 use Rox\Core\Roxx\EvaluationResult;
 use Rox\Core\Roxx\ParserInterface;
+use Rox\RoxTestCase;
 
-class InternalFlagsTests extends TestCase
+class InternalFlagsTests extends RoxTestCase
 {
-    protected function tearDown()
-    {
-        parent::tearDown();
-        \Mockery::close();
-    }
-
     public function testWillReturnFalseWhenNoExperiment()
     {
         $parser = \Mockery::mock(ParserInterface::class);

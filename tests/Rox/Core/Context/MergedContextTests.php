@@ -2,9 +2,9 @@
 
 namespace Rox\Core\Context;
 
-use PHPUnit\Framework\TestCase;
+use Rox\RoxTestCase;
 
-class MergedContextTests extends TestCase
+class MergedContextTests extends RoxTestCase
 {
     public function testWithNullLocalContext()
     {

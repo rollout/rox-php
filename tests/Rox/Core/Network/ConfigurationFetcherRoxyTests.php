@@ -3,21 +3,14 @@
 namespace Rox\Core\Network;
 
 use Exception;
-use PHPUnit\Framework\TestCase;
-use Psr\Http\Message\ResponseInterface;
 use Rox\Core\Client\BUIDInterface;
 use Rox\Core\Client\DevicePropertiesInterface;
 use Rox\Core\Configuration\ConfigurationFetchedInvoker;
 use Rox\Core\Reporting\ErrorReporterInterface;
+use Rox\RoxTestCase;
 
-class ConfigurationFetcherRoxyTests extends TestCase
+class ConfigurationFetcherRoxyTests extends RoxTestCase
 {
-    protected function tearDown()
-    {
-        parent::tearDown();
-        \Mockery::close();
-    }
-
     private $_dp;
     private $_bu;
 
@@ -49,16 +42,9 @@ class ConfigurationFetcherRoxyTests extends TestCase
             $numberOfTimersCalled[0]++;
         });
 
-        $response = \Mockery::mock(ResponseInterface::class)
-            ->shouldReceive([
-                'getStatusCode' => 200,
-                'getBody' => \GuzzleHttp\Psr7\stream_for("{\"a\": \"harti\"}")
-            ])
-            ->getMock();
-
         $request = \Mockery::mock(HttpClientInterface::class)
             ->shouldReceive('sendGet')
-            ->andReturn($response)
+            ->andReturn(new TestHttpResponse(200, "{\"a\": \"harti\"}"))
             ->getMock();
 
         $confFetcher = new ConfigurationFetcherRoxy($request, $this->_dp, $this->_bu, $confFetchInvoker, "http://harta.com", $errorReporter);
@@ -104,16 +90,9 @@ class ConfigurationFetcherRoxyTests extends TestCase
             $numberOfTimersCalled[0]++;
         });
 
-        $response = \Mockery::mock(ResponseInterface::class)
-            ->shouldReceive([
-                'getStatusCode' => 404,
-                'getBody' => \GuzzleHttp\Psr7\stream_for("harto")
-            ])
-            ->getMock();
-
         $request = \Mockery::mock(HttpClientInterface::class)
             ->shouldReceive('sendGet')
-            ->andReturn($response)
+            ->andReturn(new TestHttpResponse(HttpResponseInterface::STATUS_NOT_FOUND))
             ->getMock();
 
         $confFetcher = new ConfigurationFetcherRoxy($request, $this->_dp, $this->_bu, $confFetchInvoker, "http://harta.com", $errorReporter);

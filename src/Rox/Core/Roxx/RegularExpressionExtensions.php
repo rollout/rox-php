@@ -2,10 +2,17 @@
 
 namespace Rox\Core\Roxx;
 
+use Psr\Log\LoggerInterface;
 use Rox\Core\Context\ContextInterface;
+use Rox\Core\Logging\LoggerFactory;
 
 class RegularExpressionExtensions
 {
+    /**
+     * @var LoggerInterface
+     */
+    private $_log;
+
     /**
      * @var ParserInterface $_parser
      */
@@ -17,6 +24,7 @@ class RegularExpressionExtensions
      */
     public function __construct(ParserInterface $parser)
     {
+        $this->_log = LoggerFactory::getInstance()->createLogger(self::class);
         $this->_parser = $parser;
     }
 
@@ -50,8 +58,7 @@ class RegularExpressionExtensions
                     }
 
                     if ($flag == 'n') {
-                        // FIXME: use some logging framework here?
-                        error_log("Regexp flag ${flag} is not supported.");
+                        $this->_log->warning("Regexp flag ${flag} is not supported.");
                     }
                 }
 

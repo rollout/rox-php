@@ -2,14 +2,14 @@
 
 namespace Rox\Core\Roxx;
 
-use PHPUnit\Framework\TestCase;
+use Rox\RoxTestCase;
 
 /**
  * Class CoreStackTest
  * @package Rox\Core\Roxx
  * @covers CoreStack
  */
-final class CoreStackTests extends TestCase
+final class CoreStackTests extends RoxTestCase
 {
     public function testWillPushIntoStackString()
     {

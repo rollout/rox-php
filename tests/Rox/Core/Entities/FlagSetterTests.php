@@ -2,7 +2,6 @@
 
 namespace Rox\Core\Entities;
 
-use PHPUnit\Framework\TestCase;
 use Rox\Core\Client\InternalFlagsInterface;
 use Rox\Core\Configuration\Models\ExperimentModel;
 use Rox\Core\Context\ContextInterface;
@@ -10,15 +9,10 @@ use Rox\Core\Impression\XImpressionInvoker;
 use Rox\Core\Repositories\ExperimentRepository;
 use Rox\Core\Repositories\FlagRepository;
 use Rox\Core\Roxx\ParserInterface;
+use Rox\RoxTestCase;
 
-class FlagSetterTests extends TestCase
+class FlagSetterTests extends RoxTestCase
 {
-    protected function tearDown()
-    {
-        parent::tearDown();
-        \Mockery::close();
-    }
-
     public function testWillSetFlagData()
     {
         $flagRepo = new FlagRepository();

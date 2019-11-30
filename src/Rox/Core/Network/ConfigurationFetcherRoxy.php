@@ -2,7 +2,6 @@
 
 namespace Rox\Core\Network;
 
-use Psr\Http\Message\ResponseInterface;
 use Rox\Core\Configuration\ConfigurationFetcherOneSource;
 use Rox\Core\Consts\Environment;
 
@@ -17,7 +16,7 @@ final class ConfigurationFetcherRoxy extends ConfigurationFetcherOneSource
     }
 
     /**
-     * @return ResponseInterface
+     * @return HttpResponseInterface
      */
     protected function internalFetch()
     {

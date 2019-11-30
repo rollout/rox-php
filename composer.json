@@ -10,7 +10,11 @@
   "autoload-dev": {
     "psr-4": {
       "\\": "tests/"
-    }
+    },
+    "classmap": [
+      "src/",
+      "tests/"
+    ]
   },
   "config": {
     "platform": {
@@ -21,7 +25,8 @@
     "php": ">=5.5",
     "ext-json": "*",
     "guzzlehttp/guzzle": "^6.4",
-    "psr/http-message": "^1.0"
+    "psr/http-message": "^1.0",
+    "psr/log": "^1.1"
   },
   "require-dev": {
     "phpunit/phpunit": "^4",

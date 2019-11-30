@@ -2,7 +2,6 @@
 
 namespace Rox\Core\Impressions;
 
-use PHPUnit\Framework\TestCase;
 use Rox\Core\Client\DevicePropertiesInterface;
 use Rox\Core\Client\InternalFlagsInterface;
 use Rox\Core\Configuration\Models\ExperimentModel;
@@ -19,15 +18,10 @@ use Rox\Core\Repositories\CustomPropertyRepositoryInterface;
 use Rox\Core\Utils\TimeUtils;
 use Rox\Core\XPack\Analytics\ClientInterface;
 use Rox\Core\XPack\Analytics\Model\Event;
+use Rox\RoxTestCase;
 
-class ImpressionInvokerTests extends TestCase
+class ImpressionInvokerTests extends RoxTestCase
 {
-    protected function tearDown()
-    {
-        parent::tearDown();
-        \Mockery::close();
-    }
-
     public function testWillSetImpressionInvokerEmptyInvokeNotThrowingException()
     {
         $internalFlags = \Mockery::mock(InternalFlagsInterface::class)

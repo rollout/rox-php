@@ -2,9 +2,9 @@
 
 namespace Rox\Core\Entities;
 
-use PHPUnit\Framework\TestCase;
+use Rox\RoxTestCase;
 
-class FlagTests extends TestCase
+class FlagTests extends RoxTestCase
 {
     public function testFlagWithoutDefaultValue()
     {

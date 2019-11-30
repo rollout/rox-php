@@ -3,15 +3,21 @@
 namespace Rox\Core\Network;
 
 use Exception;
-use Psr\Http\Message\ResponseInterface;
+use Psr\Log\LoggerInterface;
 use Rox\Core\Client\BUIDInterface;
 use Rox\Core\Client\DevicePropertiesInterface;
 use Rox\Core\Configuration\ConfigurationFetchedInvokerInterface;
 use Rox\Core\Configuration\FetcherError;
+use Rox\Core\Logging\LoggerFactory;
 use Rox\Core\Reporting\ErrorReporterInterface;
 
 abstract class ConfigurationFetcherBase implements ConfigurationFetcherInterface
 {
+    /**
+     * @var LoggerInterface
+     */
+    private $_log;
+
     /**
      * @var HttpClientInterface $_request
      */
@@ -51,6 +57,7 @@ abstract class ConfigurationFetcherBase implements ConfigurationFetcherInterface
         ConfigurationFetchedInvokerInterface $configurationFetchedInvoker,
         ErrorReporterInterface $errorReporter)
     {
+        $this->_log = LoggerFactory::getInstance()->createLogger(self::class);
         $this->_request = $request;
         $this->_buid = $buid;
         $this->_deviceProperties = $deviceProperties;
@@ -68,8 +75,7 @@ abstract class ConfigurationFetcherBase implements ConfigurationFetcherInterface
     {
         if (!$data) {
             $this->_configurationFetchedInvoker->invokeWithError(FetcherError::EmptyJson);
-            // TODO: $log->error
-            error_log("Failed to parse JSON configuration - Null Or Empty");
+            $this->_log->debug("Failed to parse JSON configuration - Null Or Empty");
             $this->_errorReporter->report("Failed to parse JSON configuration - Null Or Empty", new Exception("data"));
             return null;
         }
@@ -77,7 +83,7 @@ abstract class ConfigurationFetcherBase implements ConfigurationFetcherInterface
         $decoded = json_decode($data, true);
         if ($decoded === null) {
             $this->_configurationFetchedInvoker->invokeWithError(FetcherError::CorruptedJson);
-            // TODO: $log->error
+            $this->_log->debug("Failed to parse JSON configuration");
             $this->_errorReporter->report("Failed to parse JSON configuration", new Exception("data"));
             return null;
         }
@@ -87,14 +93,14 @@ abstract class ConfigurationFetcherBase implements ConfigurationFetcherInterface
 
     /**
      * @param int $source
-     * @param ResponseInterface $response
+     * @param HttpResponseInterface $response
      * @param bool $raiseConfigurationHandler
      * @param int|null $nextSource
      * @see ConfigurationSource
      */
     protected function writeFetchErrorToLogAndInvokeFetchHandler(
         $source,
-        ResponseInterface $response,
+        HttpResponseInterface $response,
         $raiseConfigurationHandler = true,
         $nextSource = null)
     {
@@ -103,9 +109,8 @@ abstract class ConfigurationFetcherBase implements ConfigurationFetcherInterface
             $retryMsg = "Trying from " . ConfigurationSource::toString($nextSource) . '. ';
         }
 
-        // TODO: $log->debug
-        error_log("Failed to fetch from " . ConfigurationSource::toString($source) .
-            ". " . $retryMsg . "http error code: " . $response->getStatusCode(), E_ERROR);
+        $this->_log->debug("Failed to fetch from " . ConfigurationSource::toString($source) .
+            ". " . $retryMsg . "http error code: " . $response->getStatusCode());
 
         if ($raiseConfigurationHandler) {
             $this->_configurationFetchedInvoker->invokeWithError(FetcherError::NetworkError);
@@ -119,8 +124,9 @@ abstract class ConfigurationFetcherBase implements ConfigurationFetcherInterface
      */
     protected function writeFetchExceptionToLogAndInvokeFetchHandler($source, Exception $ex)
     {
-        // TODO: $log->error
-        error_log("Failed to fetch configuration. Source: " . ConfigurationSource::toString($source) . ' ' . $ex);
+        $this->_log->error("Failed to fetch configuration. Source: " . ConfigurationSource::toString($source), [
+            'exception' => $ex
+        ]);
 
         $this->_configurationFetchedInvoker->invokeWithError(FetcherError::NetworkError);
     }

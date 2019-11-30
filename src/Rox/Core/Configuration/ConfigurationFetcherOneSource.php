@@ -3,12 +3,12 @@
 namespace Rox\Core\Configuration;
 
 use Exception;
-use Psr\Http\Message\ResponseInterface;
 use Rox\Core\Client\BUIDInterface;
 use Rox\Core\Client\DevicePropertiesInterface;
 use Rox\Core\Network\ConfigurationFetcherBase;
 use Rox\Core\Network\ConfigurationSource;
 use Rox\Core\Network\HttpClientInterface;
+use Rox\Core\Network\HttpResponseInterface;
 use Rox\Core\Reporting\ErrorReporterInterface;
 
 abstract class ConfigurationFetcherOneSource extends ConfigurationFetcherBase
@@ -47,7 +47,7 @@ abstract class ConfigurationFetcherOneSource extends ConfigurationFetcherBase
     protected abstract function getSource();
 
     /**
-     * @return ResponseInterface
+     * @return HttpResponseInterface
      */
     protected abstract function internalFetch();
 
@@ -58,7 +58,7 @@ abstract class ConfigurationFetcherOneSource extends ConfigurationFetcherBase
         try {
             $roxyFetchResult = $this->internalFetch();
             if ($roxyFetchResult->getStatusCode() == 200) {
-                return $this->createConfigurationResult($roxyFetchResult->getBody()->getContents(), $usedSource);
+                return $this->createConfigurationResult($roxyFetchResult->getContent()->readAsString(), $usedSource);
             } else {
                 $this->writeFetchErrorToLogAndInvokeFetchHandler($usedSource, $roxyFetchResult);
             }

@@ -2,21 +2,15 @@
 
 namespace Rox\Core\Entities;
 
-use PHPUnit\Framework\TestCase;
 use Rox\Core\Client\InternalFlagsInterface;
 use Rox\Core\Configuration\Models\ExperimentModel;
 use Rox\Core\Impression\XImpressionInvoker;
 use Rox\Core\Roxx\EvaluationResult;
 use Rox\Core\Roxx\ParserInterface;
+use Rox\RoxTestCase;
 
-class VariantTests extends TestCase
+class VariantTests extends RoxTestCase
 {
-    protected function tearDown()
-    {
-        parent::tearDown();
-        \Mockery::close();
-    }
-
     public function testWillNotAddDefaultToOptionsIfExists()
     {
         $variant = new Variant('1', ['1', '2', '3']);

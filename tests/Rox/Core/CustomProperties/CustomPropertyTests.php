@@ -2,11 +2,11 @@
 
 namespace Rox\Core\CustomProperties;
 
-use PHPUnit\Framework\TestCase;
 use Rox\Core\Context\ContextBuilder;
 use Rox\Core\Context\ContextInterface;
+use Rox\RoxTestCase;
 
-class CustomPropertyTests extends TestCase
+class CustomPropertyTests extends RoxTestCase
 {
     public function testWillCreatePropertyWithConstValue()
     {

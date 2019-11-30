@@ -3,6 +3,7 @@
 namespace Rox\Core\Impression;
 
 use Exception;
+use Psr\Log\LoggerInterface;
 use Rox\Core\Client\InternalFlagsInterface;
 use Rox\Core\Configuration\Models\ExperimentModel;
 use Rox\Core\Consts\PropertyType;
@@ -10,12 +11,18 @@ use Rox\Core\Context\ContextInterface;
 use Rox\Core\CustomProperties\CustomPropertyType;
 use Rox\Core\Impression\Models\Experiment;
 use Rox\Core\Impression\Models\ReportingValue;
+use Rox\Core\Logging\LoggerFactory;
 use Rox\Core\Repositories\CustomPropertyRepositoryInterface;
 use Rox\Core\XPack\Analytics\ClientInterface;
 use Rox\Core\XPack\Analytics\Model\Event;
 
 class XImpressionInvoker implements ImpressionInvokerInterface
 {
+    /**
+     * @var LoggerInterface
+     */
+    private $_log;
+
     /**
      * @var CustomPropertyRepositoryInterface $_customPropertyRepository
      */
@@ -47,6 +54,7 @@ class XImpressionInvoker implements ImpressionInvokerInterface
         $customPropertyRepository,
         $analyticsClient)
     {
+        $this->_log = LoggerFactory::getInstance()->createLogger(self::class);
         $this->_customPropertyRepository = $customPropertyRepository;
         $this->_internalFlags = $internalFlags;
         $this->_analyticsClient = $analyticsClient;
@@ -94,8 +102,9 @@ class XImpressionInvoker implements ImpressionInvokerInterface
             }
         } catch (Exception $e) {
 
-            // FIXME: use some logging framework here?
-            error_log("Failed to send analytics:: ${e}");
+            $this->_log->error("Failed to send analytics", [
+                'exception' => $e
+            ]);
         }
 
         $this->_fireImpression(new ImpressionArgs($value,

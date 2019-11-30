@@ -7,7 +7,6 @@ use GuzzleHttp\ClientInterface;
 use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Uri;
-use Psr\Http\Message\ResponseInterface;
 
 class GuzzleHttpClient implements HttpClientInterface
 {
@@ -26,7 +25,7 @@ class GuzzleHttpClient implements HttpClientInterface
 
     /**
      * @param RequestData $requestData
-     * @return ResponseInterface
+     * @return HttpResponseInterface
      */
     function sendGet(RequestData $requestData)
     {
@@ -35,7 +34,7 @@ class GuzzleHttpClient implements HttpClientInterface
             if ($requestData->getQueryParams() == null) {
                 $uri = Uri::withQueryValues($uri, $requestData->getQueryParams());
             }
-            return $this->_client->send(new Request('GET', $uri));
+            return new Psr7ResponseWrapper($this->_client->send(new Request('GET', $uri)));
         } catch (GuzzleException $e) {
             throw new HttpClientException("Failed to send GET request ${requestData}", $e);
         }
@@ -43,7 +42,7 @@ class GuzzleHttpClient implements HttpClientInterface
 
     /**
      * @param RequestData $requestData
-     * @return ResponseInterface
+     * @return HttpResponseInterface
      */
     function sendPost(RequestData $requestData)
     {
@@ -57,7 +56,7 @@ class GuzzleHttpClient implements HttpClientInterface
     /**
      * @param string $uri
      * @param StringContent $content
-     * @return ResponseInterface
+     * @return HttpResponseInterface
      */
     function postContent($uri, StringContent $content)
     {
@@ -67,7 +66,7 @@ class GuzzleHttpClient implements HttpClientInterface
                 'Content-Type' => $content->getContentType() . '; charset=' . $content->getEncoding()
             ]);
             $request->withBody(\GuzzleHttp\Psr7\stream_for($content->getContent()));
-            return $this->_client->send($request);
+            return new Psr7ResponseWrapper($this->_client->send($request));
         } catch (GuzzleException $e) {
             throw new HttpClientException("Failed to send POST request to ${uri}", $e);
         }
