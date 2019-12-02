@@ -49,7 +49,7 @@ class MD5GeneratorTests extends RoxTestCase
             PropertyType::getPlatform(),
             PropertyType::getDevModeSecret()]);
 
-        $this->assertEquals($md5, "AA16F2AA33D095940A93C991B00D55C7");
+        $this->assertEquals($md5, "D24E48A1037F151773FA3A7218AE1FD3");
 
         // tests for JSONObject - values are important, no references involved
 
