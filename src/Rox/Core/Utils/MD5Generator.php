@@ -20,8 +20,7 @@ final class MD5Generator
             if (array_key_exists($pt->getName(), $properties)) {
                 $propValue = $properties[$pt->getName()];
                 if (is_array($propValue)) {
-                    $propValue = preg_replace('/^(  +?)\\1(?=[^ ])/m', '$1',
-                        json_encode($propValue, JSON_PRETTY_PRINT)); // intend by 2 instead of 4, just as in .NET
+                    $propValue = DotNetCompat::toJson($propValue);
                 } else if (is_bool($propValue)) {
                     // In .NET true becomes "True", false becomes "False"
                     $propValue = $propValue ? "True" : "False";

@@ -67,7 +67,7 @@ class CustomProperty implements CustomPropertyInterface
     {
         return json_encode([
             "name" => $this->_name,
-            "type" => $this->_type,
+            "type" => $this->_type->getType(),
             "externalType" => $this->_type->getExternalType()
         ]);
     }

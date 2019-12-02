@@ -2,6 +2,8 @@
 
 namespace Rox\Core\CustomProperties;
 
+use Rox\Core\Repositories\CustomPropertyAddedArgs;
+use Rox\Core\Repositories\CustomPropertyEventHandlerInterface;
 use Rox\Core\Repositories\CustomPropertyRepositoryInterface;
 
 class CustomPropertyRepository implements CustomPropertyRepositoryInterface
@@ -10,6 +12,11 @@ class CustomPropertyRepository implements CustomPropertyRepositoryInterface
      * @var array $_customProperties
      */
     private $_customProperties = [];
+
+    /**
+     * @var CustomPropertyEventHandlerInterface[] $_eventHandlers
+     */
+    private $_eventHandlers = [];
 
     /**
      * @param CustomPropertyInterface $customProperty
@@ -21,8 +28,7 @@ class CustomPropertyRepository implements CustomPropertyRepositoryInterface
         }
 
         $this->_customProperties[$customProperty->getName()] = $customProperty;
-
-        // TODO: fire custom property added event
+        $this->_fireCustomPropertyAdded($customProperty);
     }
 
     /**
@@ -59,5 +65,25 @@ class CustomPropertyRepository implements CustomPropertyRepositoryInterface
     function getAllCustomProperties()
     {
         return $this->_customProperties;
+    }
+
+    /**
+     * @param CustomPropertyEventHandlerInterface $eventHandler
+     */
+    function addCustomPropertyEventHandler(CustomPropertyEventHandlerInterface $eventHandler)
+    {
+        if (in_array($eventHandler, $this->_eventHandlers)) {
+            $this->_eventHandlers[] = $eventHandler;
+        }
+    }
+
+    /**
+     * @param CustomPropertyInterface $customProperty
+     */
+    private function _fireCustomPropertyAdded(CustomPropertyInterface $customProperty)
+    {
+        foreach ($this->_eventHandlers as $eventHandler) {
+            $eventHandler->onCustomPropertyAdded($this, new CustomPropertyAddedArgs($customProperty));
+        }
     }
 }

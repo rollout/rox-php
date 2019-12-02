@@ -28,4 +28,9 @@ interface CustomPropertyRepositoryInterface
      * @return array
      */
     function getAllCustomProperties();
+
+    /**
+     * @param CustomPropertyEventHandlerInterface $eventHandler
+     */
+    function addCustomPropertyEventHandler(CustomPropertyEventHandlerInterface $eventHandler);
 }

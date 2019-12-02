@@ -15,4 +15,8 @@
         </testsuite>
     </testsuites>
 
+    <php>
+        <const name="PHPUNIT_ROX_TEST_SUITE" value="true"/>
+    </php>
+
 </phpunit>
