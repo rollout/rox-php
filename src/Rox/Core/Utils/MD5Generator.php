@@ -18,7 +18,14 @@ final class MD5Generator
 
         foreach ($generatorList as $pt) {
             if (array_key_exists($pt->getName(), $properties)) {
-                array_push($values, $properties[$pt->getName()]);
+                $propValue = $properties[$pt->getName()];
+                if (is_array($propValue)) {
+                    $propValue = json_encode($propValue);
+                } else if (is_bool($propValue)) {
+                    // In .NET true becomes "True", false becomes "False"
+                    $propValue = $propValue ? "True" : "False";
+                }
+                array_push($values, (string)$propValue);
             }
         }
 
@@ -26,6 +33,6 @@ final class MD5Generator
             $values = array_merge($values, $extraValues);
         }
 
-        return str_replace('-', '', md5(join('|', $values)));
+        return strtoupper(str_replace('-', '', md5(join('|', $values))));
     }
 }
