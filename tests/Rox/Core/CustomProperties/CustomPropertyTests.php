@@ -14,31 +14,36 @@ class CustomPropertyTests extends RoxTestCase
 
         $this->assertEquals($propString->getName(), "prop1");
         $this->assertEquals($propString->getType(), CustomPropertyType::getString());
-        $this->assertEquals($propString->getValue()(null), "123");
+        $value1 = $propString->getValue();
+        $this->assertEquals($value1(null), "123");
 
         $propDouble = new CustomProperty("prop1", CustomPropertyType::getDouble(), 123.12);
 
         $this->assertEquals($propDouble->getName(), "prop1");
         $this->assertEquals($propDouble->getType(), CustomPropertyType::getDouble());
-        $this->assertEquals($propDouble->getValue()(null), 123.12);
+        $value2 = $propDouble->getValue();
+        $this->assertEquals($value2(null), 123.12);
 
         $propInt = new CustomProperty("prop1", CustomPropertyType::getInt(), 123);
 
         $this->assertEquals($propInt->getName(), "prop1");
         $this->assertEquals($propInt->getType(), CustomPropertyType::getInt());
-        $this->assertEquals($propInt->getValue()(null), 123);
+        $value3 = $propInt->getValue();
+        $this->assertEquals($value3(null), 123);
 
         $propBool = new CustomProperty("prop1", CustomPropertyType::getBool(), true);
 
         $this->assertEquals($propBool->getName(), "prop1");
         $this->assertEquals($propBool->getType(), CustomPropertyType::getBool());
-        $this->assertEquals($propBool->getValue()(null), true);
+        $value4 = $propBool->getValue();
+        $this->assertEquals($value4(null), true);
 
         $propSemver = new CustomProperty("prop1", CustomPropertyType::getSemver(), "1.2.3");
 
         $this->assertEquals($propSemver->getName(), "prop1");
         $this->assertEquals($propSemver->getType(), CustomPropertyType::getSemver());
-        $this->assertEquals($propSemver->getValue()(null), "1.2.3");
+        $value5 = $propSemver->getValue();
+        $this->assertEquals($value5(null), "1.2.3");
     }
 
     public function testWillCreatePropertyWithFuncValue()
@@ -49,7 +54,8 @@ class CustomPropertyTests extends RoxTestCase
 
         $this->assertEquals($propString->getName(), "prop1");
         $this->assertEquals($propString->getType(), CustomPropertyType::getString());
-        $this->assertEquals($propString->getValue()(null), "123");
+        $value1 = $propString->getValue();
+        $this->assertEquals($value1(null), "123");
 
         $propDouble = new CustomProperty("prop1", CustomPropertyType::getDouble(), function () {
             return 123.12;
@@ -57,7 +63,8 @@ class CustomPropertyTests extends RoxTestCase
 
         $this->assertEquals($propDouble->getName(), "prop1");
         $this->assertEquals($propDouble->getType(), CustomPropertyType::getDouble());
-        $this->assertEquals($propDouble->getValue()(null), 123.12);
+        $value2 = $propDouble->getValue();
+        $this->assertEquals($value2(null), 123.12);
 
         $propInt = new CustomProperty("prop1", CustomPropertyType::getInt(), function () {
             return 123;
@@ -65,7 +72,8 @@ class CustomPropertyTests extends RoxTestCase
 
         $this->assertEquals($propInt->getName(), "prop1");
         $this->assertEquals($propInt->getType(), CustomPropertyType::getInt());
-        $this->assertEquals($propInt->getValue()(null), 123);
+        $value3 = $propInt->getValue();
+        $this->assertEquals($value3(null), 123);
 
         $propBool = new CustomProperty("prop1", CustomPropertyType::getBool(), function () {
             return true;
@@ -73,7 +81,8 @@ class CustomPropertyTests extends RoxTestCase
 
         $this->assertEquals($propBool->getName(), "prop1");
         $this->assertEquals($propBool->getType(), CustomPropertyType::getBool());
-        $this->assertEquals($propBool->getValue()(null), true);
+        $value4 = $propBool->getValue();
+        $this->assertEquals($value4(null), true);
 
         $propSemver = new CustomProperty("prop1", CustomPropertyType::getSemver(), function () {
             return "1.2.3";
@@ -81,7 +90,8 @@ class CustomPropertyTests extends RoxTestCase
 
         $this->assertEquals($propSemver->getName(), "prop1");
         $this->assertEquals($propSemver->getType(), CustomPropertyType::getSemver());
-        $this->assertEquals($propSemver->getValue()(null), "1.2.3");
+        $value5 = $propSemver->getValue();
+        $this->assertEquals($value5(null), "1.2.3");
     }
 
     public function testWillPassContext()
@@ -96,7 +106,8 @@ class CustomPropertyTests extends RoxTestCase
             return "123";
         });
 
-        $this->assertEquals($propString->getValue()($context), "123");
+        $value = $propString->getValue();
+        $this->assertEquals($value($context), "123");
         $this->assertEquals($contextFromFunc[0]->get('a'), 1);
     }
 

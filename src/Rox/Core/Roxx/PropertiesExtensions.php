@@ -65,8 +65,9 @@ class PropertiesExtensions
                     return;
                 }
 
+                $propValue = $property->getValue();
                 if ($property->getType() === CustomPropertyType::getString()) {
-                    $value = $property->getValue()($context);
+                    $value = $propValue($context);
                     if ($value == null) {
                         $stack->push(TokenType::getUndefined());
                     }
@@ -79,7 +80,7 @@ class PropertiesExtensions
                 if ($property->getType() === CustomPropertyType::getInt() ||
                     $property->getType() === CustomPropertyType::getDouble() ||
                     $property->getType() === CustomPropertyType::getBool()) {
-                    $value = $property->getValue()($context);
+                    $value = $propValue($context);
                     if ($value != null) {
                         $stack->push($value);
                     }

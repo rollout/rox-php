@@ -2,17 +2,15 @@
 
 namespace Rox\Core\Configuration;
 
-use DateTime;
-
 interface ConfigurationFetchedInvokerInterface
 {
     /**
      * @param int $fetcherStatus
-     * @param DateTime $creationDate
+     * @param float $creationDate Creation timestamp in milliseconds.
      * @param bool $hasChanges
      * @see FetcherStatus
      */
-    function invoke($fetcherStatus, DateTime $creationDate, $hasChanges);
+    function invoke($fetcherStatus, $creationDate, $hasChanges);
 
     /**
      * @param int $error

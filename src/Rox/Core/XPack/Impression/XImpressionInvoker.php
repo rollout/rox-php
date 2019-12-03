@@ -89,7 +89,8 @@ class XImpressionInvoker implements ImpressionInvokerInterface
                 }
                 $distinctId = '(null_distinct_id';
                 if ($prop != null && $prop->getType() === CustomPropertyType::getString()) {
-                    $propDistinctId = $prop->getValue()($context);
+                    $propValue = $prop->getValue();
+                    $propDistinctId = $propValue($context);
                     if ($propDistinctId !== null) {
                         $distinctId = $propDistinctId;
                     }

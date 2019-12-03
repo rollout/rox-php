@@ -2,7 +2,7 @@
 
 namespace Rox\Core\Configuration;
 
-use DateTime;
+use Rox\Core\Utils\TimeUtils;
 
 class ConfigurationFetchedArgs
 {
@@ -13,7 +13,7 @@ class ConfigurationFetchedArgs
     private $_fetcherStatus;
 
     /**
-     * @var DateTime $_creationDate
+     * @var float $_creationDate Creation timestamp in milliseconds
      */
     private $_creationDate;
 
@@ -32,17 +32,17 @@ class ConfigurationFetchedArgs
      * ConfigurationFetchedArgs constructor.
      * @param int $_errorDetails
      * @param int $_fetcherStatus
-     * @param DateTime $_creationDate
+     * @param float|null $_creationDate
      * @param bool $_hasChanges
      */
     public function __construct(
         $_errorDetails = FetcherError::NoError,
         $_fetcherStatus = FetcherStatus::ErrorFetchedFailed,
-        DateTime $_creationDate = null,
+        $_creationDate = null,
         $_hasChanges = false)
     {
         $this->_fetcherStatus = $_fetcherStatus;
-        $this->_creationDate = $_creationDate != null ? $_creationDate : new DateTime('0001-01-01');
+        $this->_creationDate = $_creationDate != null ? $_creationDate : TimeUtils::currentTimeMillis();
         $this->_hasChanges = $_hasChanges;
         $this->_errorDetails = $_errorDetails;
     }
@@ -56,7 +56,7 @@ class ConfigurationFetchedArgs
     }
 
     /**
-     * @return DateTime
+     * @return float
      */
     public function getCreationDate()
     {

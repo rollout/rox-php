@@ -17,7 +17,8 @@ final class DotNetCompat
      */
     static function toJson($value)
     {
-        return preg_replace('/^(  +?)\\1(?=[^ ])/m', '$1',
-            json_encode($value, JSON_PRETTY_PRINT)); // intend by 2 instead of 4, just as in .NET
+        $json = json_encode($value, JSON_PRETTY_PRINT);
+        $json = preg_replace("/\[\s+\]/m", '[]', $json); // PHP 5.X issue, it outputs empty JSON array as [ ... newlines ... ]
+        return preg_replace('/^(  +?)\\1(?=[^ ])/m', '$1', $json); // intend by 2 instead of 4, just as in .NET
     }
 }

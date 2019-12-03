@@ -2,8 +2,6 @@
 
 namespace Rox\Core\Configuration;
 
-use DateTime;
-
 class ConfigurationFetchedInvoker implements ConfigurationFetchedInvokerInterface
 {
     /**
@@ -13,11 +11,11 @@ class ConfigurationFetchedInvoker implements ConfigurationFetchedInvokerInterfac
 
     /**
      * @param int $fetcherStatus
-     * @param DateTime $creationDate
+     * @param float $creationDate
      * @param bool $hasChanges
      * @see FetcherStatus
      */
-    function invoke($fetcherStatus, DateTime $creationDate, $hasChanges)
+    function invoke($fetcherStatus, $creationDate, $hasChanges)
     {
         $this->_fireConfigurationFetched(new ConfigurationFetchedArgs(
             FetcherError::NoError,
