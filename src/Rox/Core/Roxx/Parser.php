@@ -116,7 +116,15 @@ class Parser implements ParserInterface
                 $op2 = false;
             }
 
-            $stack->push($op1 == $op2);
+            if (is_numeric_strict($op1)) {
+                $op1 = (float)$op1; // cast int to float for comparison
+            }
+
+            if (is_numeric_strict($op2)) {
+                $op2 = (float)$op2; // cast int to float for comparison
+            }
+
+            $stack->push($op1 === $op2);
         });
 
         $this->addOperator("not",

@@ -2,8 +2,6 @@
 
 namespace Rox\Core\Client;
 
-use Rox\Core\CustomProperties\DefaultDynamicPropertiesRule;
-
 class RoxOptionsBuilder
 {
     /**
@@ -37,7 +35,7 @@ class RoxOptionsBuilder
     private $_roxyURL;
 
     /**
-     * @var DefaultDynamicPropertiesRule|null $_dynamicPropertiesRule
+     * @var callable|null $_dynamicPropertiesRule
      */
     private $_dynamicPropertiesRule;
 
@@ -150,7 +148,7 @@ class RoxOptionsBuilder
     }
 
     /**
-     * @return DefaultDynamicPropertiesRule|null
+     * @return callable|null
      */
     public function getDynamicPropertiesRule()
     {
@@ -158,10 +156,10 @@ class RoxOptionsBuilder
     }
 
     /**
-     * @param DefaultDynamicPropertiesRule $dynamicPropertiesRule
+     * @param callable $dynamicPropertiesRule
      * @return RoxOptionsBuilder
      */
-    public function setDynamicPropertiesRule($dynamicPropertiesRule)
+    public function setDynamicPropertiesRule(callable $dynamicPropertiesRule)
     {
         $this->_dynamicPropertiesRule = $dynamicPropertiesRule;
         return $this;

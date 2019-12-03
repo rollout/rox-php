@@ -2,9 +2,6 @@
 
 namespace Rox\Core\Client;
 
-use Rox\Core\CustomProperties\DefaultDynamicPropertiesRule;
-use Rox\Core\CustomProperties\DynamicPropertiesRuleInterface;
-
 class RoxOptions implements RoxOptionsInterface
 {
     /**
@@ -38,7 +35,7 @@ class RoxOptions implements RoxOptionsInterface
     private $_roxyURL;
 
     /**
-     * @var DefaultDynamicPropertiesRule|null $_dynamicPropertiesRule
+     * @var callable|null $_dynamicPropertiesRule
      */
     private $_dynamicPropertiesRule;
 
@@ -100,7 +97,7 @@ class RoxOptions implements RoxOptionsInterface
     }
 
     /**
-     * @return DynamicPropertiesRuleInterface|null
+     * @return callable|null
      */
     function getDynamicPropertiesRule()
     {

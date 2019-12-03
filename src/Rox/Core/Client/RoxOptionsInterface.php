@@ -2,8 +2,6 @@
 
 namespace Rox\Core\Client;
 
-use Rox\Core\CustomProperties\DynamicPropertiesRuleInterface;
-
 interface RoxOptionsInterface
 {
     /**
@@ -37,7 +35,7 @@ interface RoxOptionsInterface
     function getRoxyURL();
 
     /**
-     * @return DynamicPropertiesRuleInterface|null
+     * @return callable|null
      */
     function getDynamicPropertiesRule();
 }

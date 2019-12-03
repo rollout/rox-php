@@ -50,7 +50,7 @@ class PropertiesExtensions
                 if ($property == null) {
                     $dynamicPropertiesRule = $this->_dynamicProperties->getDynamicPropertiesRule();
                     if ($dynamicPropertiesRule != null) {
-                        $value = $dynamicPropertiesRule->invoke($propName, $context);
+                        $value = $dynamicPropertiesRule($propName, $context);
                         if ($value != null) {
                             if (is_string($value) || is_bool($value)) {
                                 $stack->push($value);

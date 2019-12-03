@@ -2,29 +2,33 @@
 
 namespace Rox\Core\CustomProperties;
 
+use Rox\Core\Context\ContextInterface;
+
 class DynamicProperties implements DynamicPropertiesInterface
 {
     /**
-     * @var DynamicPropertiesRuleInterface $_handler
+     * @var callable $_handler
      */
     private $_handler;
 
     /**
-     * @param DynamicPropertiesRuleInterface $handler
+     * @param callable $handler
      * @return void
      */
-    function setDynamicPropertiesRule($handler)
+    function setDynamicPropertiesRule(callable $handler)
     {
         $this->_handler = $handler;
     }
 
     /**
-     * @return DynamicPropertiesRuleInterface
+     * @return callable
      */
     function getDynamicPropertiesRule()
     {
         return $this->_handler != null
             ? $this->_handler
-            : new DefaultDynamicPropertiesRule();
+            : function ($propName, ContextInterface $context) {
+                return ($context != null) ? $context->get($propName) : null;
+            };
     }
 }

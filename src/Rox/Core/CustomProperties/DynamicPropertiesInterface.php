@@ -5,13 +5,13 @@ namespace Rox\Core\CustomProperties;
 interface DynamicPropertiesInterface
 {
     /**
-     * @param DynamicPropertiesRuleInterface $handler
+     * @param callable $handler
      * @return void
      */
-    function setDynamicPropertiesRule($handler);
+    function setDynamicPropertiesRule(callable $handler);
 
     /**
-     * @return DynamicPropertiesRuleInterface
+     * @return callable
      */
     function getDynamicPropertiesRule();
 }
