@@ -17,7 +17,6 @@ class Experiment
      */
     private $_identifier;
 
-
     /**
      * @var bool $_archived
      */
