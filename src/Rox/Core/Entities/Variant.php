@@ -110,11 +110,27 @@ class Variant
     }
 
     /**
+     * @param string $condition
+     */
+    public function setCondition($condition)
+    {
+        $this->_condition = $condition;
+    }
+
+    /**
      * @return ParserInterface
      */
     public function getParser()
     {
         return $this->_parser;
+    }
+
+    /**
+     * @param ParserInterface $parser
+     */
+    public function setParser($parser)
+    {
+        $this->_parser = $parser;
     }
 
     /**
@@ -131,6 +147,14 @@ class Variant
     public function getImpressionInvoker()
     {
         return $this->_impressionInvoker;
+    }
+
+    /**
+     * @param ImpressionInvokerInterface $impressionInvoker
+     */
+    public function setImpressionInvoker($impressionInvoker)
+    {
+        $this->_impressionInvoker = $impressionInvoker;
     }
 
     /**

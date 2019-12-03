@@ -37,13 +37,13 @@ class FlagSetter implements FlagAddedCallbackInterface
      * @param FlagRepositoryInterface $flagRepository
      * @param ParserInterface $parser
      * @param ExperimentRepositoryInterface $experimentRepository
-     * @param ImpressionInvokerInterface $impressionInvoker
+     * @param ImpressionInvokerInterface|null $impressionInvoker
      */
     public function __construct(
         FlagRepositoryInterface $flagRepository,
         ParserInterface $parser,
         ExperimentRepositoryInterface $experimentRepository,
-        ImpressionInvokerInterface $impressionInvoker)
+        $impressionInvoker = null)
     {
         $this->_flagRepository = $flagRepository;
         $this->_parser = $parser;

@@ -115,10 +115,10 @@ class ExperimentsExtensions
      * @param string $seed
      * @return float
      */
-    private function getBucket($seed)
+    function getBucket($seed)
     {
         $bytes = md5($seed, true);
-        $hash = ($bytes[0] & 0xFF) | (($bytes[1] & 0xFF) << 8) | (($bytes[2] & 0xFF) << 16) | (($bytes[3] & 0xFF) << 24);
+        $hash = (ord($bytes[0]) & 0xFF) | ((ord($bytes[1]) & 0xFF) << 8) | ((ord($bytes[2]) & 0xFF) << 16) | ((ord($bytes[3]) & 0xFF) << 24);
         $hash &= 0xffffffff;
         $bucket = $hash / (pow(2, 32) - 1);
         if ($bucket == 1) {
