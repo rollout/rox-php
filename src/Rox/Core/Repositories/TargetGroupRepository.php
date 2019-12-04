@@ -26,8 +26,8 @@ class TargetGroupRepository implements TargetGroupRepositoryInterface
      */
     function getTargetGroup($id)
     {
-        return current(array_filter($this->_targetGroups, function ($element) use ($id) {
-            return $element->id == $id;
+        return current(array_filter($this->_targetGroups, function (TargetGroupModel $element) use ($id) {
+            return $element->getId() == $id;
         }));
     }
 }
