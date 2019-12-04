@@ -17,6 +17,7 @@
 
     <php>
         <const name="PHPUNIT_ROX_TEST_SUITE" value="true"/>
+        <ini name="date.timezone" value="UTC"/>
     </php>
 
 </phpunit>
