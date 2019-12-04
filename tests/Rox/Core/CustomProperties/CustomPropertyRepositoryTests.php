@@ -8,7 +8,6 @@ use Rox\RoxTestCase;
 
 class CustomPropertyRepositoryTests extends RoxTestCase
 {
-
     public function testWillReturnNullWhenPropNotFound()
     {
         $repo = new CustomPropertyRepository();
