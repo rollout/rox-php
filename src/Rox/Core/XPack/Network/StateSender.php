@@ -7,24 +7,18 @@ use Psr\Log\LoggerInterface;
 use Rox\Core\Client\DevicePropertiesInterface;
 use Rox\Core\Consts\Environment;
 use Rox\Core\Consts\PropertyType;
-use Rox\Core\CustomProperties\FlagAddedCallbackArgs;
-use Rox\Core\CustomProperties\FlagAddedCallbackInterface;
 use Rox\Core\Logging\LoggerFactory;
 use Rox\Core\Network\ConfigurationSource;
 use Rox\Core\Network\HttpClientInterface;
 use Rox\Core\Network\HttpResponseInterface;
 use Rox\Core\Network\RequestData;
-use Rox\Core\Repositories\CustomPropertyAddedArgs;
-use Rox\Core\Repositories\CustomPropertyEventHandlerInterface;
 use Rox\Core\Repositories\CustomPropertyRepositoryInterface;
 use Rox\Core\Repositories\FlagRepositoryInterface;
 use Rox\Core\Utils\Debouncer;
 use Rox\Core\Utils\DotNetCompat;
 use Rox\Core\Utils\MD5Generator;
 
-class StateSender implements
-    CustomPropertyEventHandlerInterface,
-    FlagAddedCallbackInterface
+class StateSender
 {
     /**
      * @var HttpClientInterface $_request
@@ -107,31 +101,13 @@ class StateSender implements
             $this->send();
         });
 
-        $this->_customPropertyRepository->addCustomPropertyEventHandler($this);
-        $this->_flagRepository->addFlagAddedCallback($this);
-    }
+        $this->_customPropertyRepository->addCustomPropertyEventHandler(function () {
+            $this->_sendStateDebounce();
+        });
 
-    /**
-     * @param CustomPropertyRepositoryInterface $sender
-     * @param CustomPropertyAddedArgs $args
-     */
-    function onCustomPropertyAdded(
-        CustomPropertyRepositoryInterface $sender,
-        CustomPropertyAddedArgs $args)
-    {
-        $this->_sendStateDebounce();
-    }
-
-    /**
-     * @param FlagRepositoryInterface $repository
-     * @param FlagAddedCallbackArgs $args
-     * @return void
-     */
-    function onFlagAdded(
-        FlagRepositoryInterface $repository,
-        FlagAddedCallbackArgs $args)
-    {
-        $this->_sendStateDebounce();
+        $this->_flagRepository->addFlagAddedCallback(function () {
+            $this->_sendStateDebounce();
+        });
     }
 
     /**

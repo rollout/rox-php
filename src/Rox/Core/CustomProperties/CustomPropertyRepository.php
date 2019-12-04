@@ -3,7 +3,6 @@
 namespace Rox\Core\CustomProperties;
 
 use Rox\Core\Repositories\CustomPropertyAddedArgs;
-use Rox\Core\Repositories\CustomPropertyEventHandlerInterface;
 use Rox\Core\Repositories\CustomPropertyRepositoryInterface;
 
 class CustomPropertyRepository implements CustomPropertyRepositoryInterface
@@ -14,7 +13,7 @@ class CustomPropertyRepository implements CustomPropertyRepositoryInterface
     private $_customProperties = [];
 
     /**
-     * @var CustomPropertyEventHandlerInterface[] $_eventHandlers
+     * @var callable[] $_eventHandlers
      */
     private $_eventHandlers = [];
 
@@ -68,11 +67,11 @@ class CustomPropertyRepository implements CustomPropertyRepositoryInterface
     }
 
     /**
-     * @param CustomPropertyEventHandlerInterface $eventHandler
+     * @param callable $eventHandler
      */
-    function addCustomPropertyEventHandler(CustomPropertyEventHandlerInterface $eventHandler)
+    function addCustomPropertyEventHandler(callable $eventHandler)
     {
-        if (in_array($eventHandler, $this->_eventHandlers)) {
+        if (!in_array($eventHandler, $this->_eventHandlers)) {
             $this->_eventHandlers[] = $eventHandler;
         }
     }
@@ -83,7 +82,7 @@ class CustomPropertyRepository implements CustomPropertyRepositoryInterface
     private function _fireCustomPropertyAdded(CustomPropertyInterface $customProperty)
     {
         foreach ($this->_eventHandlers as $eventHandler) {
-            $eventHandler->onCustomPropertyAdded($this, new CustomPropertyAddedArgs($customProperty));
+            $eventHandler($this, new CustomPropertyAddedArgs($customProperty));
         }
     }
 }

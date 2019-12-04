@@ -3,7 +3,6 @@
 namespace Rox\Core\Repositories;
 
 use Rox\Core\CustomProperties\FlagAddedCallbackArgs;
-use Rox\Core\CustomProperties\FlagAddedCallbackInterface;
 use Rox\Core\Entities\Variant;
 
 class FlagRepository implements FlagRepositoryInterface
@@ -14,7 +13,7 @@ class FlagRepository implements FlagRepositoryInterface
     private $_variants = [];
 
     /**
-     * @var FlagAddedCallbackInterface[] $_callbacks
+     * @var callable[] $_callbacks
      */
     private $_callbacks = [];
 
@@ -54,11 +53,13 @@ class FlagRepository implements FlagRepositoryInterface
     }
 
     /**
-     * @param FlagAddedCallbackInterface $callback
+     * @param callable $callback
      */
     function addFlagAddedCallback($callback)
     {
-        array_push($this->_callbacks, $callback);
+        if (!in_array($callback, $this->_callbacks)) {
+            $this->_callbacks[] = $callback;
+        }
     }
 
     /**
@@ -67,7 +68,7 @@ class FlagRepository implements FlagRepositoryInterface
     private function _fireFlagAdded($variant)
     {
         foreach ($this->_callbacks as $callback) {
-            $callback->onFlagAdded($this, new FlagAddedCallbackArgs($variant));
+            $callback($this, new FlagAddedCallbackArgs($variant));
         }
     }
 }

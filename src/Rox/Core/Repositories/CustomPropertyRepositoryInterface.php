@@ -30,7 +30,7 @@ interface CustomPropertyRepositoryInterface
     function getAllCustomProperties();
 
     /**
-     * @param CustomPropertyEventHandlerInterface $eventHandler
+     * @param callable $eventHandler
      */
-    function addCustomPropertyEventHandler(CustomPropertyEventHandlerInterface $eventHandler);
+    function addCustomPropertyEventHandler(callable $eventHandler);
 }

@@ -2,8 +2,6 @@
 
 namespace Rox\Core\Repositories;
 
-use Rox\Core\CustomProperties\FlagAddedCallbackInterface;
-use Rox\Core\Entities\Flag;
 use Rox\Core\Entities\Variant;
 
 interface FlagRepositoryInterface
@@ -27,7 +25,7 @@ interface FlagRepositoryInterface
     function getAllFlags();
 
     /**
-     * @param FlagAddedCallbackInterface $callback
+     * @param callable $callback
      * @return void
      */
     function addFlagAddedCallback($callback);

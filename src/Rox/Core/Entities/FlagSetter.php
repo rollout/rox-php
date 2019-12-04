@@ -4,13 +4,12 @@ namespace Rox\Core\Entities;
 
 use Rox\Core\Configuration\Models\ExperimentModel;
 use Rox\Core\CustomProperties\FlagAddedCallbackArgs;
-use Rox\Core\CustomProperties\FlagAddedCallbackInterface;
 use Rox\Core\Impression\ImpressionInvokerInterface;
 use Rox\Core\Repositories\ExperimentRepositoryInterface;
 use Rox\Core\Repositories\FlagRepositoryInterface;
 use Rox\Core\Roxx\ParserInterface;
 
-class FlagSetter implements FlagAddedCallbackInterface
+class FlagSetter
 {
     /**
      * @var FlagRepositoryInterface $_flagRepository
@@ -49,19 +48,11 @@ class FlagSetter implements FlagAddedCallbackInterface
         $this->_parser = $parser;
         $this->_experimentRepository = $experimentRepository;
         $this->_impressionInvoker = $impressionInvoker;
-        $flagRepository->addFlagAddedCallback($this);
-    }
 
-    /**
-     * @param FlagRepositoryInterface $repository
-     * @param FlagAddedCallbackArgs $args
-     */
-    function onFlagAdded(
-        FlagRepositoryInterface $repository,
-        FlagAddedCallbackArgs $args)
-    {
-        $exp = $this->_experimentRepository->getExperimentByFlag($args->getVariant()->getName());
-        $this->_setFlagData($args->getVariant(), $exp);
+        $flagRepository->addFlagAddedCallback(function (FlagRepositoryInterface $sender, FlagAddedCallbackArgs $args) {
+            $exp = $this->_experimentRepository->getExperimentByFlag($args->getVariant()->getName());
+            $this->_setFlagData($args->getVariant(), $exp);
+        });
     }
 
     public function setExperiments()
