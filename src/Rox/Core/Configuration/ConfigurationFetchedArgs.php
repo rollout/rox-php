@@ -2,8 +2,6 @@
 
 namespace Rox\Core\Configuration;
 
-use Rox\Core\Utils\TimeUtils;
-
 class ConfigurationFetchedArgs
 {
     /**
@@ -42,7 +40,7 @@ class ConfigurationFetchedArgs
         $_hasChanges = false)
     {
         $this->_fetcherStatus = $_fetcherStatus;
-        $this->_creationDate = $_creationDate != null ? $_creationDate : TimeUtils::currentTimeMillis();
+        $this->_creationDate = $_creationDate;
         $this->_hasChanges = $_hasChanges;
         $this->_errorDetails = $_errorDetails;
     }
@@ -56,7 +54,7 @@ class ConfigurationFetchedArgs
     }
 
     /**
-     * @return float
+     * @return float|null
      */
     public function getCreationDate()
     {
