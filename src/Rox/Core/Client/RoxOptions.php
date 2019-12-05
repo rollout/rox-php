@@ -48,7 +48,7 @@ class RoxOptions implements RoxOptionsInterface
         }
 
         $this->_version = $roxOptionsBuilder->getVersion();
-        if (!$roxOptionsBuilder - $this->getVersion()) {
+        if (!$roxOptionsBuilder->getVersion()) {
             $this->_version = "0.0";
         }
 
