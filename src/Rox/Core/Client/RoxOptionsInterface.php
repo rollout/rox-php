@@ -15,11 +15,6 @@ interface RoxOptionsInterface
     function getVersion();
 
     /**
-     * @return int|null
-     */
-    function getFetchInterval();
-
-    /**
      * @return callable|null
      */
     function getImpressionHandler();

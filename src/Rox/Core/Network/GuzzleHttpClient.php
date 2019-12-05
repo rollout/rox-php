@@ -31,7 +31,7 @@ class GuzzleHttpClient implements HttpClientInterface
     {
         try {
             $uri = new Uri($requestData);
-            if ($requestData->getQueryParams() == null) {
+            if ($requestData->getQueryParams() != null) {
                 $uri = Uri::withQueryValues($uri, $requestData->getQueryParams());
             }
             return new Psr7ResponseWrapper($this->_client->send(new Request('GET', $uri)));

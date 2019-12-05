@@ -2,7 +2,6 @@
 
 namespace Rox\Core\Configuration;
 
-use Rox\Core\Client\InternalFlagsInterface;
 use Rox\Core\Client\SdkSettingsInterface;
 use Rox\Core\Core;
 use Rox\Core\Network\ConfigurationFetchResult;
@@ -72,10 +71,7 @@ class ConfigurationParserTests extends RoxTestCase
             ->byDefault()
             ->getMock();
 
-        $this->_cfi = new XConfigurationFetchedInvoker(
-            \Mockery::mock(InternalFlagsInterface::class),
-            \Mockery::mock(Core::class),
-            $this->_sdk);
+        $this->_cfi = new XConfigurationFetchedInvoker(\Mockery::mock(Core::class));
 
         $this->_cfi->register(function (ConfigurationFetchedInvokerInterface $sender, ConfigurationFetchedArgs $e) {
             $this->_cfiEvent = $e;

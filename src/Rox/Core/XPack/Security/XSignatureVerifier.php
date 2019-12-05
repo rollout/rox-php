@@ -13,8 +13,8 @@ class XSignatureVerifier implements SignatureVerifierInterface
      */
     function verify($data, $signatureBase64)
     {
-        $cert = base64_decode(self::ROXCertificateBase64);
-        $publicKey = openssl_pkey_get_public("-----BEGIN CERTIFICATE-----\n" . chunk_split(base64_encode($cert)) . "-----END CERTIFICATE-----");
+        $cert = chunk_split(self::ROXCertificateBase64);
+        $publicKey = openssl_pkey_get_public("-----BEGIN CERTIFICATE-----\n${cert}-----END CERTIFICATE-----");
         $signature = base64_decode($signatureBase64);
         return openssl_verify($data, $signature, $publicKey, OPENSSL_ALGO_SHA256) === 1;
     }

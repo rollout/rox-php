@@ -15,11 +15,6 @@ class RoxOptions implements RoxOptionsInterface
     private $_version;
 
     /**
-     * @var int|null
-     */
-    private $_fetchInterval;
-
-    /**
      * @var callable|null
      */
     private $_impressionHandler;
@@ -62,14 +57,6 @@ class RoxOptions implements RoxOptionsInterface
     function getVersion()
     {
         return $this->_version;
-    }
-
-    /**
-     * @return int|null
-     */
-    function getFetchInterval()
-    {
-        return $this->_fetchInterval;
     }
 
     /**

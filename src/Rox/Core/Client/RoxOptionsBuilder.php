@@ -15,11 +15,6 @@ class RoxOptionsBuilder
     private $_version;
 
     /**
-     * @var int|null
-     */
-    private $_fetchInterval;
-
-    /**
      * @var callable|null
      */
     private $_impressionHandler;
@@ -72,24 +67,6 @@ class RoxOptionsBuilder
     public function setVersion($version)
     {
         $this->_version = $version;
-        return $this;
-    }
-
-    /**
-     * @return int|null
-     */
-    public function getFetchInterval()
-    {
-        return $this->_fetchInterval;
-    }
-
-    /**
-     * @param int|null $fetchInterval
-     * @return RoxOptionsBuilder
-     */
-    public function setFetchInterval($fetchInterval)
-    {
-        $this->_fetchInterval = $fetchInterval;
         return $this;
     }
 

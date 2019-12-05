@@ -2,9 +2,10 @@
 
 namespace Rox\Core\XPack\Analytics\Model;
 
+use JsonSerializable;
 use Rox\Core\Utils\TimeUtils;
 
-class Event
+class Event implements JsonSerializable
 {
     /**
      * @var string $_flag
@@ -180,11 +181,11 @@ class Event
     }
 
     /**
-     * @return array
+     * @return string
      */
-    public function toJsonObject()
+    public function jsonSerialize()
     {
-        return [
+        return json_encode([
             'flag' => $this->_flag,
             'value' => $this->_value,
             'distinctId' => $this->_distinctId,
@@ -192,14 +193,6 @@ class Event
             'experimentVersion' => $this->_experimentVersion,
             'type' => $this->_type,
             'time' => $this->_time
-        ];
-    }
-
-    /**
-     * @return string
-     */
-    public function toJson()
-    {
-        return json_encode($this->toJsonObject());
+        ]);
     }
 }

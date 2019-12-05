@@ -2,8 +2,6 @@
 
 namespace Rox\Core\XPack\Configuration;
 
-use Rox\Core\Client\InternalFlagsInterface;
-use Rox\Core\Client\SdkSettingsInterface;
 use Rox\Core\Configuration\ConfigurationFetchedArgs;
 use Rox\Core\Configuration\ConfigurationFetchedInvoker;
 use Rox\Core\Configuration\ConfigurationFetchedInvokerInterface;
@@ -17,18 +15,10 @@ class XConfigurationFetchedInvokerTests extends RoxTestCase
 {
     public function testConfigurationInvokerWithNoSubscriberNoException()
     {
-        $configurationFetchedInvoker = new XConfigurationFetchedInvoker(
-            \Mockery::mock(InternalFlagsInterface::class),
-            \Mockery::mock(Core::class),
-            \Mockery::mock(SdkSettingsInterface::class));
-
+        $configurationFetchedInvoker = new XConfigurationFetchedInvoker(\Mockery::mock(Core::class));
         $configurationFetchedInvoker->invokeWithError(FetcherError::Unknown);
 
-        $configurationFetchedInvoker2 = new XConfigurationFetchedInvoker(
-            \Mockery::mock(InternalFlagsInterface::class),
-            \Mockery::mock(Core::class),
-            \Mockery::mock(SdkSettingsInterface::class));
-
+        $configurationFetchedInvoker2 = new XConfigurationFetchedInvoker(\Mockery::mock(Core::class));
         $configurationFetchedInvoker2->invoke(FetcherStatus::AppliedFromEmbedded,
             TimeUtils::currentTimeMillis(), true);
     }
@@ -90,10 +80,7 @@ class XConfigurationFetchedInvokerTests extends RoxTestCase
         $this->expectNoErrors();
 
         $isConfigurationHandlerInvokerRaised = [false];
-        $configurationFetchedInvoker = new XConfigurationFetchedInvoker(
-            \Mockery::mock(InternalFlagsInterface::class),
-            \Mockery::mock(Core::class),
-            \Mockery::mock(SdkSettingsInterface::class));
+        $configurationFetchedInvoker = new XConfigurationFetchedInvoker(\Mockery::mock(Core::class));
 
         $configurationFetchedInvoker->register(function (ConfigurationFetchedInvokerInterface $sender, ConfigurationFetchedArgs $e)
         use ($configurationFetchedInvoker, &$isConfigurationHandlerInvokerRaised) {
@@ -115,10 +102,7 @@ class XConfigurationFetchedInvokerTests extends RoxTestCase
     public function testConfigurationInvokerInvokeOK()
     {
         $isConfigurationHandlerInvokerRaised = [false];
-        $configurationFetchedInvoker = new XConfigurationFetchedInvoker(
-            \Mockery::mock(InternalFlagsInterface::class),
-            \Mockery::mock(Core::class),
-            \Mockery::mock(SdkSettingsInterface::class));
+        $configurationFetchedInvoker = new XConfigurationFetchedInvoker(\Mockery::mock(Core::class));
 
         $now = TimeUtils::currentTimeMillis();
         $status = FetcherStatus::AppliedFromNetwork;

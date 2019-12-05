@@ -2,7 +2,9 @@
 
 namespace Rox\Core\CustomProperties;
 
-class CustomProperty implements CustomPropertyInterface
+use JsonSerializable;
+
+class CustomProperty implements CustomPropertyInterface, JsonSerializable
 {
     /**
      * @var CustomPropertyType $_type
@@ -63,12 +65,20 @@ class CustomProperty implements CustomPropertyInterface
     /**
      * @return string
      */
-    public function __toString()
+    public function jsonSerialize()
     {
         return json_encode([
             "name" => $this->_name,
             "type" => $this->_type->getType(),
             "externalType" => $this->_type->getExternalType()
         ]);
+    }
+
+    /**
+     * @return string
+     */
+    public function __toString()
+    {
+        return $this->jsonSerialize();
     }
 }
