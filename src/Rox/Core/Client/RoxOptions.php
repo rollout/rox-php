@@ -2,6 +2,8 @@
 
 namespace Rox\Core\Client;
 
+use Rox\Core\Logging\LoggerFactory;
+
 class RoxOptions implements RoxOptionsInterface
 {
     /**
@@ -36,11 +38,28 @@ class RoxOptions implements RoxOptionsInterface
 
     /**
      * RoxOptions constructor.
-     * @param RoxOptionsBuilder $builder
+     * @param RoxOptionsBuilder $roxOptionsBuilder
      */
-    public function __construct(RoxOptionsBuilder $builder)
+    public function __construct(RoxOptionsBuilder $roxOptionsBuilder)
     {
-        // TODO: initialize from $builder
+        $this->_devModeKey = $roxOptionsBuilder->getDevModeKey();
+        if (!$roxOptionsBuilder->getDevModeKey()) {
+            $this->_devModeKey = "stam";
+        }
+
+        $this->_version = $roxOptionsBuilder->getVersion();
+        if (!$roxOptionsBuilder - $this->getVersion()) {
+            $this->_version = "0.0";
+        }
+
+        if ($roxOptionsBuilder->getLoggerFactory() != null) {
+            LoggerFactory::setup($roxOptionsBuilder->getLoggerFactory());
+        }
+
+        $this->_impressionHandler = $roxOptionsBuilder->getImpressionHandler();
+        $this->_configurationFetchedHandler = $roxOptionsBuilder->getConfigurationFetchedHandler();
+        $this->_roxyURL = $roxOptionsBuilder->getRoxyURL();
+        $this->_dynamicPropertiesRule = $roxOptionsBuilder->getDynamicPropertiesRule();
     }
 
     /**
