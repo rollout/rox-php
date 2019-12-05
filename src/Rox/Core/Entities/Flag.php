@@ -24,7 +24,7 @@ class Flag extends Variant
     /**
      * @param ContextInterface|null $context
      * @param bool $nullInsteadOfDefault
-     * @return bool
+     * @return bool|null
      */
     public function isEnabled($context, $nullInsteadOfDefault = false)
     {
