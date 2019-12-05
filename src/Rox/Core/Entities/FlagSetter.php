@@ -69,7 +69,7 @@ class FlagSetter
         }
 
         foreach (array_values($this->_flagRepository->getAllFlags()) as /*Variant*/ $variant) {
-            if (array_search($variant->getName(), $flagsWithCondition) === false) {
+            if (!in_array($variant->getName(), $flagsWithCondition)) {
                 $this->_setFlagData($variant);
             }
         }

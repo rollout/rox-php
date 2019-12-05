@@ -65,11 +65,8 @@ class XImpressionInvoker implements ImpressionInvokerInterface
      */
     function register(callable $handler)
     {
-        if ($handler == null) {
-            return;
-        }
-        if (array_search($handler, $this->_eventHandlers) === false) {
-            array_push($this->_eventHandlers, $handler);
+        if (!in_array($handler, $this->_eventHandlers)) {
+            $this->_eventHandlers[] = $handler;
         }
     }
 

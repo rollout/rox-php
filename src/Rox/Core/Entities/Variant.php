@@ -59,9 +59,9 @@ class Variant
      */
     public function __construct($defaultValue = null, $options = [])
     {
-        if (array_search($defaultValue, $options) === false) {
+        if (!in_array($defaultValue, $options)) {
             $allOptions = (new ArrayObject($options))->getArrayCopy();
-            array_push($allOptions, $defaultValue);
+            $allOptions[] = $defaultValue;
             $this->_options = $allOptions;
         } else {
             $this->_options = (new ArrayObject($options))->getArrayCopy();
