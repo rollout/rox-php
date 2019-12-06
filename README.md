@@ -26,3 +26,11 @@ From the project root run
 composer update
 composer test
 ```
+
+### Running Demo Server
+
+Run demo server which interacts with Rox API located at http://localhost:8557/.
+
+```
+composer run demo
+```

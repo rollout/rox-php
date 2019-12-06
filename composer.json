@@ -37,6 +37,7 @@
     "mockery/mockery": "^0.9.11"
   },
   "scripts": {
-    "test": "phpunit"
+    "test": "phpunit",
+    "demo": "php -S 0.0.0.0:8080 demo.php"
   }
 }
