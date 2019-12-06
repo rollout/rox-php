@@ -49,6 +49,6 @@ class ConfigurationFetchResult
     public function equals(ConfigurationFetchResult $other)
     {
         return $this->_parsedData != null && $other->_parsedData != null &&
-            json_encode($this->_parsedData) == json_encode($other->_parsedData);
+            json_encode($this->_parsedData) === json_encode($other->_parsedData);
     }
 }

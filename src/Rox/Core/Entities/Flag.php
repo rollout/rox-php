@@ -26,7 +26,7 @@ class Flag extends Variant
      * @param bool $nullInsteadOfDefault
      * @return bool|null
      */
-    public function isEnabled($context, $nullInsteadOfDefault = false)
+    public function isEnabled($context = null, $nullInsteadOfDefault = false)
     {
         $value = $this->getValue($context, $nullInsteadOfDefault);
         return $nullInsteadOfDefault && ($value === null) ? null : $this->isEnabledFromString($value);

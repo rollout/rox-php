@@ -64,7 +64,7 @@ class XBUID implements BUIDInterface
      */
     function getQueryStringParts()
     {
-        return [PropertyType::getBuid()->getName(), $this->getValue()];
+        return [PropertyType::getBuid()->getName() => $this->getValue()];
     }
 
     /**

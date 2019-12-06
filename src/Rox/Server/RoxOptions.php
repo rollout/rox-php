@@ -1,7 +1,8 @@
 <?php
 
-namespace Rox\Core\Client;
+namespace Rox\Server;
 
+use Rox\Core\Client\RoxOptionsInterface;
 use Rox\Core\Logging\LoggerFactory;
 
 class RoxOptions implements RoxOptionsInterface

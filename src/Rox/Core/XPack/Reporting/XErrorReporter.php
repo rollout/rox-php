@@ -86,8 +86,7 @@ class XErrorReporter implements ErrorReporterInterface
         $this->_log->debug("Sending bugsnag error report...");
 
         try {
-            $content = new StringContent(json_encode($payload), 'UTF-8', 'application/json');
-            $this->_request->postContent(self::BUGSNAG_NOTIFY_URL, $content);
+            $this->_request->postJson(self::BUGSNAG_NOTIFY_URL, $payload);
             $this->_log->debug("Bugsnag error report was sent");
         } catch (Exception $e) {
             $this->_log->error("Failed to send bugsnag error ", [

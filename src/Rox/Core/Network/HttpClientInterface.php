@@ -24,8 +24,8 @@ interface HttpClientInterface
 
     /**
      * @param string $uri
-     * @param StringContent $content
+     * @param array $data
      * @return HttpResponseInterface
      */
-    function postContent($uri, StringContent $content);
+    function postJson($uri, array $data);
 }

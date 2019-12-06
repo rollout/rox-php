@@ -3,11 +3,7 @@
 namespace Rox\Core\Roxx;
 
 use Rox\Core\Context\ContextInterface;
-
-function is_numeric_strict($val)
-{
-    return is_int($val) || is_float($val);
-}
+use Rox\Core\Utils\DotNetCompat;
 
 class ValueCompareExtensions
 {
@@ -27,7 +23,7 @@ class ValueCompareExtensions
             $op1 = $stack->pop();
             $op2 = $stack->pop();
 
-            if (!(is_numeric_strict($op1)) || !(is_numeric_strict($op2))) {
+            if (!(DotNetCompat::isNumericStrict($op1)) || !(DotNetCompat::isNumericStrict($op2))) {
                 $stack->push(false);
                 return;
             }
@@ -42,7 +38,7 @@ class ValueCompareExtensions
             $op1 = $stack->pop();
             $op2 = $stack->pop();
 
-            if (!(is_numeric_strict($op1)) || !(is_numeric_strict($op2))) {
+            if (!(DotNetCompat::isNumericStrict($op1)) || !(DotNetCompat::isNumericStrict($op2))) {
                 $stack->push(false);
                 return;
             }
@@ -57,7 +53,7 @@ class ValueCompareExtensions
             $op1 = $stack->pop();
             $op2 = $stack->pop();
 
-            if (!(is_numeric_strict($op1)) || !(is_numeric_strict($op2))) {
+            if (!(DotNetCompat::isNumericStrict($op1)) || !(DotNetCompat::isNumericStrict($op2))) {
                 $stack->push(false);
                 return;
             }
@@ -72,7 +68,7 @@ class ValueCompareExtensions
             $op1 = $stack->pop();
             $op2 = $stack->pop();
 
-            if (!(is_numeric_strict($op1)) || !(is_numeric_strict($op2))) {
+            if (!(DotNetCompat::isNumericStrict($op1)) || !(DotNetCompat::isNumericStrict($op2))) {
                 $stack->push(false);
                 return;
             }

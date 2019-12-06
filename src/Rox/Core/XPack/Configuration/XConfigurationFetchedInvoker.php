@@ -2,11 +2,9 @@
 
 namespace Rox\Core\XPack\Configuration;
 
-use Exception;
 use Psr\Log\LoggerInterface;
 use Rox\Core\Configuration\AbstractConfigurationFetchedInvoker;
 use Rox\Core\Configuration\ConfigurationFetchedArgs;
-use Rox\Core\Configuration\FetcherStatus;
 use Rox\Core\Core;
 use Rox\Core\Logging\LoggerFactory;
 
@@ -34,16 +32,7 @@ class XConfigurationFetchedInvoker extends AbstractConfigurationFetchedInvoker
 
     protected function internalInvoke(ConfigurationFetchedArgs $cfa)
     {
-        try {
-            if ($cfa->getFetcherStatus() !== FetcherStatus::ErrorFetchedFailed) {
-                $this->_core->fetch(true);
-            }
-        } catch (Exception $ex) {
-            $this->_log->error("Failed to fetch configuration", [
-                'exception' => $ex
-            ]);
-        }
-
+        // rox.internal.pushUpdates code omitted
         $this->fireConfigurationFetched($cfa);
     }
 }

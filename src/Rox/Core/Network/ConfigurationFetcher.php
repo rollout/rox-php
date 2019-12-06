@@ -117,7 +117,7 @@ class ConfigurationFetcher extends ConfigurationFetcherBase
                 $source = ConfigurationSource::API;
 
                 $fetchResult = $this->_fetchFromAPI($properties);
-                if ($fetchResult->getStatusCode() >= 200 && $fetchResult->getStatusCode() < 299) {
+                if ($fetchResult->isSuccessfulStatusCode()) {
                     return $this->createConfigurationResult($fetchResult->getContent()->readAsString(), $source);
                 }
             }

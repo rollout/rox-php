@@ -7,6 +7,7 @@ use GuzzleHttp\ClientInterface;
 use GuzzleHttp\Exception\GuzzleException;
 use GuzzleHttp\Psr7\Request;
 use GuzzleHttp\Psr7\Uri;
+use GuzzleHttp\RequestOptions;
 
 class GuzzleHttpClient implements HttpClientInterface
 {
@@ -20,7 +21,7 @@ class GuzzleHttpClient implements HttpClientInterface
      */
     public function __construct()
     {
-        $this->_client = new Client();
+        $this->_client = new Client(['verify' => false]);
     }
 
     /**
@@ -30,7 +31,7 @@ class GuzzleHttpClient implements HttpClientInterface
     function sendGet(RequestData $requestData)
     {
         try {
-            $uri = new Uri($requestData);
+            $uri = new Uri($requestData->getUrl());
             if ($requestData->getQueryParams() != null) {
                 $uri = Uri::withQueryValues($uri, $requestData->getQueryParams());
             }
@@ -46,27 +47,21 @@ class GuzzleHttpClient implements HttpClientInterface
      */
     function sendPost(RequestData $requestData)
     {
-        return $this->postContent($requestData->getUrl(), new StringContent(
-            json_encode($requestData->getQueryParams()),
-            'application/json',
-            'URF-8'
-        ));
+        return $this->postJson($requestData->getUrl(), $requestData->getQueryParams());
     }
 
     /**
      * @param string $uri
-     * @param StringContent $content
+     * @param array $data
      * @return HttpResponseInterface
      */
-    function postContent($uri, StringContent $content)
+    function postJson($uri, array $data)
     {
         try {
             $uriToSend = new Uri($uri);
-            $request = new Request('POST', $uriToSend, [
-                'Content-Type' => $content->getContentType() . '; charset=' . $content->getEncoding()
-            ]);
-            $request->withBody(\GuzzleHttp\Psr7\stream_for($content->getContent()));
-            return new Psr7ResponseWrapper($this->_client->send($request));
+            return new Psr7ResponseWrapper($this->_client->post($uriToSend, [
+                RequestOptions::JSON => $data
+            ]));
         } catch (GuzzleException $e) {
             throw new HttpClientException("Failed to send POST request to ${uri}", $e);
         }

@@ -25,7 +25,7 @@ class StringContent
      * @param string $contentType
      * @param string $encoding
      */
-    public function __construct($content, $contentType, $encoding = 'URF-8')
+    public function __construct($content, $contentType, $encoding = 'UTF-8')
     {
         $this->_content = $content;
         $this->_contentType = $contentType;

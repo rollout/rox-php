@@ -1,6 +1,6 @@
 <?php
 
-namespace Rox\Core\Client;
+namespace Rox\Server;
 
 use Rox\Core\Logging\LoggerFactoryInterface;
 

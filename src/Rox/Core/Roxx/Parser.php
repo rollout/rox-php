@@ -7,6 +7,7 @@ use Psr\Log\LoggerInterface;
 use Rox\Core\Context\ContextBuilder;
 use Rox\Core\Context\ContextInterface;
 use Rox\Core\Logging\LoggerFactory;
+use Rox\Core\Utils\DotNetCompat;
 use Rox\Core\Utils\TimeUtils;
 
 class Parser implements ParserInterface
@@ -116,11 +117,11 @@ class Parser implements ParserInterface
                 $op2 = false;
             }
 
-            if (is_numeric_strict($op1)) {
+            if (DotNetCompat::isNumericStrict($op1)) {
                 $op1 = (float)$op1; // cast int to float for comparison
             }
 
-            if (is_numeric_strict($op2)) {
+            if (DotNetCompat::isNumericStrict($op2)) {
                 $op2 = (float)$op2; // cast int to float for comparison
             }
 

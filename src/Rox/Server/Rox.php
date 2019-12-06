@@ -6,8 +6,6 @@ use Exception;
 use Psr\Log\LoggerInterface;
 use Ramsey\Uuid\Uuid;
 use Rox\Core\Client\DynamicApiInterface;
-use Rox\Core\Client\RoxOptions;
-use Rox\Core\Client\RoxOptionsBuilder;
 use Rox\Core\Client\SdkSettings;
 use Rox\Core\Consts\PropertyType;
 use Rox\Core\Context\ContextInterface;
@@ -19,6 +17,7 @@ use Rox\Core\Entities\RoxContainerInterface;
 use Rox\Core\Logging\LoggerFactory;
 use Rox\Server\Client\ServerProperties;
 use Rox\Server\Flags\ServerEntitiesProvider;
+use RuntimeException;
 
 class Rox
 {
@@ -57,7 +56,6 @@ class Rox
     /**
      * @param string $apiKey
      * @param RoxOptions|null $roxOptions
-     * @throws Exception
      */
     public static function setup($apiKey, $roxOptions = null)
     {
@@ -65,6 +63,7 @@ class Rox
             if ($roxOptions == null) {
                 $roxOptions = new RoxOptions(new RoxOptionsBuilder());
             }
+
             $sdkSettings = new SdkSettings($apiKey, $roxOptions->getDevModeKey());
             $serverProperties = new ServerProperties($sdkSettings, $roxOptions);
 
@@ -89,7 +88,7 @@ class Rox
             self::getLog()->error("Failed in Rox::setup", [
                 'exception' => $ex
             ]);
-            throw new Exception("Rox::setup failed. see innerException", $ex);
+            throw new RuntimeException("Rox::setup failed. see innerException", $ex);
         }
     }
 
