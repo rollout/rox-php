@@ -10,7 +10,7 @@ class DeviceProperties implements DevicePropertiesInterface
 {
     const DEFAULT_LIB_VERSION = '1.0.0';
     const DEFAULT_DISTINCT_ID = 'stam'; // FIXME: what?
-    const BUILD_NUMBER = "50";
+    const BUILD_NUMBER = "50"; // FIXME: fix the build number
 
     /**
      * @var SdkSettingsInterface $_sdkSettings
@@ -46,7 +46,7 @@ class DeviceProperties implements DevicePropertiesInterface
                 $this->getLibVersion(),
 
             PropertyType::getRolloutBuild()->getName() =>
-                self::BUILD_NUMBER, // TODO: fix the build number
+                self::BUILD_NUMBER,
 
             PropertyType::getApiVersion()->getName() =>
                 Build::API_VERSION,
