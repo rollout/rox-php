@@ -7,6 +7,9 @@ use Rox\Server\Rox;
 use Rox\Server\RoxOptions;
 use Rox\Server\RoxOptionsBuilder;
 
+const DEFAULT_API_KEY = '5b3356d00d81206da3055bc0';
+const DEFAULT_DEV_MODE_KEY = '01fcd0d21eeaed9923dff6d8';
+
 require __DIR__ . '/vendor/autoload.php';
 
 class Container implements RoxContainerInterface
@@ -25,11 +28,11 @@ if (!isset($_ENV[Environment::ENV_VAR_NAME])) {
 
 $apiKey = isset($_ENV['ROLLOUT_API_KEY'])
     ? $_ENV['ROLLOUT_API_KEY']
-    : '5b3356d00d81206da3055bc0';
+    : DEFAULT_API_KEY;
 
 $devModeKey = isset($_ENV['ROLLOUT_DEV_MODE_KEY'])
     ? $_ENV['ROLLOUT_DEV_MODE_KEY']
-    : '01fcd0d21eeaed9923dff6d8';
+    : DEFAULT_DEV_MODE_KEY;
 
 $con = new Container();
 Rox::register('demo', $con);

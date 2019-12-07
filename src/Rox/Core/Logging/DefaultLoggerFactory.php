@@ -2,17 +2,86 @@
 
 namespace Rox\Core\Logging;
 
+use Exception;
+use Monolog\Handler\HandlerInterface;
+use Monolog\Handler\StreamHandler;
+use Monolog\Logger;
 use Psr\Log\LoggerInterface;
+use Psr\Log\LogLevel;
+use RuntimeException;
 
 final class DefaultLoggerFactory implements LoggerFactoryInterface
 {
+    /**
+     * @var HandlerInterface[] $_defaultHandlers
+     */
+    private $_defaultHandlers = [];
+
+    /**
+     * @var LogLevel $_defaultLevel
+     */
+    private $_defaultLevel;
+
+    /**
+     * DefaultLoggerFactory constructor.
+     */
+    private function __construct()
+    {
+        try {
+            $this->_defaultLevel = LogLevel::DEBUG;
+            $this->_defaultHandlers = [
+                new StreamHandler('php://stdout', $this->_defaultLevel)
+            ];
+        } catch (Exception $e) {
+            throw new RuntimeException("Failed to setup default logger factory", 0, $e);
+        }
+    }
+
+    /**
+     * @return HandlerInterface[]
+     */
+    public function getDefaultHandlers()
+    {
+        return $this->_defaultHandlers;
+    }
+
+    /**
+     * @param HandlerInterface[] $defaultHandlers
+     * @return DefaultLoggerFactory
+     */
+    public function setDefaultHandlers($defaultHandlers)
+    {
+        $this->_defaultHandlers = $defaultHandlers;
+        return $this;
+    }
+
+    /**
+     * @return LogLevel
+     */
+    public function getDefaultLevel()
+    {
+        return $this->_defaultLevel;
+    }
+
+    /**
+     * @param LogLevel $defaultLevel
+     * @return DefaultLoggerFactory
+     */
+    public function setDefaultLevel($defaultLevel)
+    {
+        $this->_defaultLevel = $defaultLevel;
+        return $this;
+    }
+
     /**
      * @param string $name
      * @return LoggerInterface
      */
     function createLogger($name)
     {
-        return new DefaultLogger($name);
+        $log = new Logger($name);
+        $log->setHandlers($this->_defaultHandlers);
+        return $log;
     }
 
     /**
