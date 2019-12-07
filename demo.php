@@ -13,9 +13,6 @@ class Container implements RoxContainerInterface
 {
     public $demoFlag;
 
-    /**
-     * Container constructor.
-     */
     public function __construct()
     {
         $this->demoFlag = new RoxFlag();
