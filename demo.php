@@ -11,14 +11,14 @@ require __DIR__ . '/vendor/autoload.php';
 
 class Container implements RoxContainerInterface
 {
-    public $FirstFlag;
+    public $demoFlag;
 
     /**
      * Container constructor.
      */
     public function __construct()
     {
-        $this->FirstFlag = new RoxFlag();
+        $this->demoFlag = new RoxFlag();
     }
 }
 
@@ -26,14 +26,22 @@ if (!isset($_ENV[Environment::ENV_VAR_NAME])) {
     $_ENV[Environment::ENV_VAR_NAME] = Environment::LOCAL;
 }
 
-$con = new Container();
-Rox::register("test", $con);
-Rox::setup("5ae089f994ea359740e9e788",
-    new RoxOptions((new RoxOptionsBuilder())
-        ->setDevModeKey("6f66e1826dea3acd69abedec")));
+$apiKey = isset($_ENV['ROLLOUT_API_KEY'])
+    ? $_ENV['ROLLOUT_API_KEY']
+    : '5b3356d00d81206da3055bc0';
 
-if ($con->FirstFlag->isEnabled()) {
-    echo 'FEATURE IS ON';
+$devModeKey = isset($_ENV['ROLLOUT_DEV_MODE_KEY'])
+    ? $_ENV['ROLLOUT_DEV_MODE_KEY']
+    : '01fcd0d21eeaed9923dff6d8';
+
+$con = new Container();
+Rox::register('demo', $con);
+Rox::setup($apiKey,
+    new RoxOptions((new RoxOptionsBuilder())
+        ->setDevModeKey($devModeKey)));
+
+if ($con->demoFlag->isEnabled()) {
+    echo 'demo.demoFlag: FEATURE IS ON';
 } else {
-    echo 'FEATURE IS OFF';
+    echo 'demo.demoFlag: FEATURE IS OFF';
 }

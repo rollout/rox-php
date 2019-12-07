@@ -29,7 +29,13 @@ composer test
 
 ### Running Demo Server
 
-Run demo server which interacts with Rox API located at http://localhost:8557/.
+Demo uses the following environment variables defined in the system:
+
+ - `ROLLOUT_MODE` - can be `LOCAL`, `QA` (default), or `PROD`
+ - `ROLLOUT_API_KEY`
+ - `ROLLOUT_DEV_MOD_KEY`
+ 
+These variables can be set before run. To start demo server at `localhost:8080` run
 
 ```
 composer run demo
