@@ -23,7 +23,7 @@ class Container implements RoxContainerInterface
 }
 
 if (!isset($_ENV[Environment::ENV_VAR_NAME])) {
-    $_ENV[Environment::ENV_VAR_NAME] = Environment::LOCAL;
+    $_ENV[Environment::ENV_VAR_NAME] = Environment::QA;
 }
 
 $apiKey = isset($_ENV['ROLLOUT_API_KEY'])
