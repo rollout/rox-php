@@ -36,4 +36,9 @@ class TestLoggerFactory implements LoggerFactoryInterface
     {
         return $this->_logger;
     }
+
+    function resetLogger()
+    {
+        $this->_logger = new TestLogger();
+    }
 }

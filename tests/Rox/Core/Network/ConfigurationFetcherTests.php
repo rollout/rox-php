@@ -7,8 +7,6 @@ use Rox\Core\Client\BUIDInterface;
 use Rox\Core\Client\DevicePropertiesInterface;
 use Rox\Core\Configuration\ConfigurationFetchedInvoker;
 use Rox\Core\Consts\PropertyType;
-use Rox\Core\Logging\LoggerFactory;
-use Rox\Core\Logging\TestLoggerFactory;
 use Rox\Core\Reporting\ErrorReporterInterface;
 use Rox\RoxTestCase;
 
@@ -32,9 +30,6 @@ class ConfigurationFetcherTests extends RoxTestCase
     protected function setUp()
     {
         parent::setUp();
-
-        $this->_loggerFactory = new TestLoggerFactory();
-        LoggerFactory::setup($this->_loggerFactory);
 
         $this->_dp = \Mockery::mock(DevicePropertiesInterface::class)
             ->shouldReceive('getAllProperties')

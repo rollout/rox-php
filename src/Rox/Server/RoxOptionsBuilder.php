@@ -3,6 +3,7 @@
 namespace Rox\Server;
 
 use Rox\Core\Logging\LoggerFactoryInterface;
+use Rox\Core\Network\HttpClientFactoryInterface;
 
 class RoxOptionsBuilder
 {
@@ -40,6 +41,16 @@ class RoxOptionsBuilder
      * @var LoggerFactoryInterface $_loggerFactory
      */
     private $_loggerFactory;
+
+    /**
+     * @var HttpClientFactoryInterface $_httpClientFactory
+     */
+    private $_httpClientFactory;
+
+    /**
+     * @var string|null
+     */
+    private $_distinctId;
 
     /**
      * @return string
@@ -164,6 +175,42 @@ class RoxOptionsBuilder
     public function setLoggerFactory(LoggerFactoryInterface $loggerFactory)
     {
         $this->_loggerFactory = $loggerFactory;
+        return $this;
+    }
+
+    /**
+     * @return HttpClientFactoryInterface
+     */
+    public function getHttpClientFactory()
+    {
+        return $this->_httpClientFactory;
+    }
+
+    /**
+     * @param HttpClientFactoryInterface $httpClientFactory
+     * @return RoxOptionsBuilder
+     */
+    public function setHttpClientFactory($httpClientFactory)
+    {
+        $this->_httpClientFactory = $httpClientFactory;
+        return $this;
+    }
+
+    /**
+     * @return string|null
+     */
+    public function getDistinctId()
+    {
+        return $this->_distinctId;
+    }
+
+    /**
+     * @param string|null $distinctId
+     * @return RoxOptionsBuilder
+     */
+    public function setDistinctId($distinctId)
+    {
+        $this->_distinctId = $distinctId;
         return $this;
     }
 }

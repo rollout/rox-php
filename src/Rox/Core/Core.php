@@ -31,7 +31,7 @@ use Rox\Core\Network\ConfigurationFetcher;
 use Rox\Core\Network\ConfigurationFetcherInterface;
 use Rox\Core\Network\ConfigurationFetcherRoxy;
 use Rox\Core\Network\ConfigurationFetchResult;
-use Rox\Core\Network\GuzzleHttpClient;
+use Rox\Core\Network\GuzzleHttpClientFactory;
 use Rox\Core\Register\Registerer;
 use Rox\Core\Reporting\ErrorReporterInterface;
 use Rox\Core\Repositories\CustomPropertyRepositoryInterface;
@@ -200,8 +200,16 @@ class Core
 
         $this->_deviceProperties = $deviceProperties;
 
-        $request = new GuzzleHttpClient();
-        $reportRequest = new GuzzleHttpClient();
+        $httpClientFactory = $roxOptions != null
+            ? $roxOptions->getHttpClientFactory()
+            : null;
+
+        if ($httpClientFactory == null) {
+            $httpClientFactory = new GuzzleHttpClientFactory();
+        }
+
+        $request = $httpClientFactory->createHttpClient();
+        $reportRequest = $httpClientFactory->createHttpClient();
 
         $this->_internalFlags = new InternalFlags($this->_experimentRepository, $this->_parser);
         $buid = new XBUID($sdkSettings, $deviceProperties);

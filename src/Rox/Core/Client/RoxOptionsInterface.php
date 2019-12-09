@@ -2,6 +2,8 @@
 
 namespace Rox\Core\Client;
 
+use Rox\Core\Network\HttpClientFactoryInterface;
+
 interface RoxOptionsInterface
 {
     /**
@@ -33,4 +35,14 @@ interface RoxOptionsInterface
      * @return callable|null
      */
     function getDynamicPropertiesRule();
+
+    /**
+     * @return HttpClientFactoryInterface
+     */
+    function getHttpClientFactory();
+
+    /**
+     * @return string|null
+     */
+    function getDistinctId();
 }

@@ -2,8 +2,11 @@
 
 namespace Rox\Server;
 
+use Ramsey\Uuid\Uuid;
 use Rox\Core\Client\RoxOptionsInterface;
 use Rox\Core\Logging\LoggerFactory;
+use Rox\Core\Network\GuzzleHttpClientFactory;
+use Rox\Core\Network\HttpClientFactoryInterface;
 
 class RoxOptions implements RoxOptionsInterface
 {
@@ -38,6 +41,16 @@ class RoxOptions implements RoxOptionsInterface
     private $_dynamicPropertiesRule;
 
     /**
+     * @var HttpClientFactoryInterface $_httpClientFactory
+     */
+    private $_httpClientFactory;
+
+    /**
+     * @var string|null
+     */
+    private $_distinctId;
+
+    /**
      * RoxOptions constructor.
      * @param RoxOptionsBuilder $roxOptionsBuilder
      */
@@ -61,6 +74,22 @@ class RoxOptions implements RoxOptionsInterface
         $this->_configurationFetchedHandler = $roxOptionsBuilder->getConfigurationFetchedHandler();
         $this->_roxyURL = $roxOptionsBuilder->getRoxyURL();
         $this->_dynamicPropertiesRule = $roxOptionsBuilder->getDynamicPropertiesRule();
+
+        if ($roxOptionsBuilder->getHttpClientFactory() != null) {
+            $this->_httpClientFactory = $roxOptionsBuilder->getHttpClientFactory();
+        } else {
+            $this->_httpClientFactory = new GuzzleHttpClientFactory();
+        }
+
+        if ($roxOptionsBuilder->getDistinctId() != null) {
+            $this->_distinctId = $roxOptionsBuilder->getDistinctId();
+        } else {
+            try {
+                $this->_distinctId = Uuid::uuid4()->toString();
+            } catch (\Exception $e) {
+                $this->_distinctId = uniqid('rox-php-sdk');
+            }
+        }
     }
 
     /**
@@ -109,5 +138,21 @@ class RoxOptions implements RoxOptionsInterface
     function getDynamicPropertiesRule()
     {
         return $this->_dynamicPropertiesRule;
+    }
+
+    /**
+     * @return HttpClientFactoryInterface
+     */
+    function getHttpClientFactory()
+    {
+        return $this->_httpClientFactory;
+    }
+
+    /**
+     * @return string|null
+     */
+    function getDistinctId()
+    {
+        return $this->_distinctId;
     }
 }

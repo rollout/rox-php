@@ -2,6 +2,8 @@
 
 namespace Rox\E2E;
 
+use Kevinrob\GuzzleCache\CacheMiddleware;
+use Kevinrob\GuzzleCache\Strategy\GreedyCacheStrategy;
 use Rox\Core\Configuration\ConfigurationFetchedArgs;
 use Rox\Core\Configuration\ConfigurationFetchedInvokerInterface;
 use Rox\Core\Configuration\FetcherStatus;
@@ -9,6 +11,9 @@ use Rox\Core\Consts\Environment;
 use Rox\Core\Context\ContextBuilder;
 use Rox\Core\Impression\ImpressionArgs;
 use Rox\Core\Impression\ImpressionInvokerInterface;
+use Rox\Core\Logging\TestLoggerFactory;
+use Rox\Core\Network\GuzzleHttpClientFactory;
+use Rox\Core\Network\GuzzleHttpClientOptions;
 use Rox\RoxTestCase;
 use Rox\Server\Rox;
 use Rox\Server\RoxOptions;
@@ -16,9 +21,16 @@ use Rox\Server\RoxOptionsBuilder;
 
 class RoxE2ETests extends RoxTestCase
 {
+    /**
+     * @var TestLoggerFactory $_staticLoggerFactory
+     */
+    private static $_staticLoggerFactory;
+
     public static function setUpBeforeClass()
     {
         $_ENV[Environment::ENV_VAR_NAME] = Environment::QA;
+
+        self::$_staticLoggerFactory = new TestLoggerFactory();
 
         $options = new RoxOptions((new RoxOptionsBuilder())
             ->setConfigurationFetchedHandler(function (ConfigurationFetchedInvokerInterface $sender, ConfigurationFetchedArgs $args) {
@@ -34,7 +46,17 @@ class RoxE2ETests extends RoxTestCase
                 }
                 TestVars::$impressionReturnedArgs = $args;
             })
-            ->setDevModeKey("01fcd0d21eeaed9923dff6d8"));
+            ->setDevModeKey("01fcd0d21eeaed9923dff6d8")
+            ->setDistinctId(self::class)
+            ->setHttpClientFactory(
+                new GuzzleHttpClientFactory(
+                    (new GuzzleHttpClientOptions())
+                        ->setLogCacheHitsAndMisses(true)
+                        ->setNoCachePaths([Environment::getStateCdnPath()])
+                        ->addMiddleware(new CacheMiddleware(
+                            new GreedyCacheStrategy(null, 180)
+                        ), 'cache'))
+            )->setLoggerFactory(self::$_staticLoggerFactory));
 
         Rox::register("", Container::getInstance());
         TestCustomPropsCreator::createCustomProps();
@@ -170,5 +192,26 @@ class RoxE2ETests extends RoxTestCase
         $this->assertEquals("White", Container::getInstance()->flagColorDependentWithContext->getValue());
         $this->assertEquals("White", Container::getInstance()->flagColorDependentWithContext->getValue($someNegativeContext));
         $this->assertEquals("Yellow", Container::getInstance()->flagColorDependentWithContext->getValue($somePositiveContext));
+    }
+
+    public function testShouldUseCacheForConfig()
+    {
+        Rox::fetch();
+
+        $this->assertTrue(self::$_staticLoggerFactory->getLogger()->hasDebugThatPasses(function ($record) {
+            return strpos($record['message'], Environment::getCdnPath()) !== false &&
+                strpos($record['message'], 'HIT') !== false;
+        }));
+    }
+
+    public function testShouldNotUseCacheForSendingState()
+    {
+        Rox::fetch();
+
+        $this->assertFalse(self::$_staticLoggerFactory->getLogger()->hasDebugThatPasses(function ($record) {
+            return strpos($record['message'], Environment::getStateCdnPath()) !== false &&
+                (strpos($record['message'], 'HIT') !== false ||
+                    strpos($record['message'], 'MISS') !== false);
+        }));
     }
 }

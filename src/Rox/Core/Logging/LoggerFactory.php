@@ -19,7 +19,7 @@ class LoggerFactory
     /**
      * @return LoggerFactoryInterface
      */
-    public static function getInstance()
+    static function getInstance()
     {
         if (self::$_instance == null) {
             return DefaultLoggerFactory::getInstance();
@@ -28,7 +28,7 @@ class LoggerFactory
     }
 
     /**
-     * @var LoggerFactoryInterface $log
+     * @var LoggerFactoryInterface $_instance
      */
     private static $_instance;
 }

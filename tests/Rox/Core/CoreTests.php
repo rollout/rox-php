@@ -89,6 +89,9 @@ class CoreTests extends RoxTestCase
             ->getMock()
             ->shouldReceive('getDynamicPropertiesRule')
             ->andReturnNull()
+            ->getMock()
+            ->shouldReceive('getHttpClientFactory')
+            ->andReturnNull()
             ->getMock();
 
         $c = new Core();
@@ -107,6 +110,9 @@ class CoreTests extends RoxTestCase
             ->andReturnNull()
             ->getMock()
             ->shouldReceive('getDevModeKey')
+            ->andReturnNull()
+            ->getMock()
+            ->shouldReceive('getDistinctId')
             ->andReturnNull()
             ->getMock();
 

@@ -18,19 +18,20 @@ final class DefaultLoggerFactory implements LoggerFactoryInterface
     private $_defaultHandlers = [];
 
     /**
-     * @var LogLevel $_defaultLevel
+     * @var string $_defaultLevel
+     * @see LogLevel
      */
     private $_defaultLevel;
 
     /**
      * DefaultLoggerFactory constructor.
      */
-    private function __construct()
+    public function __construct()
     {
         try {
             $this->_defaultLevel = LogLevel::DEBUG;
             $this->_defaultHandlers = [
-                new StreamHandler('php://stdout', $this->_defaultLevel)
+                new StreamHandler('php://stdout', Logger::toMonologLevel($this->_defaultLevel))
             ];
         } catch (Exception $e) {
             throw new RuntimeException("Failed to setup default logger factory", 0, $e);
@@ -56,7 +57,8 @@ final class DefaultLoggerFactory implements LoggerFactoryInterface
     }
 
     /**
-     * @return LogLevel
+     * @return string
+     * @see LogLevel
      */
     public function getDefaultLevel()
     {
@@ -64,8 +66,9 @@ final class DefaultLoggerFactory implements LoggerFactoryInterface
     }
 
     /**
-     * @param LogLevel $defaultLevel
+     * @param string $defaultLevel
      * @return DefaultLoggerFactory
+     * @see LogLevel
      */
     public function setDefaultLevel($defaultLevel)
     {
