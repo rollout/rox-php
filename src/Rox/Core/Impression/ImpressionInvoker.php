@@ -27,7 +27,10 @@ class ImpressionInvoker implements ImpressionInvokerInterface
     /**
      * @inheritDoc
      */
-    function invoke(ReportingValue $value, $experiment, $context)
+    function invoke(
+        ReportingValue $value,
+        ExperimentModel $experiment = null,
+        ContextInterface $context = null)
     {
         $this->_fireImpression($value, $experiment, $context);
     }

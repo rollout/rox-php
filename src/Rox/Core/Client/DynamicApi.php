@@ -2,6 +2,7 @@
 
 namespace Rox\Core\Client;
 
+use Rox\Core\Context\ContextInterface;
 use Rox\Core\Entities\EntitiesProviderInterface;
 use Rox\Core\Entities\Flag;
 use Rox\Core\Repositories\FlagRepositoryInterface;
@@ -34,10 +35,10 @@ class DynamicApi implements DynamicApiInterface
     /**
      * @param string $name
      * @param string $defaultValue
-     * @param null $context
+     * @param ContextInterface|null $context
      * @return bool
      */
-    function isEnabled($name, $defaultValue, $context = null)
+    function isEnabled($name, $defaultValue, ContextInterface $context = null)
     {
         $variant = $this->_flagRepository->getFlag($name);
         if ($variant == null) {
@@ -58,10 +59,10 @@ class DynamicApi implements DynamicApiInterface
      * @param string $name
      * @param string $defaultValue
      * @param array $options
-     * @param null $context
+     * @param ContextInterface|null $context
      * @return string
      */
-    function getValue($name, $defaultValue, $options = [], $context = null)
+    function getValue($name, $defaultValue, $options = [], ContextInterface $context = null)
     {
         $variant = $this->_flagRepository->getFlag($name);
         if ($variant == null) {

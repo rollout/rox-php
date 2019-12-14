@@ -90,7 +90,7 @@ class ConfigurationParser
      * @param SdkSettingsInterface|null $sdkSettings
      * @return Configuration|null
      */
-    public function parse(ConfigurationFetchResult $fetchResult, $sdkSettings)
+    public function parse(ConfigurationFetchResult $fetchResult, SdkSettingsInterface $sdkSettings = null)
     {
         try {
             $json = $fetchResult->getParsedData();

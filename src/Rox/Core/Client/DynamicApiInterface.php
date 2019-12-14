@@ -12,7 +12,7 @@ interface DynamicApiInterface
      * @param ContextInterface|null $context
      * @return bool
      */
-    function isEnabled($name, $defaultValue, $context = null);
+    function isEnabled($name, $defaultValue, ContextInterface $context = null);
 
     /**
      * @param string $name
@@ -21,5 +21,5 @@ interface DynamicApiInterface
      * @param ContextInterface|null $context
      * @return string
      */
-    function getValue($name, $defaultValue, $options = [], $context = null);
+    function getValue($name, $defaultValue, $options = [], ContextInterface $context = null);
 }

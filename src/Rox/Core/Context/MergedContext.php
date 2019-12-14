@@ -16,13 +16,15 @@ class MergedContext implements ContextInterface
 
     /**
      * MergedContext constructor.
-     * @param ContextInterface|null $_globalContext
-     * @param ContextInterface|null $_localContext
+     * @param ContextInterface|null $globalContext
+     * @param ContextInterface|null $localContext
      */
-    public function __construct($_globalContext, $_localContext)
+    public function __construct(
+        ContextInterface $globalContext = null,
+        ContextInterface $localContext = null)
     {
-        $this->_globalContext = $_globalContext;
-        $this->_localContext = $_localContext;
+        $this->_globalContext = $globalContext;
+        $this->_localContext = $localContext;
     }
 
     /**
