@@ -2,8 +2,7 @@
 
 namespace Rox\E2E;
 
-use Kevinrob\GuzzleCache\CacheMiddleware;
-use Kevinrob\GuzzleCache\Strategy\GreedyCacheStrategy;
+use Kevinrob\GuzzleCache\Storage\VolatileRuntimeStorage;
 use Rox\Core\Configuration\ConfigurationFetchedArgs;
 use Rox\Core\Configuration\ConfigurationFetchedInvokerInterface;
 use Rox\Core\Configuration\FetcherStatus;
@@ -12,8 +11,6 @@ use Rox\Core\Context\ContextBuilder;
 use Rox\Core\Impression\ImpressionArgs;
 use Rox\Core\Impression\ImpressionInvokerInterface;
 use Rox\Core\Logging\TestLoggerFactory;
-use Rox\Core\Network\GuzzleHttpClientFactory;
-use Rox\Core\Network\GuzzleHttpClientOptions;
 use Rox\RoxTestCase;
 use Rox\Server\Rox;
 use Rox\Server\RoxOptions;
@@ -48,15 +45,9 @@ class RoxE2ETests extends RoxTestCase
             })
             ->setDevModeKey("01fcd0d21eeaed9923dff6d8")
             ->setDistinctId(self::class)
-            ->setHttpClientFactory(
-                new GuzzleHttpClientFactory(
-                    (new GuzzleHttpClientOptions())
-                        ->setLogCacheHitsAndMisses(true)
-                        ->setNoCachePaths([Environment::getStateCdnPath()])
-                        ->addMiddleware(new CacheMiddleware(
-                            new GreedyCacheStrategy(null, 180)
-                        ), 'cache'))
-            )->setLoggerFactory(self::$_staticLoggerFactory));
+            ->setCacheStorage(new VolatileRuntimeStorage())
+            ->setLogCacheHitsAndMisses(true)
+            ->setLoggerFactory(self::$_staticLoggerFactory));
 
         Rox::register("", Container::getInstance());
         TestCustomPropsCreator::createCustomProps();
@@ -204,11 +195,11 @@ class RoxE2ETests extends RoxTestCase
         }));
     }
 
-    public function testShouldNotUseCacheForSendingState()
+    public function testShouldUseCacheForSendingState()
     {
         Rox::fetch();
 
-        $this->assertFalse(self::$_staticLoggerFactory->getLogger()->hasDebugThatPasses(function ($record) {
+        $this->assertTrue(self::$_staticLoggerFactory->getLogger()->hasDebugThatPasses(function ($record) {
             return strpos($record['message'], Environment::getStateCdnPath()) !== false &&
                 (strpos($record['message'], 'HIT') !== false ||
                     strpos($record['message'], 'MISS') !== false);

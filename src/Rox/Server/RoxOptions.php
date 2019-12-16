@@ -2,11 +2,10 @@
 
 namespace Rox\Server;
 
+use Kevinrob\GuzzleCache\Storage\CacheStorageInterface;
 use Ramsey\Uuid\Uuid;
 use Rox\Core\Client\RoxOptionsInterface;
 use Rox\Core\Logging\LoggerFactory;
-use Rox\Core\Network\GuzzleHttpClientFactory;
-use Rox\Core\Network\HttpClientFactoryInterface;
 
 class RoxOptions implements RoxOptionsInterface
 {
@@ -41,14 +40,24 @@ class RoxOptions implements RoxOptionsInterface
     private $_dynamicPropertiesRule;
 
     /**
-     * @var HttpClientFactoryInterface $_httpClientFactory
-     */
-    private $_httpClientFactory;
-
-    /**
      * @var string|null
      */
     private $_distinctId;
+
+    /**
+     * @var CacheStorageInterface|null $_cacheStorage
+     */
+    private $_cacheStorage;
+
+    /**
+     * @var bool $_logCacheHitsAndMisses
+     */
+    private $_logCacheHitsAndMisses = false;
+
+    /**
+     * @var int|null
+     */
+    private $_configFetchIntervalInSeconds;
 
     /**
      * RoxOptions constructor.
@@ -74,12 +83,9 @@ class RoxOptions implements RoxOptionsInterface
         $this->_configurationFetchedHandler = $roxOptionsBuilder->getConfigurationFetchedHandler();
         $this->_roxyURL = $roxOptionsBuilder->getRoxyURL();
         $this->_dynamicPropertiesRule = $roxOptionsBuilder->getDynamicPropertiesRule();
-
-        if ($roxOptionsBuilder->getHttpClientFactory() != null) {
-            $this->_httpClientFactory = $roxOptionsBuilder->getHttpClientFactory();
-        } else {
-            $this->_httpClientFactory = new GuzzleHttpClientFactory();
-        }
+        $this->_cacheStorage = $roxOptionsBuilder->getCacheStorage();
+        $this->_logCacheHitsAndMisses = $roxOptionsBuilder->isLogCacheHitsAndMisses();
+        $this->_configFetchIntervalInSeconds = $roxOptionsBuilder->getConfigFetchIntervalInSeconds();
 
         if ($roxOptionsBuilder->getDistinctId() != null) {
             $this->_distinctId = $roxOptionsBuilder->getDistinctId();
@@ -141,18 +147,34 @@ class RoxOptions implements RoxOptionsInterface
     }
 
     /**
-     * @return HttpClientFactoryInterface
-     */
-    function getHttpClientFactory()
-    {
-        return $this->_httpClientFactory;
-    }
-
-    /**
      * @return string|null
      */
     function getDistinctId()
     {
         return $this->_distinctId;
+    }
+
+    /**
+     * @return CacheStorageInterface|void|null
+     */
+    function getCacheStorage()
+    {
+        return $this->_cacheStorage;
+    }
+
+    /**
+     * @return bool
+     */
+    function isLogCacheHitsAndMisses()
+    {
+        return $this->_logCacheHitsAndMisses;
+    }
+
+    /**
+     * @return int|null
+     */
+    function getConfigFetchIntervalInSeconds()
+    {
+        return $this->_configFetchIntervalInSeconds;
     }
 }

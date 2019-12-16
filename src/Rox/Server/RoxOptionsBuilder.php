@@ -2,8 +2,8 @@
 
 namespace Rox\Server;
 
+use Kevinrob\GuzzleCache\Storage\CacheStorageInterface;
 use Rox\Core\Logging\LoggerFactoryInterface;
-use Rox\Core\Network\HttpClientFactoryInterface;
 
 class RoxOptionsBuilder
 {
@@ -43,14 +43,24 @@ class RoxOptionsBuilder
     private $_loggerFactory;
 
     /**
-     * @var HttpClientFactoryInterface $_httpClientFactory
-     */
-    private $_httpClientFactory;
-
-    /**
      * @var string|null
      */
     private $_distinctId;
+
+    /**
+     * @var CacheStorageInterface|null $_cacheStorage
+     */
+    private $_cacheStorage;
+
+    /**
+     * @var bool $_logCacheHitsAndMisses
+     */
+    private $_logCacheHitsAndMisses = false;
+
+    /**
+     * @var int|null $_configFetchIntervalInSeconds
+     */
+    private $_configFetchIntervalInSeconds;
 
     /**
      * @return string
@@ -179,24 +189,6 @@ class RoxOptionsBuilder
     }
 
     /**
-     * @return HttpClientFactoryInterface
-     */
-    public function getHttpClientFactory()
-    {
-        return $this->_httpClientFactory;
-    }
-
-    /**
-     * @param HttpClientFactoryInterface $httpClientFactory
-     * @return RoxOptionsBuilder
-     */
-    public function setHttpClientFactory($httpClientFactory)
-    {
-        $this->_httpClientFactory = $httpClientFactory;
-        return $this;
-    }
-
-    /**
      * @return string|null
      */
     public function getDistinctId()
@@ -211,6 +203,60 @@ class RoxOptionsBuilder
     public function setDistinctId($distinctId)
     {
         $this->_distinctId = $distinctId;
+        return $this;
+    }
+
+    /**
+     * @return CacheStorageInterface|null
+     */
+    public function getCacheStorage()
+    {
+        return $this->_cacheStorage;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isLogCacheHitsAndMisses()
+    {
+        return $this->_logCacheHitsAndMisses;
+    }
+
+    /**
+     * @param bool $logCacheHitsAndMisses
+     * @return RoxOptionsBuilder
+     */
+    public function setLogCacheHitsAndMisses($logCacheHitsAndMisses)
+    {
+        $this->_logCacheHitsAndMisses = $logCacheHitsAndMisses;
+        return $this;
+    }
+
+    /**
+     * @param CacheStorageInterface|null $cacheStrategy
+     * @return RoxOptionsBuilder
+     */
+    public function setCacheStorage($cacheStrategy)
+    {
+        $this->_cacheStorage = $cacheStrategy;
+        return $this;
+    }
+
+    /**
+     * @return int|null
+     */
+    public function getConfigFetchIntervalInSeconds()
+    {
+        return $this->_configFetchIntervalInSeconds;
+    }
+
+    /**
+     * @param int|null $configFetchIntervalInSeconds
+     * @return RoxOptionsBuilder
+     */
+    public function setConfigFetchIntervalInSeconds($configFetchIntervalInSeconds)
+    {
+        $this->_configFetchIntervalInSeconds = $configFetchIntervalInSeconds;
         return $this;
     }
 }

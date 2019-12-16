@@ -3,6 +3,8 @@
 namespace Rox\Core;
 
 use InvalidArgumentException;
+use Kevinrob\GuzzleCache\CacheMiddleware;
+use Kevinrob\GuzzleCache\Strategy\GreedyCacheStrategy;
 use Psr\Log\LoggerInterface;
 use Rox\Core\Client\DevicePropertiesInterface;
 use Rox\Core\Client\DynamicApi;
@@ -32,6 +34,8 @@ use Rox\Core\Network\ConfigurationFetcherInterface;
 use Rox\Core\Network\ConfigurationFetcherRoxy;
 use Rox\Core\Network\ConfigurationFetchResult;
 use Rox\Core\Network\GuzzleHttpClientFactory;
+use Rox\Core\Network\GuzzleHttpClientOptions;
+use Rox\Core\Network\HttpClientFactoryInterface;
 use Rox\Core\Register\Registerer;
 use Rox\Core\Reporting\ErrorReporterInterface;
 use Rox\Core\Repositories\CustomPropertyRepositoryInterface;
@@ -200,35 +204,33 @@ class Core
 
         $this->_deviceProperties = $deviceProperties;
 
-        $httpClientFactory = $roxOptions != null
-            ? $roxOptions->getHttpClientFactory()
-            : null;
+        $cacheTtl = $roxOptions != null
+            ? $roxOptions->getConfigFetchIntervalInSeconds() :
+            self::MIN_CACHE_TTL_SECONDS;
 
-        if ($httpClientFactory == null) {
-            $httpClientFactory = new GuzzleHttpClientFactory();
-        }
+        $httpClientFactory = $this->_createHttpClientFactory($roxOptions, $cacheTtl);
 
-        $request = $httpClientFactory->createHttpClient();
-        $reportRequest = $httpClientFactory->createHttpClient();
-
+        $httpClient = $httpClientFactory->createHttpClient();
         $this->_internalFlags = new InternalFlags($this->_experimentRepository, $this->_parser);
         $buid = new XBUID($sdkSettings, $deviceProperties);
 
         $signature = null;
         $apiKeyVerifier = null;
 
-        $this->_errorReporter = new XErrorReporter($reportRequest, $deviceProperties, $buid);
+        $this->_errorReporter = new XErrorReporter($httpClientFactory->createHttpClient(), $deviceProperties, $buid);
 
         if ($roxyUrl != null) {
             $this->_configurationFetchedInvoker = new ConfigurationFetchedInvoker();
-            $this->_configurationFetcher = new ConfigurationFetcherRoxy($request, $deviceProperties, $buid, $this->_configurationFetchedInvoker, $roxyUrl, $this->_errorReporter);
+            $this->_configurationFetcher = new ConfigurationFetcherRoxy($httpClient, $deviceProperties, $buid, $this->_configurationFetchedInvoker, $roxyUrl, $this->_errorReporter);
             $this->_impressionInvoker = new ImpressionInvoker();
             $signature = new SignatureVerifier();
             $apiKeyVerifier = new APIKeyVerifier();
         } else {
-            $this->_stateSender = new StateSender($request, $deviceProperties, $this->_flagRepository, $this->_customPropertyRepository);
+            $stateSenderHttpClient = $this->_createHttpClientFactory($roxOptions, self::STATE_STORE_CACHE_TTL_SECONDS)
+                ->createHttpClient();
+            $this->_stateSender = new StateSender($stateSenderHttpClient, $deviceProperties, $this->_flagRepository, $this->_customPropertyRepository);
             $this->_configurationFetchedInvoker = new XConfigurationFetchedInvoker($this);
-            $this->_configurationFetcher = new ConfigurationFetcher($request, $buid, $deviceProperties, $this->_configurationFetchedInvoker, $this->_errorReporter);
+            $this->_configurationFetcher = new ConfigurationFetcher($httpClient, $buid, $deviceProperties, $this->_configurationFetchedInvoker, $this->_errorReporter);
             $this->_impressionInvoker = new XImpressionInvoker($this->_internalFlags, $this->_customPropertyRepository, null);
             $signature = new XSignatureVerifier();
             $apiKeyVerifier = new XAPIKeyVerifier($sdkSettings);
@@ -340,4 +342,29 @@ class Core
     {
         return new DynamicApi($this->_flagRepository, $entitiesProvider);
     }
+
+    /**
+     * @param RoxOptionsInterface|null $options
+     * @param int|null $cacheTtl
+     * @return HttpClientFactoryInterface
+     */
+    private function _createHttpClientFactory($options, $cacheTtl)
+    {
+        $httpClientOptions = new GuzzleHttpClientOptions();
+        if ($options) {
+            if ($options->getCacheStorage()) {
+                $httpClientOptions->addMiddleware(new CacheMiddleware(
+                    new GreedyCacheStrategy(
+                        $options->getCacheStorage(),
+                        max($cacheTtl ?: self::MIN_CACHE_TTL_SECONDS, self::MIN_CACHE_TTL_SECONDS)
+                    )
+                ), 'cache');
+            }
+            $httpClientOptions->setLogCacheHitsAndMisses($options->isLogCacheHitsAndMisses());
+        }
+        return new GuzzleHttpClientFactory($httpClientOptions);
+    }
+
+    const MIN_CACHE_TTL_SECONDS = 30;
+    const STATE_STORE_CACHE_TTL_SECONDS = 31556952; // 1 year
 }
