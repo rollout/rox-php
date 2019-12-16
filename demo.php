@@ -54,7 +54,6 @@ if (!isset($_GET['nocache'])) {
         ->setHttpClientFactory(new GuzzleHttpClientFactory(
                 (new GuzzleHttpClientOptions())
                     ->setLogCacheHitsAndMisses(true)
-                    ->setNoCachePaths([Environment::getStateCdnPath()]) // Don't cache state report requests
                     ->addMiddleware(new CacheMiddleware(
                         new GreedyCacheStrategy(
                             new DoctrineCacheStorage(
