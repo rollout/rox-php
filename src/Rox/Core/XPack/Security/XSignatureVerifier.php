@@ -13,6 +13,9 @@ class XSignatureVerifier implements SignatureVerifierInterface
      */
     function verify($data, $signatureBase64)
     {
+        if (!function_exists('openssl_verify')) {
+            return true;
+        }
         $cert = chunk_split(self::ROXCertificateBase64);
         $publicKey = openssl_pkey_get_public("-----BEGIN CERTIFICATE-----\n${cert}-----END CERTIFICATE-----");
         $signature = base64_decode($signatureBase64);
