@@ -73,7 +73,7 @@ class ConfigurationParserTests extends RoxTestCase
 
         $this->_cfi = new XConfigurationFetchedInvoker(\Mockery::mock(Core::class));
 
-        $this->_cfi->register(function (ConfigurationFetchedInvokerInterface $sender, ConfigurationFetchedArgs $e) {
+        $this->_cfi->register(function (ConfigurationFetchedArgs $e) {
             $this->_cfiEvent = $e;
         });
     }
@@ -101,7 +101,7 @@ EOT;
 
     public function testWillReturnNullWhenWrongSignature()
     {
-        $this->_cfi->register(function (ConfigurationFetchedInvokerInterface $sender, ConfigurationFetchedArgs $e) use (&$cfiEvent) {
+        $this->_cfi->register(function (ConfigurationFetchedArgs $e) use (&$cfiEvent) {
             $cfiEvent = [$e];
         });
 

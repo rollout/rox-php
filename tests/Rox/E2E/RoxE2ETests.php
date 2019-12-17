@@ -4,12 +4,10 @@ namespace Rox\E2E;
 
 use Kevinrob\GuzzleCache\Storage\VolatileRuntimeStorage;
 use Rox\Core\Configuration\ConfigurationFetchedArgs;
-use Rox\Core\Configuration\ConfigurationFetchedInvokerInterface;
 use Rox\Core\Configuration\FetcherStatus;
 use Rox\Core\Consts\Environment;
 use Rox\Core\Context\ContextBuilder;
 use Rox\Core\Impression\ImpressionArgs;
-use Rox\Core\Impression\ImpressionInvokerInterface;
 use Rox\Core\Logging\TestLoggerFactory;
 use Rox\RoxTestCase;
 use Rox\Server\Rox;
@@ -30,12 +28,12 @@ class RoxE2ETests extends RoxTestCase
         self::$_staticLoggerFactory = new TestLoggerFactory();
 
         $options = new RoxOptions((new RoxOptionsBuilder())
-            ->setConfigurationFetchedHandler(function (ConfigurationFetchedInvokerInterface $sender, ConfigurationFetchedArgs $args) {
+            ->setConfigurationFetchedHandler(function (ConfigurationFetchedArgs $args) {
                 if ($args != null && $args->getFetcherStatus() == FetcherStatus::AppliedFromNetwork) {
                     TestVars::$configurationFetchedCount++;
                 }
             })
-            ->setImpressionHandler(function (ImpressionInvokerInterface $sender, ImpressionArgs $args) {
+            ->setImpressionHandler(function (ImpressionArgs $args) {
                 if ($args != null && $args->getReportingValue() != null) {
                     if ($args->getReportingValue()->getName() == "flagForImpression") {
                         TestVars::$isImpressionRaised = true;

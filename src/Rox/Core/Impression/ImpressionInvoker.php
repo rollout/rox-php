@@ -42,10 +42,11 @@ class ImpressionInvoker implements ImpressionInvokerInterface
      */
     private function _fireImpression(ReportingValue $value, $experiment, $context)
     {
+        $args = new ImpressionArgs($value,
+            $experiment != null ? new Experiment($experiment) : null,
+            $context);
         foreach ($this->_handlers as $handler) {
-            $handler($this, new ImpressionArgs($value,
-                $experiment != null ? new Experiment($experiment) : null,
-                $context));
+            $handler($args);
         }
     }
 }

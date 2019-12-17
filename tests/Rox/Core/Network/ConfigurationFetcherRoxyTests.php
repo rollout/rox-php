@@ -5,6 +5,7 @@ namespace Rox\Core\Network;
 use Exception;
 use Rox\Core\Client\BUIDInterface;
 use Rox\Core\Client\DevicePropertiesInterface;
+use Rox\Core\Configuration\ConfigurationFetchedArgs;
 use Rox\Core\Configuration\ConfigurationFetchedInvoker;
 use Rox\Core\Reporting\ErrorReporterInterface;
 use Rox\RoxTestCase;
@@ -38,7 +39,7 @@ class ConfigurationFetcherRoxyTests extends RoxTestCase
         $errorReporter = \Mockery::mock(ErrorReporterInterface::class);
 
         $numberOfTimersCalled = [0];
-        $confFetchInvoker->register(function ($sender, $e) use (&$numberOfTimersCalled) {
+        $confFetchInvoker->register(function (ConfigurationFetchedArgs $e) use (&$numberOfTimersCalled) {
             $numberOfTimersCalled[0]++;
         });
 
@@ -61,7 +62,7 @@ class ConfigurationFetcherRoxyTests extends RoxTestCase
         $errorReporter = \Mockery::mock(ErrorReporterInterface::class);
 
         $numberOfTimersCalled = [0];
-        $confFetchInvoker->register(function ($sender, $e) use (&$numberOfTimersCalled) {
+        $confFetchInvoker->register(function (ConfigurationFetchedArgs $e) use (&$numberOfTimersCalled) {
             $numberOfTimersCalled[0]++;
         });
 
@@ -86,7 +87,7 @@ class ConfigurationFetcherRoxyTests extends RoxTestCase
         $numberOfTimersCalled = 0;
 
         $numberOfTimersCalled = [0];
-        $confFetchInvoker->register(function ($sender, $e) use (&$numberOfTimersCalled) {
+        $confFetchInvoker->register(function (ConfigurationFetchedArgs $e) use (&$numberOfTimersCalled) {
             $numberOfTimersCalled[0]++;
         });
 

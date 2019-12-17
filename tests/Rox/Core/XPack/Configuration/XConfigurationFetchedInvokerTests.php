@@ -4,7 +4,6 @@ namespace Rox\Core\XPack\Configuration;
 
 use Rox\Core\Configuration\ConfigurationFetchedArgs;
 use Rox\Core\Configuration\ConfigurationFetchedInvoker;
-use Rox\Core\Configuration\ConfigurationFetchedInvokerInterface;
 use Rox\Core\Configuration\FetcherError;
 use Rox\Core\Configuration\FetcherStatus;
 use Rox\Core\Core;
@@ -56,10 +55,8 @@ class XConfigurationFetchedInvokerTests extends RoxTestCase
         $isConfigurationHandlerInvokerRaised = [false];
         $configurationFetchedInvoker = new ConfigurationFetchedInvoker();
 
-        $configurationFetchedInvoker->register(function (ConfigurationFetchedInvokerInterface $sender, ConfigurationFetchedArgs $e)
+        $configurationFetchedInvoker->register(function (ConfigurationFetchedArgs $e)
         use ($configurationFetchedInvoker, &$isConfigurationHandlerInvokerRaised) {
-
-            $this->assertEquals($sender, $configurationFetchedInvoker);
 
             $this->assertEquals(FetcherStatus::ErrorFetchedFailed, $e->getFetcherStatus());
             $this->assertNull($e->getCreationDate());
@@ -82,9 +79,8 @@ class XConfigurationFetchedInvokerTests extends RoxTestCase
         $isConfigurationHandlerInvokerRaised = [false];
         $configurationFetchedInvoker = new XConfigurationFetchedInvoker(\Mockery::mock(Core::class));
 
-        $configurationFetchedInvoker->register(function (ConfigurationFetchedInvokerInterface $sender, ConfigurationFetchedArgs $e)
+        $configurationFetchedInvoker->register(function (ConfigurationFetchedArgs $e)
         use ($configurationFetchedInvoker, &$isConfigurationHandlerInvokerRaised) {
-            $this->assertEquals($sender, $configurationFetchedInvoker);
 
             $this->assertEquals(FetcherStatus::ErrorFetchedFailed, $e->getFetcherStatus());
             $this->assertNull($e->getCreationDate());
@@ -108,9 +104,8 @@ class XConfigurationFetchedInvokerTests extends RoxTestCase
         $status = FetcherStatus::AppliedFromNetwork;
         $hasChanges = true;
 
-        $configurationFetchedInvoker->register(function (ConfigurationFetchedInvokerInterface $sender, ConfigurationFetchedArgs $e)
+        $configurationFetchedInvoker->register(function (ConfigurationFetchedArgs $e)
         use ($now, $status, $configurationFetchedInvoker, &$isConfigurationHandlerInvokerRaised) {
-            $this->assertEquals($sender, $configurationFetchedInvoker);
 
             $this->assertEquals($status, $e->getFetcherStatus());
             $this->assertEquals($now, $e->getCreationDate());

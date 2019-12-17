@@ -120,7 +120,7 @@ class XImpressionInvoker implements ImpressionInvokerInterface
     private function _fireImpression(ImpressionArgs $args)
     {
         foreach ($this->_eventHandlers as $handler) {
-            $handler($this, $args);
+            $handler($args);
         }
     }
 }

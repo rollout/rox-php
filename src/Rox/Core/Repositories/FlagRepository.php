@@ -68,7 +68,7 @@ class FlagRepository implements FlagRepositoryInterface
     private function _fireFlagAdded($variant)
     {
         foreach ($this->_callbacks as $callback) {
-            $callback($this, new FlagAddedCallbackArgs($variant));
+            $callback(new FlagAddedCallbackArgs($variant));
         }
     }
 }

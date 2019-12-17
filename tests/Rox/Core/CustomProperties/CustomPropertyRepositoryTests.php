@@ -3,7 +3,6 @@
 namespace Rox\Core\CustomProperties;
 
 use Rox\Core\Repositories\CustomPropertyAddedArgs;
-use Rox\Core\Repositories\CustomPropertyRepositoryInterface;
 use Rox\RoxTestCase;
 
 class CustomPropertyRepositoryTests extends RoxTestCase
@@ -58,7 +57,7 @@ class CustomPropertyRepositoryTests extends RoxTestCase
         $cp = new CustomProperty("prop1", CustomPropertyType::getString(), "123");
 
         $propFromEvent = [null];
-        $repo->addCustomPropertyEventHandler(function (CustomPropertyRepositoryInterface $sender, CustomPropertyAddedArgs $args) use (&$propFromEvent) {
+        $repo->addCustomPropertyEventHandler(function (CustomPropertyAddedArgs $args) use (&$propFromEvent) {
             $propFromEvent[0] = $args->getCustomProperty();
         });
         $repo->addCustomProperty($cp);

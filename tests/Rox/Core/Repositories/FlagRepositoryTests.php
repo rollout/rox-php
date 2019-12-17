@@ -31,7 +31,7 @@ class FlagRepositoryTests extends RoxTestCase
         $flag = new Flag();
 
         $variantFromEvent = [null];
-        $repo->addFlagAddedCallback(function (FlagRepositoryInterface $sender, FlagAddedCallbackArgs $args) use (&$variantFromEvent) {
+        $repo->addFlagAddedCallback(function (FlagAddedCallbackArgs $args) use (&$variantFromEvent) {
             $variantFromEvent[0] = $args->getVariant();
         });
         $repo->addFlag($flag, "harti");

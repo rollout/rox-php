@@ -13,7 +13,7 @@ use Rox\Core\CustomProperties\DynamicProperties;
 use Rox\Core\Entities\Flag;
 use Rox\Core\Entities\FlagSetter;
 use Rox\Core\Entities\Variant;
-use Rox\Core\Impression\ImpressionInvokerInterface;
+use Rox\Core\Impression\ImpressionArgs;
 use Rox\Core\Impression\XImpressionInvoker;
 use Rox\Core\Repositories\ExperimentRepository;
 use Rox\Core\Repositories\ExperimentRepositoryInterface;
@@ -172,7 +172,7 @@ class ExperimentsExtensionsTests extends RoxTestCase
         $v->setParser($parser);
         $v->setImpressionInvoker($ii);
 
-        $ii->register(function ($sender, $e) use (&$impressionList) {
+        $ii->register(function (ImpressionArgs $e) use (&$impressionList) {
             $impressionList[] = $e;
         });
 

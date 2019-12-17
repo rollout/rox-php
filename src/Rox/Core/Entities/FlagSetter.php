@@ -49,7 +49,7 @@ class FlagSetter
         $this->_experimentRepository = $experimentRepository;
         $this->_impressionInvoker = $impressionInvoker;
 
-        $flagRepository->addFlagAddedCallback(function (FlagRepositoryInterface $sender, FlagAddedCallbackArgs $args) {
+        $flagRepository->addFlagAddedCallback(function (FlagAddedCallbackArgs $args) {
             $exp = $this->_experimentRepository->getExperimentByFlag($args->getVariant()->getName());
             $this->_setFlagData($args->getVariant(), $exp);
         });
