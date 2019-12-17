@@ -46,7 +46,7 @@ class RoxE2ETests extends RoxTestCase
                 }
                 TestVars::$impressionReturnedArgs = $args;
             })
-            ->setDevModeKey("01fcd0d21eeaed9923dff6d8")
+            ->setDevModeKey("ba9bf259159cfd1af16feb19")
             ->setDistinctId(self::class)
             ->setHttpClientFactory(
                 new GuzzleHttpClientFactory(
@@ -61,7 +61,7 @@ class RoxE2ETests extends RoxTestCase
         Rox::register("", Container::getInstance());
         TestCustomPropsCreator::createCustomProps();
 
-        Rox::setup("5b3356d00d81206da3055bc0", $options);
+        Rox::setup("5df8d5e802e23378643705bf", $options);
     }
 
     protected function setUp()
@@ -166,7 +166,7 @@ class RoxE2ETests extends RoxTestCase
 
         $this->assertNotNull(TestVars::$impressionReturnedArgs);
         $this->assertNotNull(TestVars::$impressionReturnedArgs->getExperiment());
-        $this->assertEquals("5b3cc569f452c215921a4a9c", TestVars::$impressionReturnedArgs->getExperiment()->getIdentifier());
+        $this->assertEquals("5df8d8b930fcc301c34ad331", TestVars::$impressionReturnedArgs->getExperiment()->getIdentifier());
         $this->assertEquals("flag for impression with experiment and context", TestVars::$impressionReturnedArgs->getExperiment()->getName());
 
         $this->assertEquals("val", TestVars::$impressionReturnedArgs->getContext()->get("var"));
