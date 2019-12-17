@@ -10,7 +10,6 @@ use Rox\Core\Context\ContextBuilder;
 use Rox\Core\CustomProperties\CustomProperty;
 use Rox\Core\CustomProperties\CustomPropertyType;
 use Rox\Core\Impression\ImpressionArgs;
-use Rox\Core\Impression\ImpressionInvokerInterface;
 use Rox\Core\Impression\Models\Experiment;
 use Rox\Core\Impression\Models\ReportingValue;
 use Rox\Core\Impression\XImpressionInvoker;
