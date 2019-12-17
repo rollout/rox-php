@@ -10,7 +10,6 @@ use Rox\Core\Context\ContextBuilder;
 use Rox\Core\CustomProperties\CustomProperty;
 use Rox\Core\CustomProperties\CustomPropertyType;
 use Rox\Core\Impression\ImpressionArgs;
-use Rox\Core\Impression\ImpressionInvokerInterface;
 use Rox\Core\Impression\Models\Experiment;
 use Rox\Core\Impression\Models\ReportingValue;
 use Rox\Core\Impression\XImpressionInvoker;
@@ -46,15 +45,13 @@ class ImpressionInvokerTests extends RoxTestCase
         $experiment = new Experiment($originalExperiment);
 
         $isImpressionRaised = [false];
-        $impressionInvoker->register(function (ImpressionInvokerInterface $sender, ImpressionArgs $e) use (
+        $impressionInvoker->register(function (ImpressionArgs $e) use (
             $context,
             $experiment,
             $reportingValue,
             $impressionInvoker,
             &$isImpressionRaised
         ) {
-
-            $this->assertEquals($sender, $impressionInvoker);
 
             $this->assertEquals($e->getReportingValue(), $reportingValue);
             $this->assertEquals($e->getExperiment()->getIdentifier(), $experiment->getIdentifier());
@@ -123,8 +120,7 @@ class ImpressionInvokerTests extends RoxTestCase
         $experiment = new Experiment($originalExperiment);
 
         $isImpressionRaised = [false];
-        $impressionInvoker->register(function (ImpressionInvokerInterface $sender, ImpressionArgs $e) use ($context, $experiment, $reportingValue, $impressionInvoker, &$isImpressionRaised) {
-            $this->assertEquals($sender, $impressionInvoker);
+        $impressionInvoker->register(function (ImpressionArgs $e) use ($context, $experiment, $reportingValue, $impressionInvoker, &$isImpressionRaised) {
 
             $this->assertEquals($e->getReportingValue(), $reportingValue);
             $this->assertEquals($e->getExperiment()->getIdentifier(), $experiment->getIdentifier());
@@ -176,8 +172,7 @@ class ImpressionInvokerTests extends RoxTestCase
         $originalExperiment = new ExperimentModel('id', 'name', 'cond', true, null, [], 'stam');
         $experiment = new Experiment($originalExperiment);
 
-        $impressionInvoker->register(function (ImpressionInvokerInterface $sender, ImpressionArgs $e) use ($context, $experiment, $reportingValue, $impressionInvoker) {
-            $this->assertEquals($sender, $impressionInvoker);
+        $impressionInvoker->register(function (ImpressionArgs $e) use ($context, $experiment, $reportingValue, $impressionInvoker) {
 
             $this->assertEquals($e->getReportingValue(), $reportingValue);
             $this->assertEquals($e->getExperiment()->getIdentifier(), $experiment->getIdentifier());
@@ -229,8 +224,7 @@ class ImpressionInvokerTests extends RoxTestCase
         $originalExperiment = new ExperimentModel('id', 'name', 'cond', true, null, [], 'stam');
         $experiment = new Experiment($originalExperiment);
 
-        $impressionInvoker->register(function (ImpressionInvokerInterface $sender, ImpressionArgs $e) use ($context, $experiment, $reportingValue, $impressionInvoker) {
-            $this->assertEquals($sender, $impressionInvoker);
+        $impressionInvoker->register(function (ImpressionArgs $e) use ($context, $experiment, $reportingValue, $impressionInvoker) {
 
             $this->assertEquals($e->getReportingValue(), $reportingValue);
             $this->assertEquals($e->getExperiment()->getIdentifier(), $experiment->getIdentifier());
@@ -293,8 +287,7 @@ class ImpressionInvokerTests extends RoxTestCase
         $originalExperiment = new ExperimentModel('id', 'name', 'cond', true, null, [], 'stickProp');
         $experiment = new Experiment($originalExperiment);
 
-        $impressionInvoker->register(function (ImpressionInvokerInterface $sender, ImpressionArgs $e) use ($context, $experiment, $reportingValue, $impressionInvoker) {
-            $this->assertEquals($sender, $impressionInvoker);
+        $impressionInvoker->register(function (ImpressionArgs $e) use ($context, $experiment, $reportingValue, $impressionInvoker) {
 
             $this->assertEquals($e->getReportingValue(), $reportingValue);
             $this->assertEquals($e->getExperiment()->getIdentifier(), $experiment->getIdentifier());
@@ -358,8 +351,7 @@ class ImpressionInvokerTests extends RoxTestCase
         $originalExperiment = new ExperimentModel('id', 'name', 'cond', true, null, [], 'stickPropy');
         $experiment = new Experiment($originalExperiment);
 
-        $impressionInvoker->register(function (ImpressionInvokerInterface $sender, ImpressionArgs $e) use ($context, $experiment, $reportingValue, $impressionInvoker) {
-            $this->assertEquals($sender, $impressionInvoker);
+        $impressionInvoker->register(function (ImpressionArgs $e) use ($context, $experiment, $reportingValue, $impressionInvoker) {
 
             $this->assertEquals($e->getReportingValue(), $reportingValue);
             $this->assertEquals($e->getExperiment()->getIdentifier(), $experiment->getIdentifier());
@@ -415,8 +407,7 @@ class ImpressionInvokerTests extends RoxTestCase
         $originalExperiment = new ExperimentModel('id', 'name', 'cond', true, null, [], 'stam');
         $experiment = new Experiment($originalExperiment);
 
-        $impressionInvoker->register(function (ImpressionInvokerInterface $sender, ImpressionArgs $e) use ($context, $experiment, $reportingValue, $impressionInvoker) {
-            $this->assertEquals($sender, $impressionInvoker);
+        $impressionInvoker->register(function (ImpressionArgs $e) use ($context, $experiment, $reportingValue, $impressionInvoker) {
 
             $this->assertEquals($e->getReportingValue(), $reportingValue);
             $this->assertEquals($e->getExperiment()->getIdentifier(), $experiment->getIdentifier());

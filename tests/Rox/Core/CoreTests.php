@@ -90,8 +90,14 @@ class CoreTests extends RoxTestCase
             ->shouldReceive('getDynamicPropertiesRule')
             ->andReturnNull()
             ->getMock()
-            ->shouldReceive('getHttpClientFactory')
+            ->shouldReceive('getConfigFetchIntervalInSeconds')
             ->andReturnNull()
+            ->getMock()
+            ->shouldReceive('getCacheStorage')
+            ->andReturnNull()
+            ->getMock()
+            ->shouldReceive('isLogCacheHitsAndMisses')
+            ->andReturn(false)
             ->getMock();
 
         $c = new Core();

@@ -18,5 +18,8 @@ interface ImpressionInvokerInterface
      * @param ExperimentModel|null $experiment
      * @param ContextInterface|null $context
      */
-    function invoke(ReportingValue $value, $experiment, $context);
+    function invoke(
+        ReportingValue $value,
+        ExperimentModel $experiment = null,
+        ContextInterface $context = null);
 }

@@ -5,6 +5,7 @@ namespace Rox\Core\Network;
 use Exception;
 use Rox\Core\Client\BUIDInterface;
 use Rox\Core\Client\DevicePropertiesInterface;
+use Rox\Core\Configuration\ConfigurationFetchedArgs;
 use Rox\Core\Configuration\ConfigurationFetchedInvoker;
 use Rox\Core\Consts\PropertyType;
 use Rox\Core\Reporting\ErrorReporterInterface;
@@ -58,7 +59,7 @@ class ConfigurationFetcherTests extends RoxTestCase
         $confFetchInvoker = new ConfigurationFetchedInvoker();
 
         $numberOfTimerCalled = [0];
-        $confFetchInvoker->register(function ($sender, $e) use (&$numberOfTimerCalled) {
+        $confFetchInvoker->register(function (ConfigurationFetchedArgs $e) use (&$numberOfTimerCalled) {
             $numberOfTimerCalled[0]++;
         });
 
@@ -91,7 +92,7 @@ class ConfigurationFetcherTests extends RoxTestCase
         $confFetchInvoker = new ConfigurationFetchedInvoker();
         $numberOfTimerCalled = [0];
 
-        $confFetchInvoker->register(function ($sender, $e) use (&$numberOfTimerCalled) {
+        $confFetchInvoker->register(function (ConfigurationFetchedArgs $e) use (&$numberOfTimerCalled) {
             $numberOfTimerCalled[0]++;
         });
 
@@ -115,7 +116,7 @@ class ConfigurationFetcherTests extends RoxTestCase
         $confFetchInvoker = new ConfigurationFetchedInvoker();
         $numberOfTimerCalled = [0];
 
-        $confFetchInvoker->register(function ($sender, $e) use (&$numberOfTimerCalled) {
+        $confFetchInvoker->register(function (ConfigurationFetchedArgs $e) use (&$numberOfTimerCalled) {
             $numberOfTimerCalled[0]++;
         });
 
@@ -143,7 +144,7 @@ class ConfigurationFetcherTests extends RoxTestCase
     {
         $confFetchInvoker = new ConfigurationFetchedInvoker();
         $numberOfTimerCalled = [0];
-        $confFetchInvoker->register(function ($sender, $e) use (&$numberOfTimerCalled) {
+        $confFetchInvoker->register(function (ConfigurationFetchedArgs $e) use (&$numberOfTimerCalled) {
             $numberOfTimerCalled[0]++;
         });
 
@@ -172,7 +173,7 @@ class ConfigurationFetcherTests extends RoxTestCase
         $confFetchInvoker = new ConfigurationFetchedInvoker();
         $numberOfTimerCalled = [0];
 
-        $confFetchInvoker->register(function ($sender, $e) use (&$numberOfTimerCalled) {
+        $confFetchInvoker->register(function (ConfigurationFetchedArgs $e) use (&$numberOfTimerCalled) {
             $numberOfTimerCalled[0]++;
         });
 
@@ -198,7 +199,7 @@ class ConfigurationFetcherTests extends RoxTestCase
         $confFetchInvoker = new ConfigurationFetchedInvoker();
         $numberOfTimerCalled = [0];
 
-        $confFetchInvoker->register(function ($sender, $e) use (&$numberOfTimerCalled) {
+        $confFetchInvoker->register(function (ConfigurationFetchedArgs $e) use (&$numberOfTimerCalled) {
             $numberOfTimerCalled[0]++;
         });
 
@@ -246,7 +247,7 @@ class ConfigurationFetcherTests extends RoxTestCase
         $confFetchInvoker = new ConfigurationFetchedInvoker();
         $numberOfTimerCalled = [0];
 
-        $confFetchInvoker->register(function ($sender, $e) use (&$numberOfTimerCalled) {
+        $confFetchInvoker->register(function (ConfigurationFetchedArgs $e) use (&$numberOfTimerCalled) {
             $numberOfTimerCalled[0]++;
         });
 
@@ -273,7 +274,7 @@ class ConfigurationFetcherTests extends RoxTestCase
         $confFetchInvoker = new ConfigurationFetchedInvoker();
         $numberOfTimerCalled = [0];
 
-        $confFetchInvoker->register(function ($sender, $e) use (&$numberOfTimerCalled) {
+        $confFetchInvoker->register(function (ConfigurationFetchedArgs $e) use (&$numberOfTimerCalled) {
             $numberOfTimerCalled[0]++;
         });
 
@@ -300,7 +301,7 @@ class ConfigurationFetcherTests extends RoxTestCase
         $confFetchInvoker = new ConfigurationFetchedInvoker();
         $numberOfTimerCalled = [0];
 
-        $confFetchInvoker->register(function ($sender, $e) use (&$numberOfTimerCalled) {
+        $confFetchInvoker->register(function (ConfigurationFetchedArgs $e) use (&$numberOfTimerCalled) {
             $numberOfTimerCalled[0]++;
         });
 

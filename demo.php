@@ -3,13 +3,9 @@
 use Doctrine\Common\Cache\ArrayCache;
 use Doctrine\Common\Cache\ChainCache;
 use Doctrine\Common\Cache\FilesystemCache;
-use Kevinrob\GuzzleCache\CacheMiddleware;
 use Kevinrob\GuzzleCache\Storage\DoctrineCacheStorage;
-use Kevinrob\GuzzleCache\Strategy\GreedyCacheStrategy;
 use Rox\Core\Consts\Environment;
 use Rox\Core\Entities\RoxContainerInterface;
-use Rox\Core\Network\GuzzleHttpClientFactory;
-use Rox\Core\Network\GuzzleHttpClientOptions;
 use Rox\Server\Flags\RoxFlag;
 use Rox\Server\Rox;
 use Rox\Server\RoxOptions;
@@ -51,22 +47,14 @@ if (!isset($_GET['nocache'])) {
 
     $roxOptionsBuilder
         ->setDistinctId('rox-php-demo') // Some app-specific ID that would stay unchanged between requests
-        ->setHttpClientFactory(new GuzzleHttpClientFactory(
-                (new GuzzleHttpClientOptions())
-                    ->setLogCacheHitsAndMisses(true)
-                    ->setNoCachePaths([Environment::getStateCdnPath()]) // Don't cache state report requests
-                    ->addMiddleware(new CacheMiddleware(
-                        new GreedyCacheStrategy(
-                            new DoctrineCacheStorage(
-                                new ChainCache([
-                                    new ArrayCache(),
-                                    new FilesystemCache('/tmp/rollout/cache'),
-                                ])
-                            ),
-                            1800 // Default cache entry TTL
-                        )
-                    ), 'cache'))
-        );
+        ->setCacheStorage(new DoctrineCacheStorage(
+            new ChainCache([
+                new ArrayCache(),
+                new FilesystemCache('/tmp/rollout/cache'),
+            ])
+        ))
+        ->setLogCacheHitsAndMisses(true)
+        ->setConfigFetchIntervalInSeconds(30);
 
     echo "Using cache...\n";
 

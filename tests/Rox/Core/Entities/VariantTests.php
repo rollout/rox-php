@@ -4,6 +4,7 @@ namespace Rox\Core\Entities;
 
 use Rox\Core\Client\InternalFlagsInterface;
 use Rox\Core\Configuration\Models\ExperimentModel;
+use Rox\Core\Impression\ImpressionArgs;
 use Rox\Core\Impression\XImpressionInvoker;
 use Rox\Core\Roxx\EvaluationResult;
 use Rox\Core\Roxx\ParserInterface;
@@ -105,7 +106,7 @@ class VariantTests extends RoxTestCase
             $impInvoker);
 
         $isImpressionRaised = [false];
-        $impInvoker->register(function ($sender, $e) use (&$isImpressionRaised) {
+        $impInvoker->register(function (ImpressionArgs $e) use (&$isImpressionRaised) {
             $isImpressionRaised[0] = true;
         });
 

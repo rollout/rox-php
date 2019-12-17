@@ -51,8 +51,8 @@ class XImpressionInvoker implements ImpressionInvokerInterface
      */
     public function __construct(
         InternalFlagsInterface $internalFlags,
-        $customPropertyRepository,
-        $analyticsClient)
+        CustomPropertyRepositoryInterface $customPropertyRepository = null,
+        ClientInterface $analyticsClient = null)
     {
         $this->_log = LoggerFactory::getInstance()->createLogger(self::class);
         $this->_customPropertyRepository = $customPropertyRepository;
@@ -75,7 +75,10 @@ class XImpressionInvoker implements ImpressionInvokerInterface
      * @param ExperimentModel|null $experiment
      * @param ContextInterface|null $context
      */
-    function invoke(ReportingValue $value, $experiment, $context)
+    function invoke(
+        ReportingValue $value,
+        ExperimentModel $experiment = null,
+        ContextInterface $context = null)
     {
         try {
             $internalExperiment = $this->_internalFlags->isEnabled('rox.internal.analytics');
@@ -117,7 +120,7 @@ class XImpressionInvoker implements ImpressionInvokerInterface
     private function _fireImpression(ImpressionArgs $args)
     {
         foreach ($this->_eventHandlers as $handler) {
-            $handler($this, $args);
+            $handler($args);
         }
     }
 }

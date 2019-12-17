@@ -2,7 +2,7 @@
 
 namespace Rox\Core\Client;
 
-use Rox\Core\Network\HttpClientFactoryInterface;
+use Kevinrob\GuzzleCache\Storage\CacheStorageInterface;
 
 interface RoxOptionsInterface
 {
@@ -37,12 +37,22 @@ interface RoxOptionsInterface
     function getDynamicPropertiesRule();
 
     /**
-     * @return HttpClientFactoryInterface
-     */
-    function getHttpClientFactory();
-
-    /**
      * @return string|null
      */
     function getDistinctId();
+
+    /**
+     * @return CacheStorageInterface|null
+     */
+    function getCacheStorage();
+
+    /**
+     * @return bool
+     */
+    function isLogCacheHitsAndMisses();
+
+    /**
+     * @return int|null
+     */
+    function getConfigFetchIntervalInSeconds();
 }

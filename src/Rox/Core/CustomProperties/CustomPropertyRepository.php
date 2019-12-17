@@ -81,8 +81,9 @@ class CustomPropertyRepository implements CustomPropertyRepositoryInterface
      */
     private function _fireCustomPropertyAdded(CustomPropertyInterface $customProperty)
     {
+        $args = new CustomPropertyAddedArgs($customProperty);
         foreach ($this->_eventHandlers as $eventHandler) {
-            $eventHandler($this, new CustomPropertyAddedArgs($customProperty));
+            $eventHandler($args);
         }
     }
 }

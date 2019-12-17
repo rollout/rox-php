@@ -45,8 +45,8 @@ class ExperimentModel
      * @param string $name
      * @param string $condition
      * @param bool $archived
-     * @param string[]|null $flags
-     * @param string[]|null $labels
+     * @param string[] $flags
+     * @param string[] $labels
      * @param string $stickinessProperty
      */
     public function __construct($id, $name, $condition, $archived, $flags, $labels, $stickinessProperty)

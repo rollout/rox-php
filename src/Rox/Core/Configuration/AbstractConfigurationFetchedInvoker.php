@@ -54,7 +54,7 @@ abstract class AbstractConfigurationFetchedInvoker implements ConfigurationFetch
     protected final function fireConfigurationFetched(ConfigurationFetchedArgs $args)
     {
         foreach ($this->_eventHandlers as $eventHandler) {
-            $eventHandler($this, $args);
+            $eventHandler($args);
         }
     }
 }

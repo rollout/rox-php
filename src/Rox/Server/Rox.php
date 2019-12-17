@@ -57,7 +57,7 @@ class Rox
      * @param string $apiKey
      * @param RoxOptions|null $roxOptions
      */
-    public static function setup($apiKey, $roxOptions = null)
+    public static function setup($apiKey, RoxOptions $roxOptions = null)
     {
         try {
             if ($roxOptions == null) {
