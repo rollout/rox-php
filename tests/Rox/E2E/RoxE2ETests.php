@@ -9,10 +9,12 @@ use Rox\Core\Consts\Environment;
 use Rox\Core\Context\ContextBuilder;
 use Rox\Core\Impression\ImpressionArgs;
 use Rox\Core\Logging\TestLoggerFactory;
+use Rox\Core\Register\TestContainer;
 use Rox\RoxTestCase;
 use Rox\Server\Rox;
 use Rox\Server\RoxOptions;
 use Rox\Server\RoxOptionsBuilder;
+use RuntimeException;
 
 class RoxE2ETests extends RoxTestCase
 {
@@ -202,5 +204,92 @@ class RoxE2ETests extends RoxTestCase
                 (strpos($record['message'], 'HIT') !== false ||
                     strpos($record['message'], 'MISS') !== false);
         }));
+    }
+
+    public function testWillNotAllowToRegisterAfterSetup()
+    {
+        $this->setExpectedException(RuntimeException::class);
+
+        Rox::register('', new TestContainer());
+    }
+
+    public function testWillNotAllowToAddCustomBooleanPropertyAfterSetup()
+    {
+        $this->setExpectedException(RuntimeException::class);
+
+        Rox::setCustomBooleanProperty('test', true);
+    }
+
+    public function testWillNotAllowToAddCustomDoublePropertyAfterSetup()
+    {
+        $this->setExpectedException(RuntimeException::class);
+
+        Rox::setCustomDoubleProperty('test', 1.0);
+    }
+
+    public function testWillNotAllowToAddCustomIntegerPropertyAfterSetup()
+    {
+        $this->setExpectedException(RuntimeException::class);
+
+        Rox::setCustomIntegerProperty('test', 1);
+    }
+
+    public function testWillNotAllowToAddCustomStringPropertyAfterSetup()
+    {
+        $this->setExpectedException(RuntimeException::class);
+
+        Rox::setCustomStringProperty('test', 'foo');
+    }
+
+    public function testWillNotAllowToAddCustomSemverPropertyAfterSetup()
+    {
+        $this->setExpectedException(RuntimeException::class);
+
+        Rox::setCustomSemverProperty('test', '1.0.0');
+    }
+
+    public function testWillNotAllowToAddCustomComputedBooleanPropertyAfterSetup()
+    {
+        $this->setExpectedException(RuntimeException::class);
+
+        Rox::setCustomComputedBooleanProperty('test', function () {
+            return true;
+        });
+    }
+
+    public function testWillNotAllowToAddCustomComputedDoublePropertyAfterSetup()
+    {
+        $this->setExpectedException(RuntimeException::class);
+
+        Rox::setCustomComputedDoubleProperty('test', function () {
+            return 1.0;
+        });
+    }
+
+    public function testWillNotAllowToAddCustomComputedIntegerPropertyAfterSetup()
+    {
+        $this->setExpectedException(RuntimeException::class);
+
+        Rox::setCustomComputedIntegerProperty('test', function () {
+            return 1;
+        });
+    }
+
+    public function testWillNotAllowToAddCustomComputedStringPropertyAfterSetup()
+    {
+        $this->setExpectedException(RuntimeException::class);
+
+        Rox::setCustomComputedStringProperty('test', function () {
+            return 'foo';
+        });
+    }
+
+    public function testWillNotAllowToAddCustomComputedSemverPropertyAfterSetup()
+    {
+        $this->setExpectedException(RuntimeException::class);
+
+        Rox::setCustomComputedSemverProperty('test', function () {
+            return '1.0.0';
+        });
     }
 }

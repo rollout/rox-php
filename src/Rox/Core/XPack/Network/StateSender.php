@@ -14,7 +14,6 @@ use Rox\Core\Network\HttpResponseInterface;
 use Rox\Core\Network\RequestData;
 use Rox\Core\Repositories\CustomPropertyRepositoryInterface;
 use Rox\Core\Repositories\FlagRepositoryInterface;
-use Rox\Core\Utils\Debouncer;
 use Rox\Core\Utils\DotNetCompat;
 use Rox\Core\Utils\MD5Generator;
 
@@ -41,11 +40,6 @@ class StateSender
     private $_customPropertyRepository;
 
     /**
-     * @var Debouncer $_stateDebouncer
-     */
-    private $_stateDebouncer;
-
-    /**
      * @var PropertyType[] $_relevantAPICallParams
      */
     private $_relevantAPICallParams;
@@ -59,6 +53,11 @@ class StateSender
      * @var LoggerInterface $_logger
      */
     private $_log;
+
+    /**
+     * @var bool $_stateSent
+     */
+    private $_stateSent = false;
 
     /**
      * StateSender constructor.
@@ -96,18 +95,6 @@ class StateSender
         $this->_deviceProperties = $deviceProperties;
         $this->_flagRepository = $flagRepository;
         $this->_customPropertyRepository = $customPropertyRepository;
-
-        $this->_stateDebouncer = new Debouncer(3000, function () {
-            $this->send();
-        });
-
-        $this->_customPropertyRepository->addCustomPropertyEventHandler(function () {
-            $this->_sendStateDebounce();
-        });
-
-        $this->_flagRepository->addFlagAddedCallback(function () {
-            $this->_sendStateDebounce();
-        });
     }
 
     /**
@@ -230,13 +217,12 @@ class StateSender
         return $properties;
     }
 
-    private function _sendStateDebounce()
-    {
-        $this->_stateDebouncer->invoke();
-    }
-
     function send()
     {
+        if ($this->_stateSent) {
+            return;
+        }
+
         $properties = $this->_preparePropsFromDeviceProps();
         $shouldRetry = false;
         $source = ConfigurationSource::CDN;
@@ -257,6 +243,7 @@ class StateSender
 
                 if (!$shouldRetry) {
                     // success from cdn
+                    $this->_stateSent = true;
                     return;
                 }
             }
@@ -270,6 +257,7 @@ class StateSender
                 $fetchResult = $this->_sendStateToAPI($properties);
                 if ($fetchResult->isSuccessfulStatusCode()) {
                     // success for api
+                    $this->_stateSent = true;
                     return;
                 }
             }
@@ -278,6 +266,14 @@ class StateSender
         } catch (Exception $ex) {
             $this->_logSendStateException($source, $ex);
         }
+    }
+
+    /**
+     * @return bool
+     */
+    public function isStateSent()
+    {
+        return $this->_stateSent;
     }
 
     /**

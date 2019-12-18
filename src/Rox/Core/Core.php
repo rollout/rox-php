@@ -57,6 +57,7 @@ use Rox\Core\XPack\Network\StateSender;
 use Rox\Core\XPack\Reporting\XErrorReporter;
 use Rox\Core\XPack\Security\XAPIKeyVerifier;
 use Rox\Core\XPack\Security\XSignatureVerifier;
+use RuntimeException;
 
 class Core
 {
@@ -305,6 +306,7 @@ class Core
      */
     public function register($ns, RoxContainerInterface $roxContainer)
     {
+        $this->checkStateIsNotSent();
         $this->_registerer->registerInstance($roxContainer, $ns);
     }
 
@@ -323,6 +325,7 @@ class Core
      */
     public function addCustomProperty(CustomProperty $property)
     {
+        $this->checkStateIsNotSent();
         $this->_customPropertyRepository->addCustomProperty($property);
     }
 
@@ -331,6 +334,7 @@ class Core
      */
     public function addCustomPropertyIfNotExists(CustomProperty $property)
     {
+        $this->checkStateIsNotSent();
         $this->_customPropertyRepository->addCustomPropertyIfNotExists($property);
     }
 
@@ -367,4 +371,12 @@ class Core
 
     const MIN_CACHE_TTL_SECONDS = 30;
     const STATE_STORE_CACHE_TTL_SECONDS = 31556952; // 1 year
+
+    private function checkStateIsNotSent()
+    {
+        if ($this->_stateSender != null && $this->_stateSender->isStateSent()) {
+            // In PHP it's only possible to call register() before setup() (https://github.com/rollout/rox-php/issues/1).
+            throw new RuntimeException('Cannot register new container after setup() is called');
+        }
+    }
 }
