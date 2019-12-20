@@ -223,6 +223,7 @@ class StateSender
             return;
         }
 
+        $this->_stateSent = true;
         $properties = $this->_preparePropsFromDeviceProps();
         $shouldRetry = false;
         $source = ConfigurationSource::CDN;
@@ -243,7 +244,6 @@ class StateSender
 
                 if (!$shouldRetry) {
                     // success from cdn
-                    $this->_stateSent = true;
                     return;
                 }
             }
@@ -257,7 +257,6 @@ class StateSender
                 $fetchResult = $this->_sendStateToAPI($properties);
                 if ($fetchResult->isSuccessfulStatusCode()) {
                     // success for api
-                    $this->_stateSent = true;
                     return;
                 }
             }

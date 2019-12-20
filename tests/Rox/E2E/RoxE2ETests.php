@@ -14,7 +14,6 @@ use Rox\RoxTestCase;
 use Rox\Server\Rox;
 use Rox\Server\RoxOptions;
 use Rox\Server\RoxOptionsBuilder;
-use RuntimeException;
 
 class RoxE2ETests extends RoxTestCase
 {
@@ -208,88 +207,83 @@ class RoxE2ETests extends RoxTestCase
 
     public function testWillNotAllowToRegisterAfterSetup()
     {
-        $this->setExpectedException(RuntimeException::class);
-
         Rox::register('', new TestContainer());
+        $this->assertHasRegisterAfterSetupWarning();
     }
 
     public function testWillNotAllowToAddCustomBooleanPropertyAfterSetup()
     {
-        $this->setExpectedException(RuntimeException::class);
-
         Rox::setCustomBooleanProperty('test', true);
+        $this->assertHasRegisterAfterSetupWarning();
     }
 
     public function testWillNotAllowToAddCustomDoublePropertyAfterSetup()
     {
-        $this->setExpectedException(RuntimeException::class);
-
         Rox::setCustomDoubleProperty('test', 1.0);
+        $this->assertHasRegisterAfterSetupWarning();
     }
 
     public function testWillNotAllowToAddCustomIntegerPropertyAfterSetup()
     {
-        $this->setExpectedException(RuntimeException::class);
-
         Rox::setCustomIntegerProperty('test', 1);
+        $this->assertHasRegisterAfterSetupWarning();
     }
 
     public function testWillNotAllowToAddCustomStringPropertyAfterSetup()
     {
-        $this->setExpectedException(RuntimeException::class);
-
         Rox::setCustomStringProperty('test', 'foo');
+        $this->assertHasRegisterAfterSetupWarning();
     }
 
     public function testWillNotAllowToAddCustomSemverPropertyAfterSetup()
     {
-        $this->setExpectedException(RuntimeException::class);
-
         Rox::setCustomSemverProperty('test', '1.0.0');
+        $this->assertHasRegisterAfterSetupWarning();
     }
 
     public function testWillNotAllowToAddCustomComputedBooleanPropertyAfterSetup()
     {
-        $this->setExpectedException(RuntimeException::class);
-
         Rox::setCustomComputedBooleanProperty('test', function () {
             return true;
         });
+        $this->assertHasRegisterAfterSetupWarning();
     }
 
     public function testWillNotAllowToAddCustomComputedDoublePropertyAfterSetup()
     {
-        $this->setExpectedException(RuntimeException::class);
-
         Rox::setCustomComputedDoubleProperty('test', function () {
             return 1.0;
         });
+        $this->assertHasRegisterAfterSetupWarning();
     }
 
     public function testWillNotAllowToAddCustomComputedIntegerPropertyAfterSetup()
     {
-        $this->setExpectedException(RuntimeException::class);
-
         Rox::setCustomComputedIntegerProperty('test', function () {
             return 1;
         });
+        $this->assertHasRegisterAfterSetupWarning();
     }
 
     public function testWillNotAllowToAddCustomComputedStringPropertyAfterSetup()
     {
-        $this->setExpectedException(RuntimeException::class);
-
         Rox::setCustomComputedStringProperty('test', function () {
             return 'foo';
         });
+        $this->assertHasRegisterAfterSetupWarning();
     }
 
     public function testWillNotAllowToAddCustomComputedSemverPropertyAfterSetup()
     {
-        $this->setExpectedException(RuntimeException::class);
-
         Rox::setCustomComputedSemverProperty('test', function () {
             return '1.0.0';
         });
+        $this->assertHasRegisterAfterSetupWarning();
+    }
+
+    private function assertHasRegisterAfterSetupWarning()
+    {
+        $this->assertTrue(self::$_staticLoggerFactory->getLogger()
+            ->hasWarning('Cannot register new container or add custom property after setup() is called'));
     }
 }
