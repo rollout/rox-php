@@ -43,11 +43,6 @@ class RoxOptionsBuilder
     private $_loggerFactory;
 
     /**
-     * @var string|null
-     */
-    private $_distinctId;
-
-    /**
      * @var CacheStorageInterface|null $_cacheStorage
      */
     private $_cacheStorage;
@@ -185,24 +180,6 @@ class RoxOptionsBuilder
     public function setLoggerFactory(LoggerFactoryInterface $loggerFactory)
     {
         $this->_loggerFactory = $loggerFactory;
-        return $this;
-    }
-
-    /**
-     * @return string|null
-     */
-    public function getDistinctId()
-    {
-        return $this->_distinctId;
-    }
-
-    /**
-     * @param string|null $distinctId
-     * @return RoxOptionsBuilder
-     */
-    public function setDistinctId($distinctId)
-    {
-        $this->_distinctId = $distinctId;
         return $this;
     }
 

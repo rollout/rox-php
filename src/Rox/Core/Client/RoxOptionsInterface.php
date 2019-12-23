@@ -37,11 +37,6 @@ interface RoxOptionsInterface
     function getDynamicPropertiesRule();
 
     /**
-     * @return string|null
-     */
-    function getDistinctId();
-
-    /**
      * @return CacheStorageInterface|null
      */
     function getCacheStorage();

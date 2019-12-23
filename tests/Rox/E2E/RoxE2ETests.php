@@ -43,7 +43,6 @@ class RoxE2ETests extends RoxTestCase
                 TestVars::$impressionReturnedArgs = $args;
             })
             ->setDevModeKey("ba9bf259159cfd1af16feb19")
-            ->setDistinctId(self::class)
             ->setCacheStorage(new VolatileRuntimeStorage())
             ->setLogCacheHitsAndMisses(true)
             ->setLoggerFactory(self::$_staticLoggerFactory));
