@@ -5,6 +5,7 @@ namespace Rox\Server\Client;
 use Rox\Core\Client\DeviceProperties;
 use Rox\Core\Client\RoxOptionsInterface;
 use Rox\Core\Client\SdkSettingsInterface;
+use Rox\Core\Consts\Environment;
 
 class ServerProperties extends DeviceProperties
 {
@@ -22,14 +23,16 @@ class ServerProperties extends DeviceProperties
         RoxOptionsInterface $roxOptions)
     {
         parent::__construct($sdkSettings, $roxOptions);
-        $this->_distinctId = md5(join('.', [
-            getmyuid(),
-            getmygid(),
-            get_current_user(),
-            getmyinode(),
-            getmypid(),
-            getlastmod()
-        ]));
+        $this->_distinctId = isset($_ENV[Environment::INSTANCE_ID_ENV_VAR_NAME])
+            ? $_ENV[Environment::INSTANCE_ID_ENV_VAR_NAME]
+            : md5(join('.', [
+                getmyuid(),
+                getmygid(),
+                get_current_user(),
+                getmyinode(),
+                getmypid(),
+                getlastmod()
+            ]));
     }
 
     function getLibVersion()
