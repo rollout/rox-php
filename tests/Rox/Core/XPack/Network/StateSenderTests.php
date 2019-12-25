@@ -103,6 +103,32 @@ class StateSenderTests extends RoxTestCase
         $this->_validateNoErrors();
     }
 
+    public function testWillNotCallCDNTwice()
+    {
+        $reqData = [null];
+        $request = \Mockery::mock(HttpClientInterface::class)
+            ->shouldReceive('sendGet')
+            ->andReturnUsing(function ($req) use (&$reqData) {
+                $reqData[0] = $req;
+                return new TestHttpResponse(200, "{\"result\": \"200\"}");
+            })
+            ->once()
+            ->getMock();
+
+        $this->_flagRepo->addFlag(new Flag(), "flag1");
+
+        $stateSender = new StateSender($request, $this->_dp, $this->_flagRepo, $this->_cpRepo);
+        $stateSender->send();
+
+        $this->assertEquals(parse_url($reqData[0]->getUrl())['path'], "/{$this->_appKey}/09FBB5C9B28B300E8FF14BE4EBB5A829");
+        $this->_validateNoErrors();
+
+        $reqData[0] = null;
+        $stateSender->send();
+        $this->assertNull($reqData[0]);
+        $this->_validateNoErrors();
+    }
+
     public function testWillCallOnlyCDNStateMD5ChangesForFlag()
     {
         $reqData = [null];
@@ -124,6 +150,8 @@ class StateSenderTests extends RoxTestCase
         $this->assertEquals(parse_url($reqData[0]->getUrl())['path'], "/{$this->_appKey}/09FBB5C9B28B300E8FF14BE4EBB5A829");
 
         $this->_flagRepo->addFlag(new Flag(), "flag2");
+
+        $stateSender = new StateSender($request, $this->_dp, $this->_flagRepo, $this->_cpRepo);
         $stateSender->send();
         $this->assertEquals(parse_url($reqData[0]->getUrl())['path'], "/{$this->_appKey}/70748DE9C7F33257E8D2E6B6D7F13C21");
     }
@@ -149,6 +177,7 @@ class StateSenderTests extends RoxTestCase
         $this->assertEquals(parse_url($reqData[0]->getUrl())['path'], "/{$this->_appKey}/81E3F0A97C49E64CA5E47558F2DFC028");
 
         $this->_cpRepo->addCustomProperty(new CustomProperty("cp2", CustomPropertyType::getDouble(), 20));
+        $stateSender = new StateSender($request, $this->_dp, $this->_flagRepo, $this->_cpRepo);
         $stateSender->send();
         $this->assertEquals(parse_url($reqData[0]->getUrl())['path'], "/{$this->_appKey}/A5D9A87DB72A5A8DA0E571408E81A0A9");
     }
@@ -169,18 +198,19 @@ class StateSenderTests extends RoxTestCase
         $this->_flagRepo->addFlag(new Flag(), "flag2");
 
         $stateSender = new StateSender($request, $this->_dp, $this->_flagRepo, $this->_cpRepo);
-
         $stateSender->send();
         $this->_validateNoErrors();
 
         $this->assertEquals(parse_url($reqData[0]->getUrl())['path'], "/{$this->_appKey}/70748DE9C7F33257E8D2E6B6D7F13C21");
 
+        $stateSender = new StateSender($request, $this->_dp, $this->_flagRepo, $this->_cpRepo);
         $stateSender->send();
         $fr2 = new FlagRepository();
         $stateSender2 = new StateSender($request, $this->_dp, $fr2, $this->_cpRepo);
         $fr2->addFlag(new Flag(), "flag2");
         $fr2->addFlag(new Flag(), "flag1");
 
+        $stateSender = new StateSender($request, $this->_dp, $this->_flagRepo, $this->_cpRepo);
         $stateSender2->send();
         $this->_validateNoErrors();
 
@@ -203,12 +233,12 @@ class StateSenderTests extends RoxTestCase
         $this->_cpRepo->addCustomProperty(new CustomProperty("cp2", CustomPropertyType::getString(), "2222"));;
 
         $stateSender = new StateSender($request, $this->_dp, $this->_flagRepo, $this->_cpRepo);
-
         $stateSender->send();
         $this->_validateNoErrors();
 
         $this->assertEquals(parse_url($reqData[0]->getUrl())['path'], "/{$this->_appKey}/F8B8EC489E8F944187BA8343537B14BA");
 
+        $stateSender = new StateSender($request, $this->_dp, $this->_flagRepo, $this->_cpRepo);
         $stateSender->send();
         $cpr2 = new CustomPropertyRepository();
         $stateSender2 = new StateSender($request, $this->_dp, $this->_flagRepo, $cpr2);
