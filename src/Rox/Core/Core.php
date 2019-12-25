@@ -4,7 +4,8 @@ namespace Rox\Core;
 
 use InvalidArgumentException;
 use Kevinrob\GuzzleCache\CacheMiddleware;
-use Kevinrob\GuzzleCache\Strategy\GreedyCacheStrategy;
+use Kevinrob\GuzzleCache\Strategy\Delegate\DelegatingCacheStrategy;
+use Kevinrob\GuzzleCache\Strategy\NullCacheStrategy;
 use Psr\Log\LoggerInterface;
 use Rox\Core\Client\DevicePropertiesInterface;
 use Rox\Core\Client\DynamicApi;
@@ -29,6 +30,8 @@ use Rox\Core\Impression\ImpressionInvoker;
 use Rox\Core\Impression\ImpressionInvokerInterface;
 use Rox\Core\Impression\XImpressionInvoker;
 use Rox\Core\Logging\LoggerFactory;
+use Rox\Core\Network\CdnCacheStrategy;
+use Rox\Core\Network\CdnRequestMatcher;
 use Rox\Core\Network\ConfigurationFetcher;
 use Rox\Core\Network\ConfigurationFetcherInterface;
 use Rox\Core\Network\ConfigurationFetcherRoxy;
@@ -362,12 +365,12 @@ class Core
         $httpClientOptions = new GuzzleHttpClientOptions();
         if ($options) {
             if ($options->getCacheStorage()) {
-                $httpClientOptions->addMiddleware(new CacheMiddleware(
-                    new GreedyCacheStrategy(
-                        $options->getCacheStorage(),
-                        max($cacheTtl ?: self::MIN_CACHE_TTL_SECONDS, self::MIN_CACHE_TTL_SECONDS)
-                    )
-                ), 'cache');
+                $strategy = new DelegatingCacheStrategy(new NullCacheStrategy());
+                $strategy->registerRequestMatcher(new CdnRequestMatcher(), new CdnCacheStrategy(
+                    $options->getCacheStorage(),
+                    max($cacheTtl ?: self::MIN_CACHE_TTL_SECONDS, self::MIN_CACHE_TTL_SECONDS)
+                ));
+                $httpClientOptions->addMiddleware(new CacheMiddleware($strategy), 'cache');
             }
             $httpClientOptions->setLogCacheHitsAndMisses($options->isLogCacheHitsAndMisses());
         }
