@@ -96,7 +96,7 @@ class DeviceProperties implements DevicePropertiesInterface
      */
     function getDistinctId()
     {
-        return $this->_roxOptions->getDistinctId() ?: self::DEFAULT_DISTINCT_ID;
+        return self::DEFAULT_DISTINCT_ID;
     }
 
     /**

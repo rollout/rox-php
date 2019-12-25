@@ -4,6 +4,7 @@ namespace Rox\Core\Consts;
 
 class Environment
 {
+    const INSTANCE_ID_ENV_VAR_NAME = 'ROLLOUT_INSTANCE_ID';
     const ENV_VAR_NAME = 'ROLLOUT_MODE';
     const PRODUCTION = 'PRODUCTION';
     const QA = 'QA';

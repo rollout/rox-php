@@ -40,11 +40,6 @@ class RoxOptions implements RoxOptionsInterface
     private $_dynamicPropertiesRule;
 
     /**
-     * @var string|null
-     */
-    private $_distinctId;
-
-    /**
      * @var CacheStorageInterface|null $_cacheStorage
      */
     private $_cacheStorage;
@@ -86,16 +81,6 @@ class RoxOptions implements RoxOptionsInterface
         $this->_cacheStorage = $roxOptionsBuilder->getCacheStorage();
         $this->_logCacheHitsAndMisses = $roxOptionsBuilder->isLogCacheHitsAndMisses();
         $this->_configFetchIntervalInSeconds = $roxOptionsBuilder->getConfigFetchIntervalInSeconds();
-
-        if ($roxOptionsBuilder->getDistinctId() != null) {
-            $this->_distinctId = $roxOptionsBuilder->getDistinctId();
-        } else {
-            try {
-                $this->_distinctId = Uuid::uuid4()->toString();
-            } catch (\Exception $e) {
-                $this->_distinctId = uniqid('rox-php-sdk');
-            }
-        }
     }
 
     /**
@@ -144,14 +129,6 @@ class RoxOptions implements RoxOptionsInterface
     function getDynamicPropertiesRule()
     {
         return $this->_dynamicPropertiesRule;
-    }
-
-    /**
-     * @return string|null
-     */
-    function getDistinctId()
-    {
-        return $this->_distinctId;
     }
 
     /**

@@ -46,7 +46,6 @@ if (!isset($_GET['nocache'])) {
     // Sample caching setup using Doctrine example from https://github.com/Kevinrob/guzzle-cache-middleware
 
     $roxOptionsBuilder
-        ->setDistinctId('rox-php-demo') // Some app-specific ID that would stay unchanged between requests
         ->setCacheStorage(new DoctrineCacheStorage(
             new ChainCache([
                 new ArrayCache(),

@@ -150,7 +150,6 @@ class CoreTests extends RoxTestCase
     public function testWillCheckCoreSetupWhenNoOptions()
     {
         $dp = new DeviceProperties($this->_mockedSdkSettings, $this->_mockedOptions);
-
         $c = new Core();
         $c->setup($this->_mockedSdkSettings, $dp, null);
     }
