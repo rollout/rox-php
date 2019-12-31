@@ -41,7 +41,7 @@ class LoggerFactory
             try {
                 self::$_defaultFactory = (new MonologLoggerFactory())
                     ->setDefaultHandlers([
-                        new StreamHandler('php://stdout', Logger::toMonologLevel(LogLevel::INFO))
+                        new StreamHandler('php://stderr', Logger::toMonologLevel(LogLevel::ERROR))
                     ]);
             } catch (Exception $e) {
                 error_log("Failed to setup default logging: {$e->getMessage()}\n{$e->getTraceAsString()}");

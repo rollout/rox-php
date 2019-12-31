@@ -50,7 +50,7 @@ echo '<pre>';
 if (!isset($_GET['nolog'])) {
 
     // Example of setting up custom logging handlers. By default it outputs log records
-    // to stdout, and default log level is INFO. Here we're setting custom logging handlers
+    // to stderr, and default log level is ERROR. Here we're setting custom logging handlers
     // to output to filesystem instead with DEBUG log level.
     //
     // It's also possible to specify custom log record processors by calling
