@@ -2,8 +2,12 @@
 
 namespace Rox\Core;
 
+use Doctrine\Common\Cache\ArrayCache;
+use Doctrine\Common\Cache\ChainCache;
+use Doctrine\Common\Cache\FilesystemCache;
 use InvalidArgumentException;
 use Kevinrob\GuzzleCache\CacheMiddleware;
+use Kevinrob\GuzzleCache\Storage\DoctrineCacheStorage;
 use Kevinrob\GuzzleCache\Strategy\Delegate\DelegatingCacheStrategy;
 use Kevinrob\GuzzleCache\Strategy\NullCacheStrategy;
 use Psr\Log\LoggerInterface;
@@ -363,17 +367,30 @@ class Core
     private function _createHttpClientFactory($options, $cacheTtl)
     {
         $httpClientOptions = new GuzzleHttpClientOptions();
-        if ($options) {
-            if ($options->getCacheStorage()) {
-                $strategy = new DelegatingCacheStrategy(new NullCacheStrategy());
-                $strategy->registerRequestMatcher(new CdnRequestMatcher(), new CdnCacheStrategy(
-                    $options->getCacheStorage(),
-                    max($cacheTtl ?: self::MIN_CACHE_TTL_SECONDS, self::MIN_CACHE_TTL_SECONDS)
-                ));
-                $httpClientOptions->addMiddleware(new CacheMiddleware($strategy), 'cache');
-            }
-            $httpClientOptions->setLogCacheHitsAndMisses($options->isLogCacheHitsAndMisses());
+        $cacheStorage = $options
+            ? $options->getCacheStorage()
+            : null;
+        if (!$cacheStorage) {
+            $cacheStorage = new DoctrineCacheStorage(
+                new ChainCache([
+                    new ArrayCache(),
+                    new FilesystemCache(join(DIRECTORY_SEPARATOR, [
+                        sys_get_temp_dir(),
+                        'rollout',
+                        'cache'
+                    ])),
+                ])
+            );
         }
+        $strategy = new DelegatingCacheStrategy(new NullCacheStrategy());
+        $strategy->registerRequestMatcher(new CdnRequestMatcher(), new CdnCacheStrategy(
+            $cacheStorage,
+            max($cacheTtl ?: self::MIN_CACHE_TTL_SECONDS, self::MIN_CACHE_TTL_SECONDS)
+        ));
+        $httpClientOptions->addMiddleware(new CacheMiddleware($strategy), 'cache');
+        $httpClientOptions->setLogCacheHitsAndMisses($options
+            ? $options->isLogCacheHitsAndMisses()
+            : false);
         return new GuzzleHttpClientFactory($httpClientOptions);
     }
 
