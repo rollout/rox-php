@@ -3,7 +3,6 @@
 namespace Rox\Server;
 
 use Kevinrob\GuzzleCache\Storage\CacheStorageInterface;
-use Rox\Core\Logging\LoggerFactoryInterface;
 
 class RoxOptionsBuilder
 {
@@ -36,11 +35,6 @@ class RoxOptionsBuilder
      * @var callable|null $_dynamicPropertiesRule
      */
     private $_dynamicPropertiesRule;
-
-    /**
-     * @var LoggerFactoryInterface $_loggerFactory
-     */
-    private $_loggerFactory;
 
     /**
      * @var CacheStorageInterface|null $_cacheStorage
@@ -162,24 +156,6 @@ class RoxOptionsBuilder
     public function setDynamicPropertiesRule(callable $dynamicPropertiesRule)
     {
         $this->_dynamicPropertiesRule = $dynamicPropertiesRule;
-        return $this;
-    }
-
-    /**
-     * @return LoggerFactoryInterface
-     */
-    public function getLoggerFactory()
-    {
-        return $this->_loggerFactory;
-    }
-
-    /**
-     * @param LoggerFactoryInterface $loggerFactory
-     * @return RoxOptionsBuilder
-     */
-    public function setLoggerFactory(LoggerFactoryInterface $loggerFactory)
-    {
-        $this->_loggerFactory = $loggerFactory;
         return $this;
     }
 

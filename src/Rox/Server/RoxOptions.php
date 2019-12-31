@@ -3,9 +3,7 @@
 namespace Rox\Server;
 
 use Kevinrob\GuzzleCache\Storage\CacheStorageInterface;
-use Ramsey\Uuid\Uuid;
 use Rox\Core\Client\RoxOptionsInterface;
-use Rox\Core\Logging\LoggerFactory;
 
 class RoxOptions implements RoxOptionsInterface
 {
@@ -68,10 +66,6 @@ class RoxOptions implements RoxOptionsInterface
         $this->_version = $roxOptionsBuilder->getVersion();
         if (!$roxOptionsBuilder->getVersion()) {
             $this->_version = "0.0";
-        }
-
-        if ($roxOptionsBuilder->getLoggerFactory() != null) {
-            LoggerFactory::setup($roxOptionsBuilder->getLoggerFactory());
         }
 
         $this->_impressionHandler = $roxOptionsBuilder->getImpressionHandler();

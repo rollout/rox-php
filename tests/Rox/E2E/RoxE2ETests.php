@@ -8,6 +8,7 @@ use Rox\Core\Configuration\FetcherStatus;
 use Rox\Core\Consts\Environment;
 use Rox\Core\Context\ContextBuilder;
 use Rox\Core\Impression\ImpressionArgs;
+use Rox\Core\Logging\LoggerFactory;
 use Rox\Core\Logging\TestLoggerFactory;
 use Rox\Core\Register\TestContainer;
 use Rox\RoxTestCase;
@@ -27,6 +28,7 @@ class RoxE2ETests extends RoxTestCase
         $_ENV[Environment::ENV_VAR_NAME] = Environment::QA;
 
         self::$_staticLoggerFactory = new TestLoggerFactory();
+        LoggerFactory::setup(self::$_staticLoggerFactory);
 
         $options = new RoxOptions((new RoxOptionsBuilder())
             ->setConfigurationFetchedHandler(function (ConfigurationFetchedArgs $args) {
@@ -44,8 +46,7 @@ class RoxE2ETests extends RoxTestCase
             })
             ->setDevModeKey("ba9bf259159cfd1af16feb19")
             ->setCacheStorage(new VolatileRuntimeStorage())
-            ->setLogCacheHitsAndMisses(true)
-            ->setLoggerFactory(self::$_staticLoggerFactory));
+            ->setLogCacheHitsAndMisses(true));
 
         Rox::register("", Container::getInstance());
         TestCustomPropsCreator::createCustomProps();
