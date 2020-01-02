@@ -22,7 +22,7 @@ extension=php_openssl.dll 	# config signature check
 
 Getting started guide, use cases, examples and videos can be found in [Rollout support site](https://support.rollout.io)
 
-# Rollout PHPH SDK
+# Rollout PHP SDK
 
 Rollout PHP SDK. Define and use simple and advanced feature flags, remote configuration variables, static and computed custom properties in code. Control your application features via Rollout's dashboard.
 
