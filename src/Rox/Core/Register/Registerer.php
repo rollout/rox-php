@@ -54,24 +54,29 @@ class Registerer
             $this->_namespaces[] = $ns;
         }
 
+        // Use get_object_vars() to get most properties (including ones dynamically set)
+        $properties = get_object_vars($container);
         try {
             $reflect = new ReflectionClass($container);
+            // Use a ReflectionClass to get properties not picked up by get_object_vars() (private & protected ones)
             foreach ($reflect->getProperties() as $prop) {
                 $prop->setAccessible(true);
-                $value = $prop->getValue($container);
-                if ($value instanceof Variant) {
-                    $name = $prop->getName();
-                    if ($ns) {
-                        $name = "${ns}.${name}";
-                    }
-                    $this->_flagRepository->addFlag($value, $name);
-                }
+                $properties[$prop->getName()] = $prop->getValue($container);
             }
         } catch (ReflectionException $e) {
             $type = get_class($container);
             $this->_log->error("Failed to obtain properties of class ${type}", [
                 'exception' => $e
             ]);
+        }
+
+        foreach ($properties as $name => $value) {
+            if ($value instanceof Variant) {
+                if ($ns) {
+                    $name = "${ns}.${name}";
+                }
+                $this->_flagRepository->addFlag($value, $name);
+            }
         }
     }
 }
