@@ -7,7 +7,7 @@ Install `composer` using these guidelines: https://getcomposer.org/doc/00-intro.
 After installation proceed to the project root directory and run
 
 ```
-composer update
+composer install
 ```  
 
 ### Tests
@@ -15,7 +15,7 @@ composer update
 From the project root run
 
 ```
-composer update
+composer install
 composer test
 ```
 

@@ -1,5 +1,7 @@
 {
   "name": "rollout/rox",
+  "description": "Rollout SDK for PHP",
+  "license": "proprietary",
   "autoload": {
     "psr-4": {
       "\\": "src/"
