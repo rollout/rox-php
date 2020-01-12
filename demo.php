@@ -7,7 +7,6 @@ use Kevinrob\GuzzleCache\Storage\DoctrineCacheStorage;
 use Monolog\Handler\StreamHandler;
 use Monolog\Logger;
 use Rox\Core\Consts\Environment;
-use Rox\Core\Entities\RoxContainerInterface;
 use Rox\Core\Logging\LoggerFactory;
 use Rox\Core\Logging\MonologLoggerFactory;
 use Rox\Server\Flags\RoxFlag;
@@ -20,7 +19,7 @@ const DEFAULT_DEV_MODE_KEY = '01fcd0d21eeaed9923dff6d8';
 
 require __DIR__ . '/vendor/autoload.php';
 
-class Container implements RoxContainerInterface
+class Container
 {
     public $demoFlag;
 

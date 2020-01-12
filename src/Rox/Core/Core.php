@@ -29,7 +29,6 @@ use Rox\Core\CustomProperties\DynamicProperties;
 use Rox\Core\CustomProperties\DynamicPropertiesInterface;
 use Rox\Core\Entities\EntitiesProviderInterface;
 use Rox\Core\Entities\FlagSetter;
-use Rox\Core\Entities\RoxContainerInterface;
 use Rox\Core\Impression\ImpressionInvoker;
 use Rox\Core\Impression\ImpressionInvokerInterface;
 use Rox\Core\Impression\XImpressionInvoker;
@@ -311,9 +310,9 @@ class Core
 
     /**
      * @param string $ns
-     * @param RoxContainerInterface $roxContainer
+     * @param object $roxContainer
      */
-    public function register($ns, RoxContainerInterface $roxContainer)
+    public function register($ns, $roxContainer)
     {
         if (!$this->_checkStateIsNotSent()) {
             return;
