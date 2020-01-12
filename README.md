@@ -31,7 +31,7 @@ Rollout PHP SDK. Define and use simple and advanced feature flags, remote config
 
 Rollout is free-to-use, proprietary software. Please see the full license (found in LICENSE in this distribution) for details on its license and the licenses of its dependencies.
 
-Rollout Go SDK is free-to-use, proprietary software. Please see the full license found under the LICENSE file for more details.
+Rollout SDK is free-to-use, proprietary software. Please see the full license found under the LICENSE file for more details.
 
 ## Feedback
 
