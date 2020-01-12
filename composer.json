@@ -1,5 +1,6 @@
 {
   "name": "rollout/rox",
+  "license": "proprietary",
   "autoload": {
     "psr-4": {
       "\\": "src/"
