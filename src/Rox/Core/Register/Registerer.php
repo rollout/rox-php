@@ -6,7 +6,6 @@ use InvalidArgumentException;
 use Psr\Log\LoggerInterface;
 use ReflectionClass;
 use ReflectionException;
-use Rox\Core\Entities\RoxContainerInterface;
 use Rox\Core\Entities\Variant;
 use Rox\Core\Logging\LoggerFactory;
 use Rox\Core\Repositories\FlagRepositoryInterface;
@@ -39,10 +38,10 @@ class Registerer
     }
 
     /**
-     * @param RoxContainerInterface $container
+     * @param object $container
      * @param string $ns
      */
-    public function registerInstance(RoxContainerInterface $container, $ns)
+    public function registerInstance($container, $ns)
     {
         if ($ns === null) {
             throw new InvalidArgumentException("A namespace cannot be null");

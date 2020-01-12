@@ -13,7 +13,6 @@ use Rox\Core\Core;
 use Rox\Core\CustomProperties\CustomProperty;
 use Rox\Core\CustomProperties\CustomPropertyType;
 use Rox\Core\CustomProperties\DeviceProperty;
-use Rox\Core\Entities\RoxContainerInterface;
 use Rox\Core\Logging\LoggerFactory;
 use Rox\Server\Client\ServerProperties;
 use Rox\Server\Flags\ServerEntitiesProvider;
@@ -94,9 +93,9 @@ class Rox
 
     /**
      * @param string $namespace
-     * @param RoxContainerInterface $roxContainer
+     * @param object $roxContainer
      */
-    public static function register($namespace, RoxContainerInterface $roxContainer)
+    public static function register($namespace, $roxContainer)
     {
         self::getCore()->register($namespace, $roxContainer);
     }

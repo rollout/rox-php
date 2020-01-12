@@ -3,11 +3,10 @@
 namespace Rox\Core\Register;
 
 use Rox\Core\Entities\Flag;
-use Rox\Core\Entities\RoxContainerInterface;
 use Rox\Core\Entities\Variant;
 use stdClass;
 
-class TestContainer implements RoxContainerInterface
+class TestContainer
 {
     private $variant1;
     private $flag1;

@@ -2,11 +2,10 @@
 
 namespace Rox\E2E;
 
-use Rox\Core\Entities\RoxContainerInterface;
 use Rox\Server\Flags\RoxFlag;
 use Rox\Server\Flags\RoxVariant;
 
-class Container implements RoxContainerInterface
+class Container
 {
     /**
      * @var Container $_instance
