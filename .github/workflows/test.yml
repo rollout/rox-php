@@ -1,4 +1,4 @@
-name: PHP Composer
+name: SDK Tests
 
 on: [push]
 
@@ -10,18 +10,11 @@ jobs:
     steps:
     - uses: actions/checkout@v1
 
-#     FIXME: it fails with error "No license specified, it is recommended to do so..."
-#    - name: Validate composer.json and composer.lock
-#      run: composer validate
+    - name: Validate composer.json and composer.lock
+      run: composer validate
 
     - name: Install dependencies
       run: composer install --prefer-dist --no-progress --no-suggest
     
     - name: Run test suite
       run: composer test
-
-    # Add a test script to composer.json, for instance: "test": "vendor/bin/phpunit"
-    # Docs: https://getcomposer.org/doc/articles/scripts.md
-
-    # - name: Run test suite
-    #   run: composer run-script test
