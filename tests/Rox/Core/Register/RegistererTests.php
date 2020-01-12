@@ -40,9 +40,10 @@ class RegistererTests extends RoxTestCase
 
         $registerer->registerInstance($container, "ns1");
 
-        $this->assertEquals(count($flagRepo->getAllFlags()), 4);
+        $this->assertEquals(count($flagRepo->getAllFlags()), 5);
 
         $this->assertEquals($flagRepo->getFlag("ns1.variant1")->getDefaultValue(), "1");
+        $this->assertEquals($flagRepo->getFlag("ns1.variant2")->getDefaultValue(), "6");
         $this->assertEquals($flagRepo->getFlag("ns1.flag1")->getDefaultValue(), "false");
     }
 
@@ -54,9 +55,10 @@ class RegistererTests extends RoxTestCase
 
         $registerer->registerInstance($container, "");
 
-        $this->assertEquals(count($flagRepo->getAllFlags()), 4);
+        $this->assertEquals(count($flagRepo->getAllFlags()), 5);
 
         $this->assertEquals($flagRepo->getFlag("variant1")->getDefaultValue(), "1");
+        $this->assertEquals($flagRepo->getFlag("variant2")->getDefaultValue(), "6");
         $this->assertEquals($flagRepo->getFlag("flag1")->getDefaultValue(), "false");
     }
 }

@@ -21,6 +21,7 @@ class TestContainer implements RoxContainerInterface
     public function __construct()
     {
         $this->variant1 = new Variant("1", ["1", "2", "3"]);
+        $this->variant2 = new Variant("6", ["4", "5", "6"]);
         $this->flag1 = new Flag();
         $this->flag2 = new Flag();
         $this->flag3 = new Flag();
