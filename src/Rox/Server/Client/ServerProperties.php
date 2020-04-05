@@ -30,7 +30,6 @@ class ServerProperties extends DeviceProperties
                 getmygid(),
                 get_current_user(),
                 getmyinode(),
-                getmypid(),
                 getlastmod()
             ]));
     }
