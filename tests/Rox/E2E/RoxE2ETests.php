@@ -10,6 +10,7 @@ use Rox\Core\Context\ContextBuilder;
 use Rox\Core\Impression\ImpressionArgs;
 use Rox\Core\Logging\LoggerFactory;
 use Rox\Core\Logging\TestLoggerFactory;
+use Rox\Core\Register\TestContainer;
 use Rox\RoxTestCase;
 use Rox\Server\Rox;
 use Rox\Server\RoxOptions;
@@ -81,15 +82,6 @@ class RoxE2ETests extends RoxTestCase
         $this->assertEquals(Container::getInstance()->variantOverwritten->getValue(), "green");
     }
 
-    public function testRegisterAfterSetup()
-    {
-        $this->assertTrue(ContainerTwo::getInstance()->flag2->isEnabled());
-        $this->assertEquals("red", ContainerTwo::getInstance()->variant2->getValue()); 
-        Rox::register("afterSetup", ContainerTwo::getInstance());
-        $this->assertFalse(ContainerTwo::getInstance()->flag2->isEnabled());
-        $this->assertEquals("green", ContainerTwo::getInstance()->variant2->getValue());
-    }
-
     public function testAllCustomProperties()
     {
         $this->assertTrue(Container::getInstance()->flagCustomProperties->isEnabled());
@@ -99,10 +91,6 @@ class RoxE2ETests extends RoxTestCase
         $this->assertTrue(TestVars::$isComputedIntPropCalled);
         $this->assertTrue(TestVars::$isComputedSemverPropCalled);
         $this->assertTrue(TestVars::$isComputedStringPropCalled);
-
-        // Testing custom prop change after setup
-        Rox::setCustomStringProperty("stringProp1", "unexpectedValue");
-        $this->assertFalse(Container::getInstance()->flagCustomProperties->isEnabled());
     }
 
     public function testFetchWithinTimeout()
@@ -215,5 +203,87 @@ class RoxE2ETests extends RoxTestCase
                 (strpos($record['message'], 'HIT') !== false ||
                     strpos($record['message'], 'MISS') !== false);
         }));
+    }
+
+    public function testWillNotAllowToRegisterAfterSetup()
+    {
+        Rox::register('', new TestContainer());
+        $this->assertHasRegisterAfterSetupWarning();
+    }
+
+    public function testWillNotAllowToAddCustomBooleanPropertyAfterSetup()
+    {
+        Rox::setCustomBooleanProperty('test', true);
+        $this->assertHasRegisterAfterSetupWarning();
+    }
+
+    public function testWillNotAllowToAddCustomDoublePropertyAfterSetup()
+    {
+        Rox::setCustomDoubleProperty('test', 1.0);
+        $this->assertHasRegisterAfterSetupWarning();
+    }
+
+    public function testWillNotAllowToAddCustomIntegerPropertyAfterSetup()
+    {
+        Rox::setCustomIntegerProperty('test', 1);
+        $this->assertHasRegisterAfterSetupWarning();
+    }
+
+    public function testWillNotAllowToAddCustomStringPropertyAfterSetup()
+    {
+        Rox::setCustomStringProperty('test', 'foo');
+        $this->assertHasRegisterAfterSetupWarning();
+    }
+
+    public function testWillNotAllowToAddCustomSemverPropertyAfterSetup()
+    {
+        Rox::setCustomSemverProperty('test', '1.0.0');
+        $this->assertHasRegisterAfterSetupWarning();
+    }
+
+    public function testWillNotAllowToAddCustomComputedBooleanPropertyAfterSetup()
+    {
+        Rox::setCustomComputedBooleanProperty('test', function () {
+            return true;
+        });
+        $this->assertHasRegisterAfterSetupWarning();
+    }
+
+    public function testWillNotAllowToAddCustomComputedDoublePropertyAfterSetup()
+    {
+        Rox::setCustomComputedDoubleProperty('test', function () {
+            return 1.0;
+        });
+        $this->assertHasRegisterAfterSetupWarning();
+    }
+
+    public function testWillNotAllowToAddCustomComputedIntegerPropertyAfterSetup()
+    {
+        Rox::setCustomComputedIntegerProperty('test', function () {
+            return 1;
+        });
+        $this->assertHasRegisterAfterSetupWarning();
+    }
+
+    public function testWillNotAllowToAddCustomComputedStringPropertyAfterSetup()
+    {
+        Rox::setCustomComputedStringProperty('test', function () {
+            return 'foo';
+        });
+        $this->assertHasRegisterAfterSetupWarning();
+    }
+
+    public function testWillNotAllowToAddCustomComputedSemverPropertyAfterSetup()
+    {
+        Rox::setCustomComputedSemverProperty('test', function () {
+            return '1.0.0';
+        });
+        $this->assertHasRegisterAfterSetupWarning();
+    }
+
+    private function assertHasRegisterAfterSetupWarning()
+    {
+        $this->assertTrue(self::$_staticLoggerFactory->getLogger()
+            ->hasWarning('Cannot register new container or add custom property after setup() is called'));
     }
 }
