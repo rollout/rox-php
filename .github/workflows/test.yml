@@ -38,7 +38,7 @@ jobs:
 
     # TODO: remove the following step once Mockery releases backport of https://github.com/mockery/mockery/pull/980 to v0.9.XX
     - name: PHP v7.4 workaround
-      run: composer require --dev hamcrest/hamcrest-php:1.2.2 mockery/mockery:0.9 --ignore-platform-reqs
+      run: composer require --dev hamcrest/hamcrest-php:1.2.2 mockery/mockery:0.9:11 --ignore-platform-reqs
 
     # TODO: remove --ignore-platform-reqs once Mockery releases backport of https://github.com/mockery/mockery/pull/980 to v0.9.XX
     - name: Install dependencies
