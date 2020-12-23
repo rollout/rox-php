@@ -10,7 +10,7 @@ class RegistererTests extends RoxTestCase
 {
     public function testWillThrowWhenNSNull()
     {
-        $this->setExpectedException(InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
 
         $flagRepo = new FlagRepository();
         $container = new TestContainer();
@@ -21,7 +21,7 @@ class RegistererTests extends RoxTestCase
 
     public function testWillThrowWhenNSRegisteredTwice()
     {
-        $this->setExpectedException(InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
 
         $flagRepo = new FlagRepository();
         $container = new TestContainer();
