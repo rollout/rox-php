@@ -76,7 +76,7 @@ class CoreTests extends RoxTestCase
 
     public function testWillCheckNullApiKey()
     {
-        $this->setExpectedException(InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
 
         $this->_mockedSdkSettings
             ->shouldReceive('getApiKey')
@@ -96,7 +96,7 @@ class CoreTests extends RoxTestCase
 
     public function testWillCheckEmptyApiKey()
     {
-        $this->setExpectedException(InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
 
         $this->_mockedSdkSettings
             ->shouldReceive('getApiKey')
@@ -116,7 +116,7 @@ class CoreTests extends RoxTestCase
 
     public function testWillCheckInvalidApiKey()
     {
-        $this->setExpectedException(InvalidArgumentException::class);
+        $this->expectException(InvalidArgumentException::class);
 
         $this->_mockedSdkSettings
             ->shouldReceive('getApiKey')
@@ -145,6 +145,8 @@ class CoreTests extends RoxTestCase
 
         $c = new Core();
         $c->setup($this->_mockedSdkSettings, $mockedDeviceProps, $this->_mockedOptions);
+
+        $this->ignoreNoAssertationTest();
     }
 
     public function testWillCheckCoreSetupWhenNoOptions()
@@ -152,5 +154,14 @@ class CoreTests extends RoxTestCase
         $dp = new DeviceProperties($this->_mockedSdkSettings, $this->_mockedOptions);
         $c = new Core();
         $c->setup($this->_mockedSdkSettings, $dp, null);
+
+        $this->ignoreNoAssertationTest();
+    }
+
+    public function ignoreNoAssertationTest()
+    {
+        $this->addToAssertionCount(
+            \Mockery::getContainer()->mockery_getExpectationCount()
+        );
     }
 }

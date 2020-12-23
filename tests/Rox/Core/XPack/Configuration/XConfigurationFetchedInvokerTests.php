@@ -20,6 +20,8 @@ class XConfigurationFetchedInvokerTests extends RoxTestCase
         $configurationFetchedInvoker2 = new XConfigurationFetchedInvoker(\Mockery::mock(Core::class));
         $configurationFetchedInvoker2->invoke(FetcherStatus::AppliedFromEmbedded,
             TimeUtils::currentTimeMillis(), true);
+
+        self::assertTrue(true);
     }
 
     public function testConfigurationFetchedArgsConstructor()

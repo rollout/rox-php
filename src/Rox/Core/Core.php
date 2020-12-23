@@ -314,9 +314,6 @@ class Core
      */
     public function register($ns, $roxContainer)
     {
-        if (!$this->_checkStateIsNotSent()) {
-            return;
-        }
         $this->_registerer->registerInstance($roxContainer, $ns);
     }
 
@@ -335,9 +332,6 @@ class Core
      */
     public function addCustomProperty(CustomProperty $property)
     {
-        if (!$this->_checkStateIsNotSent()) {
-            return;
-        }
         $this->_customPropertyRepository->addCustomProperty($property);
     }
 
@@ -346,9 +340,6 @@ class Core
      */
     public function addCustomPropertyIfNotExists(CustomProperty $property)
     {
-        if (!$this->_checkStateIsNotSent()) {
-            return;
-        }
         $this->_customPropertyRepository->addCustomPropertyIfNotExists($property);
     }
 
@@ -394,18 +385,5 @@ class Core
             ? $options->isLogCacheHitsAndMisses()
             : false);
         return new GuzzleHttpClientFactory($httpClientOptions);
-    }
-
-    /**
-     * @return bool
-     */
-    private function _checkStateIsNotSent()
-    {
-        if ($this->_stateSender != null && $this->_stateSender->isStateSent()) {
-            // In PHP it's only possible to call register() before setup() (https://github.com/rollout/rox-php/issues/1).
-            $this->_log->warning('Cannot register new container or add custom property after setup() is called');
-            return false;
-        }
-        return true;
     }
 }

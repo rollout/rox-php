@@ -30,6 +30,8 @@ class ImpressionInvokerTests extends RoxTestCase
 
         $impressionInvoker = new XImpressionInvoker($internalFlags, null, null);
         $impressionInvoker->invoke(new ReportingValue('foo', 'bar'), null, null);
+
+        $this->ignoreNoAssertationTest();
     }
 
     public function testWillTestImpressionInvokerInvokeAndParameters()
@@ -424,5 +426,12 @@ class ImpressionInvokerTests extends RoxTestCase
         $this->assertEquals($outEvent[0]->getValue(), 'value');
         $this->assertEquals($outEvent[0]->getType(), 'IMPRESSION');
         $this->assertTrue($outEvent[0]->getTime() <= TimeUtils::currentTimeMillis());
+    }
+
+    public function ignoreNoAssertationTest()
+    {
+        $this->addToAssertionCount(
+            \Mockery::getContainer()->mockery_getExpectationCount()
+        );
     }
 }
