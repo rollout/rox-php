@@ -2,26 +2,26 @@
 
 namespace Rox\Core\CustomProperties;
 
-use Rox\Core\Entities\Variant;
+use Rox\Core\Entities\RoxStringBase;
 
 class FlagAddedCallbackArgs
 {
     /**
-     * @var Variant $_variant
+     * @var RoxStringBase $_variant
      */
     private $_variant;
 
     /**
      * FlagAddedCallbackArgs constructor.
-     * @param Variant $variant
+     * @param RoxStringBase $variant
      */
-    public function __construct(Variant $variant)
+    public function __construct(RoxStringBase $variant)
     {
         $this->_variant = $variant;
     }
 
     /**
-     * @return Variant
+     * @return RoxStringBase
      */
     public function getVariant()
     {

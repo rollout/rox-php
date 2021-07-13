@@ -10,6 +10,7 @@ use Rox\Core\Repositories\ExperimentRepository;
 use Rox\Core\Repositories\FlagRepository;
 use Rox\Core\Roxx\ParserInterface;
 use Rox\RoxTestCase;
+use Rox\Server\Flags\RoxFlag;
 
 class FlagSetterTests extends RoxTestCase
 {
@@ -22,7 +23,7 @@ class FlagSetterTests extends RoxTestCase
 
         $impressionInvoker = new XImpressionInvoker($internalFlags, null, null);
 
-        $flagRepo->addFlag(new Flag(), "f1");
+        $flagRepo->addFlag(new RoxFlag(), "f1");
         $expRepo->setExperiments(
             [
                 new ExperimentModel("33", "1", "1", false, ["f1"], [], "stam")
@@ -45,8 +46,8 @@ class FlagSetterTests extends RoxTestCase
         $internalFlags = \Mockery::mock(InternalFlagsInterface::class);
         $impressionInvoker = new XImpressionInvoker($internalFlags, null, null);
 
-        $flagRepo->addFlag(new Flag(), "f1");
-        $flagRepo->addFlag(new Flag(), "f2");
+        $flagRepo->addFlag(new RoxFlag(), "f1");
+        $flagRepo->addFlag(new RoxFlag(), "f2");
         $expRepo->setExperiments(
             [
                 new ExperimentModel("1", "1", "1", false, ["f1"], [], "stam")
@@ -71,7 +72,7 @@ class FlagSetterTests extends RoxTestCase
 
         $flagSetter = new FlagSetter($flagRepo, $parser, $expRepo, $impressionInvoker);
 
-        $flagRepo->addFlag(new Flag(), "f2");
+        $flagRepo->addFlag(new RoxFlag(), "f2");
 
         $flagSetter->setExperiments();
 
@@ -104,7 +105,7 @@ class FlagSetterTests extends RoxTestCase
 
         $flagSetter = new FlagSetter($flagRepo, $parser, $expRepo, $impressionInvoker);
 
-        $flagRepo->addFlag(new Flag(), "f2");
+        $flagRepo->addFlag(new RoxFlag(), "f2");
         $expRepo->setExperiments(
             [
                 new ExperimentModel("id1", "1", "con1", false, ["f2"], [], "stam")
@@ -143,8 +144,8 @@ class FlagSetterTests extends RoxTestCase
         $flagSetter = new FlagSetter($flagRepo, $parser, $expRepo, $impressionInvoker);
         $flagSetter->setExperiments();
 
-        $flagRepo->addFlag(new Flag(), "f1");
-        $flagRepo->addFlag(new Flag(), "f2");
+        $flagRepo->addFlag(new RoxFlag(), "f1");
+        $flagRepo->addFlag(new RoxFlag(), "f2");
 
         $this->assertEquals($flagRepo->getFlag("f1")->getCondition(), "1");
         $this->assertEquals($flagRepo->getFlag("f2")->getCondition(), '');

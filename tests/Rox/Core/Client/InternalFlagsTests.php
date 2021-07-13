@@ -1,10 +1,9 @@
 <?php
 
-namespace Rox\Core;
+namespace Rox\Core\Client;
 
-use Rox\Core\Client\InternalFlags;
 use Rox\Core\Configuration\Models\ExperimentModel;
-use Rox\Core\Entities\Flag;
+use Rox\Core\Entities\BoolFlagValueConverter;
 use Rox\Core\Repositories\ExperimentRepositoryInterface;
 use Rox\Core\Roxx\EvaluationResult;
 use Rox\Core\Roxx\ParserInterface;
@@ -44,7 +43,7 @@ class InternalFlagsTests extends RoxTestCase
     {
         $parser = \Mockery::mock(ParserInterface::class)
             ->shouldReceive('evaluateExpression')
-            ->andReturn(new EvaluationResult(Flag::FLAG_FALSE_VALUE))
+            ->andReturn(new EvaluationResult(BoolFlagValueConverter::FLAG_FALSE_VALUE))
             ->getMock();
 
         $expRepo = \Mockery::mock(ExperimentRepositoryInterface::class)
@@ -61,7 +60,7 @@ class InternalFlagsTests extends RoxTestCase
     {
         $parser = \Mockery::mock(ParserInterface::class)
             ->shouldReceive('evaluateExpression')
-            ->andReturn(new EvaluationResult(Flag::FLAG_TRUE_VALUE))
+            ->andReturn(new EvaluationResult(BoolFlagValueConverter::FLAG_TRUE_VALUE))
             ->getMock();
 
         $expRepo = \Mockery::mock(ExperimentRepositoryInterface::class)

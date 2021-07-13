@@ -3,7 +3,7 @@
 namespace Rox\E2E;
 
 use Rox\Server\Flags\RoxFlag;
-use Rox\Server\Flags\RoxVariant;
+use Rox\Server\Flags\RoxString;
 
 class Container
 {
@@ -53,17 +53,17 @@ class Container
     public $flagTargetGroupsNone;
 
     /**
-     * @var RoxVariant $variantWithContext
+     * @var RoxString $variantWithContext
      */
     public $variantWithContext;
 
     /**
-     * @var RoxVariant $variant
+     * @var RoxString $variant
      */
     public $variant;
 
     /**
-     * @var RoxVariant $variantOverwritten
+     * @var RoxString $variantOverwritten
      */
     public $variantOverwritten;
 
@@ -73,7 +73,7 @@ class Container
     public $flagForDependency;
 
     /**
-     * @var RoxVariant $flagColorsForDependency
+     * @var RoxString $flagColorsForDependency
      */
     public $flagColorsForDependency;
 
@@ -83,7 +83,7 @@ class Container
     public $flagDependent;
 
     /**
-     * @var RoxVariant $flagColorDependentWithContext
+     * @var RoxString $flagColorDependentWithContext
      */
     public $flagColorDependentWithContext;
 
@@ -104,15 +104,15 @@ class Container
         $this->flagTargetGroupsAny = new RoxFlag();
         $this->flagTargetGroupsNone = new RoxFlag();
 
-        $this->variantWithContext = new RoxVariant("red", ["red", "blue", "green"]);
+        $this->variantWithContext = new RoxString("red", ["red", "blue", "green"]);
 
-        $this->variant = new RoxVariant("red", ["red", "blue", "green"]);
-        $this->variantOverwritten = new RoxVariant("red", ["red", "blue", "green"]);
+        $this->variant = new RoxString("red", ["red", "blue", "green"]);
+        $this->variantOverwritten = new RoxString("red", ["red", "blue", "green"]);
 
         $this->flagForDependency = new RoxFlag(false);
-        $this->flagColorsForDependency = new RoxVariant("White", ["White", "Blue", "Green", "Yellow"]);
+        $this->flagColorsForDependency = new RoxString("White", ["White", "Blue", "Green", "Yellow"]);
         $this->flagDependent = new RoxFlag(false);
-        $this->flagColorDependentWithContext = new RoxVariant("White", ["White", "Blue", "Green", "Yellow"]);
+        $this->flagColorDependentWithContext = new RoxString("White", ["White", "Blue", "Green", "Yellow"]);
     }
 
     public static function getInstance()

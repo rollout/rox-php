@@ -2,8 +2,8 @@
 
 namespace Rox\Core\Register;
 
-use Rox\Core\Entities\Flag;
-use Rox\Core\Entities\Variant;
+use Rox\Server\Flags\RoxFlag;
+use Rox\Server\Flags\RoxString;
 use stdClass;
 
 class TestContainer
@@ -19,11 +19,11 @@ class TestContainer
      */
     public function __construct()
     {
-        $this->variant1 = new Variant("1", ["1", "2", "3"]);
-        $this->variant2 = new Variant("6", ["4", "5", "6"]);
-        $this->flag1 = new Flag();
-        $this->flag2 = new Flag();
-        $this->flag3 = new Flag();
+        $this->variant1 = new RoxString("1", ["1", "2", "3"]);
+        $this->variant2 = new RoxString("6", ["4", "5", "6"]);
+        $this->flag1 = new RoxFlag();
+        $this->flag2 = new RoxFlag();
+        $this->flag3 = new RoxFlag();
         $this->somethingElse = new stdClass();
     }
 }

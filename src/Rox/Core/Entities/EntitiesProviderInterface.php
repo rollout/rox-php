@@ -5,15 +5,29 @@ namespace Rox\Core\Entities;
 interface EntitiesProviderInterface
 {
     /**
-     * @param string $defaultValue
-     * @return Flag
+     * @param bool $defaultValue
+     * @return RoxStringBase
      */
     function createFlag($defaultValue);
 
     /**
      * @param string $defaultValue
-     * @param array $options
-     * @return Variant
+     * @param array $variations
+     * @return RoxStringBase
      */
-    function createVariant($defaultValue, array $options);
+    function createString($defaultValue, array $variations);
+
+    /**
+     * @param int $defaultValue
+     * @param array $variations
+     * @return RoxStringBase
+     */
+    function createInt($defaultValue, array $variations);
+
+    /**
+     * @param double $defaultValue
+     * @param array $variations
+     * @return RoxStringBase
+     */
+    function createDouble($defaultValue, array $variations);
 }

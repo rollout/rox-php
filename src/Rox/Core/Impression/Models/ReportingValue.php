@@ -15,14 +15,21 @@ class ReportingValue
     private $_value;
 
     /**
+     * @var bool $_targeting
+     */
+    private $_targeting;
+
+    /**
      * ReportingValue constructor.
      * @param string $name
      * @param string $value
+     * @param bool $targeting
      */
-    public function __construct($name, $value)
+    public function __construct($name, $value, $targeting = false)
     {
         $this->_name = $name;
         $this->_value = $value;
+        $this->_targeting = $targeting;
     }
 
     /**
@@ -39,6 +46,14 @@ class ReportingValue
     public function getValue()
     {
         return $this->_value;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isTargeting()
+    {
+        return $this->_targeting;
     }
 
     /**

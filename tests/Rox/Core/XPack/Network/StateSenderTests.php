@@ -1,6 +1,6 @@
 <?php
 
-namespace Rox\Core\Network;
+namespace Rox\Core\XPack\Network;
 
 use Exception;
 use Psr\Log\Test\TestLogger;
@@ -9,14 +9,16 @@ use Rox\Core\Consts\PropertyType;
 use Rox\Core\CustomProperties\CustomProperty;
 use Rox\Core\CustomProperties\CustomPropertyRepository;
 use Rox\Core\CustomProperties\CustomPropertyType;
-use Rox\Core\Entities\Flag;
 use Rox\Core\Logging\LoggerFactory;
+use Rox\Core\Network\HttpClientInterface;
+use Rox\Core\Network\RequestData;
+use Rox\Core\Network\TestHttpResponse;
 use Rox\Core\Repositories\CustomPropertyRepositoryInterface;
 use Rox\Core\Repositories\FlagRepository;
 use Rox\Core\Repositories\FlagRepositoryInterface;
 use Rox\Core\Utils\DotNetCompat;
-use Rox\Core\XPack\Network\StateSender;
 use Rox\RoxTestCase;
+use Rox\Server\Flags\RoxFlag;
 
 class StateSenderTests extends RoxTestCase
 {
@@ -93,12 +95,12 @@ class StateSenderTests extends RoxTestCase
             ->once()
             ->getMock();
 
-        $this->_flagRepo->addFlag(new Flag(), "flag1");
+        $this->_flagRepo->addFlag(new RoxFlag(), "flag1");
 
         $stateSender = new StateSender($request, $this->_dp, $this->_flagRepo, $this->_cpRepo);
         $stateSender->send();
 
-        $this->assertEquals(parse_url($reqData[0]->getUrl())['path'], "/{$this->_appKey}/09FBB5C9B28B300E8FF14BE4EBB5A829");
+        $this->assertEquals("/{$this->_appKey}/09FBB5C9B28B300E8FF14BE4EBB5A829", parse_url($reqData[0]->getUrl())['path']);
 
         $this->_validateNoErrors();
     }
@@ -115,7 +117,7 @@ class StateSenderTests extends RoxTestCase
             ->once()
             ->getMock();
 
-        $this->_flagRepo->addFlag(new Flag(), "flag1");
+        $this->_flagRepo->addFlag(new RoxFlag(), "flag1");
 
         $stateSender = new StateSender($request, $this->_dp, $this->_flagRepo, $this->_cpRepo);
         $stateSender->send();
@@ -141,7 +143,7 @@ class StateSenderTests extends RoxTestCase
             ->twice()
             ->getMock();
 
-        $this->_flagRepo->addFlag(new Flag(), "flag1");
+        $this->_flagRepo->addFlag(new RoxFlag(), "flag1");
         $stateSender = new StateSender($request, $this->_dp, $this->_flagRepo, $this->_cpRepo);
         $stateSender->send();
 
@@ -149,7 +151,7 @@ class StateSenderTests extends RoxTestCase
 
         $this->assertEquals(parse_url($reqData[0]->getUrl())['path'], "/{$this->_appKey}/09FBB5C9B28B300E8FF14BE4EBB5A829");
 
-        $this->_flagRepo->addFlag(new Flag(), "flag2");
+        $this->_flagRepo->addFlag(new RoxFlag(), "flag2");
 
         $stateSender = new StateSender($request, $this->_dp, $this->_flagRepo, $this->_cpRepo);
         $stateSender->send();
@@ -194,8 +196,8 @@ class StateSenderTests extends RoxTestCase
             ->times(3)
             ->getMock();
 
-        $this->_flagRepo->addFlag(new Flag(), "flag1");
-        $this->_flagRepo->addFlag(new Flag(), "flag2");
+        $this->_flagRepo->addFlag(new RoxFlag(), "flag1");
+        $this->_flagRepo->addFlag(new RoxFlag(), "flag2");
 
         $stateSender = new StateSender($request, $this->_dp, $this->_flagRepo, $this->_cpRepo);
         $stateSender->send();
@@ -207,8 +209,8 @@ class StateSenderTests extends RoxTestCase
         $stateSender->send();
         $fr2 = new FlagRepository();
         $stateSender2 = new StateSender($request, $this->_dp, $fr2, $this->_cpRepo);
-        $fr2->addFlag(new Flag(), "flag2");
-        $fr2->addFlag(new Flag(), "flag1");
+        $fr2->addFlag(new RoxFlag(), "flag2");
+        $fr2->addFlag(new RoxFlag(), "flag1");
 
         $stateSender = new StateSender($request, $this->_dp, $this->_flagRepo, $this->_cpRepo);
         $stateSender2->send();
@@ -267,7 +269,7 @@ class StateSenderTests extends RoxTestCase
             ->never()
             ->getMock();
 
-        $this->_flagRepo->addFlag(new Flag(), "flag");
+        $this->_flagRepo->addFlag(new RoxFlag(), "flag");
 
         $stateSender = new StateSender($request, $this->_dp, $this->_flagRepo, $this->_cpRepo);
         $stateSender->send();
@@ -293,7 +295,7 @@ class StateSenderTests extends RoxTestCase
             ->never()
             ->getMock();
 
-        $this->_flagRepo->addFlag(new Flag(), "flag");
+        $this->_flagRepo->addFlag(new RoxFlag(), "flag");
 
         $stateSender = new StateSender($request, $this->_dp, $this->_flagRepo, $this->_cpRepo);
         $stateSender->send();
@@ -317,7 +319,7 @@ class StateSenderTests extends RoxTestCase
             ->never()
             ->getMock();
 
-        $this->_flagRepo->addFlag(new Flag(), "flag");
+        $this->_flagRepo->addFlag(new RoxFlag(), "flag");
 
         $stateSender = new StateSender($request, $this->_dp, $this->_flagRepo, $this->_cpRepo);
         $stateSender->send();
@@ -347,7 +349,7 @@ class StateSenderTests extends RoxTestCase
             ->once()
             ->getMock();
 
-        $this->_flagRepo->addFlag(new Flag(), "flag");
+        $this->_flagRepo->addFlag(new RoxFlag(), "flag");
         $this->_cpRepo->addCustomProperty(new CustomProperty("id", CustomPropertyType::getString(), "1111"));
 
         $stateSender = new StateSender($request, $this->_dp, $this->_flagRepo, $this->_cpRepo);
@@ -382,7 +384,7 @@ class StateSenderTests extends RoxTestCase
             ->once()
             ->getMock();
 
-        $this->_flagRepo->addFlag(new Flag(), "flag");
+        $this->_flagRepo->addFlag(new RoxFlag(), "flag");
         $this->_cpRepo->addCustomProperty(new CustomProperty("id", CustomPropertyType::getString(), "1111"));
         $stateSender = new StateSender($request, $this->_dp, $this->_flagRepo, $this->_cpRepo);
         $stateSender->send();
@@ -415,7 +417,7 @@ class StateSenderTests extends RoxTestCase
             ->once()
             ->getMock();
 
-        $this->_flagRepo->addFlag(new Flag(), "flag");
+        $this->_flagRepo->addFlag(new RoxFlag(), "flag");
         $this->_cpRepo->addCustomProperty(new CustomProperty("id", CustomPropertyType::getString(), "1111"));
 
         $stateSender = new StateSender($request, $this->_dp, $this->_flagRepo, $this->_cpRepo);
@@ -458,7 +460,7 @@ class StateSenderTests extends RoxTestCase
             ->once()
             ->getMock();
 
-        $this->_flagRepo->addFlag(new Flag(), "flag");
+        $this->_flagRepo->addFlag(new RoxFlag(), "flag");
 
         $stateSender = new StateSender($request, $this->_dp, $this->_flagRepo, $this->_cpRepo);
         $stateSender->send();

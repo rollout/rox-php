@@ -3,8 +3,8 @@
 namespace Rox\Core\Repositories;
 
 use Rox\Core\CustomProperties\FlagAddedCallbackArgs;
-use Rox\Core\Entities\Flag;
 use Rox\RoxTestCase;
+use Rox\Server\Flags\RoxFlag;
 
 class FlagRepositoryTests extends RoxTestCase
 {
@@ -18,7 +18,7 @@ class FlagRepositoryTests extends RoxTestCase
     public function testWillAddFlagAndSetName()
     {
         $repo = new FlagRepository();
-        $flag = new Flag();
+        $flag = new RoxFlag();
 
         $repo->addFlag($flag, "harti");
 
@@ -28,7 +28,7 @@ class FlagRepositoryTests extends RoxTestCase
     public function testWillRaiseFlagAddedEvent()
     {
         $repo = new FlagRepository();
-        $flag = new Flag();
+        $flag = new RoxFlag();
 
         $variantFromEvent = [null];
         $repo->addFlagAddedCallback(function (FlagAddedCallbackArgs $args) use (&$variantFromEvent) {

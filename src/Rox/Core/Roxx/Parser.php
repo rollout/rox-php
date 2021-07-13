@@ -195,9 +195,10 @@ class Parser implements ParserInterface
     /**
      * @param string $expression
      * @param ContextInterface $context
+     * @param EvaluationContext $evaluationContext
      * @return EvaluationResult
      */
-    public function evaluateExpression($expression, $context = null)
+    public function evaluateExpression($expression, $context = null, $evaluationContext = null)
     {
         if ($context == null) {
             $context = (new ContextBuilder())->build(); // Don't pass nulls anywhere, it's a bad practice.
@@ -218,10 +219,10 @@ class Parser implements ParserInterface
                 } else if ($node->getType() == Node::TYPE_RATOR) {
                     $key = (string)$node->getValue();
                     if (array_key_exists($key, $this->_operatorsMap)) {
-                        $this->_operatorsMap[$key]($this, $stack, $context);
+                        $this->_operatorsMap[$key]($this, $stack, $context, $evaluationContext);
                     }
                 } else {
-                    return new EvaluationResult($result);
+                    return new EvaluationResult($result, $context);
                 }
             }
 
@@ -234,6 +235,6 @@ class Parser implements ParserInterface
             ]);
         }
 
-        return new EvaluationResult($result);
+        return new EvaluationResult($result, $context);
     }
 }

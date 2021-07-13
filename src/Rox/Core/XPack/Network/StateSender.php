@@ -124,12 +124,12 @@ class StateSender
         $keys = array_keys($allFlags);
         sort($keys);
         return array_map(function ($key) use (&$allFlags) {
-            $var = /*Variant*/
+            $var = /*RoxStringBase*/
                 $allFlags[$key];
             return [
                 'name' => $var->getName(),
                 'defaultValue' => $var->getDefaultValue(),
-                'options' => $var->getOptions(),
+                'options' => $var->getVariations(),
             ];
         }, $keys);
     }

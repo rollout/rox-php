@@ -6,7 +6,7 @@ use InvalidArgumentException;
 use Psr\Log\LoggerInterface;
 use ReflectionClass;
 use ReflectionException;
-use Rox\Core\Entities\Variant;
+use Rox\Core\Entities\RoxStringBase;
 use Rox\Core\Logging\LoggerFactory;
 use Rox\Core\Repositories\FlagRepositoryInterface;
 
@@ -70,7 +70,7 @@ class Registerer
         }
 
         foreach ($properties as $name => $value) {
-            if ($value instanceof Variant) {
+            if ($value instanceof RoxStringBase) {
                 if ($ns) {
                     $name = "${ns}.${name}";
                 }

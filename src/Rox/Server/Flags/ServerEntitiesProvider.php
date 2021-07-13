@@ -17,8 +17,24 @@ class ServerEntitiesProvider implements EntitiesProviderInterface
     /**
      * @inheritDoc
      */
-    function createVariant($defaultValue, array $options)
+    function createString($defaultValue, array $variations)
     {
-        return new RoxVariant($defaultValue, $options);
+        return new RoxString($defaultValue, $variations);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    function createInt($defaultValue, array $variations)
+    {
+        return new RoxInt($defaultValue, $variations);
+    }
+
+    /**
+     * @inheritDoc
+     */
+    function createDouble($defaultValue, array $variations)
+    {
+        return new RoxDouble($defaultValue, $variations);
     }
 }
