@@ -29,10 +29,10 @@
     "php": ">=5.5",
     "ext-json": "*",
     "ext-openssl": "*",
-    "guzzlehttp/guzzle": "^6.4",
+    "guzzlehttp/guzzle": "^6.4|^7.3.0",
     "psr/http-message": "^1.0",
     "psr/log": "^1.1",
-    "ramsey/uuid": "^3.9",
+    "ramsey/uuid": "^3.9|^4.1.1",
     "monolog/monolog": "^1.25|^2",
     "kevinrob/guzzle-cache-middleware": "^3.2",
     "doctrine/cache": "^1.6"
