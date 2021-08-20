@@ -235,6 +235,10 @@ class StateSender
                 $responseAsString = $fetchResult->getContent()->readAsString();
                 $responseJSON = json_decode($responseAsString, true);
 
+                if ($responseJSON === null) {
+                    throw new Exception('StateSender.send did received an empty response.');
+                }
+
                 if (array_key_exists("result", $responseJSON)) {
                     $responseResultValue = $responseJSON["result"];
                     if ((int)$responseResultValue == 404) {

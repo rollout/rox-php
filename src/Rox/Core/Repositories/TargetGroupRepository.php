@@ -26,6 +26,10 @@ class TargetGroupRepository implements TargetGroupRepositoryInterface
      */
     function getTargetGroup($id)
     {
+        if ($this->_targetGroups === null) {
+            throw new \Exception('TargetGroupRepository._targetGroups is not set.');
+        }
+
         return current(array_filter($this->_targetGroups, function (TargetGroupModel $element) use ($id) {
             return $element->getId() == $id;
         }));
