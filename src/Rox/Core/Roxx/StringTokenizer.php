@@ -149,7 +149,7 @@ class StringTokenizer
      */
     private static function charCount($codePoint)
     {
-        return $codePoint >= self::MIN_SUPPLEMENTARY_CODE_POINT ? 2 : 1;
+        return ord($codePoint) >= self::MIN_SUPPLEMENTARY_CODE_POINT ? 2 : 1;
     }
 
     /**
