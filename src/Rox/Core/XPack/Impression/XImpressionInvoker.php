@@ -9,7 +9,6 @@ use Rox\Core\Configuration\Models\ExperimentModel;
 use Rox\Core\Consts\PropertyType;
 use Rox\Core\Context\ContextInterface;
 use Rox\Core\CustomProperties\CustomPropertyType;
-use Rox\Core\Impression\Models\Experiment;
 use Rox\Core\Impression\Models\ReportingValue;
 use Rox\Core\Logging\LoggerFactory;
 use Rox\Core\Repositories\CustomPropertyRepositoryInterface;
@@ -50,9 +49,9 @@ class XImpressionInvoker implements ImpressionInvokerInterface
      * @param ClientInterface|null $analyticsClient
      */
     public function __construct(
-        InternalFlagsInterface $internalFlags,
+        InternalFlagsInterface            $internalFlags,
         CustomPropertyRepositoryInterface $customPropertyRepository = null,
-        ClientInterface $analyticsClient = null)
+        ClientInterface                   $analyticsClient = null)
     {
         $this->_log = LoggerFactory::getInstance()->createLogger(self::class);
         $this->_customPropertyRepository = $customPropertyRepository;
@@ -76,15 +75,15 @@ class XImpressionInvoker implements ImpressionInvokerInterface
      * @param ContextInterface|null $context
      */
     function invoke(
-        ReportingValue $value,
-        ExperimentModel $experiment = null,
+        ReportingValue   $value,
+        ExperimentModel  $experiment = null,
         ContextInterface $context = null)
     {
         try {
             $internalExperiment = $this->_internalFlags->isEnabled('rox.internal.analytics');
-            if ($internalExperiment && $experiment != null && $this->_analyticsClient != null) {
-                $prop = $this->_customPropertyRepository->getCustomProperty($experiment->getStickinessProperty());
-                if ($prop === null) {
+            if ($internalExperiment && $this->_analyticsClient) {
+                $prop = $experiment ? $this->_customPropertyRepository->getCustomProperty($experiment->getStickinessProperty()) : null;
+                if (!$prop) {
                     $prop = $this->_customPropertyRepository->getCustomProperty('rox.' . PropertyType::getDistinctId()->getName());
                 }
                 $distinctId = '(null_distinct_id';
@@ -98,8 +97,7 @@ class XImpressionInvoker implements ImpressionInvokerInterface
                 $this->_analyticsClient->track((new Event())
                     ->setFlag($value->getName())
                     ->setValue($value->getValue())
-                    ->setDistinctId($distinctId)
-                    ->setExperimentId($experiment->getId()));
+                    ->setDistinctId($distinctId));
             }
         } catch (Exception $e) {
 
@@ -108,10 +106,7 @@ class XImpressionInvoker implements ImpressionInvokerInterface
             ]);
         }
 
-        $this->_fireImpression(new ImpressionArgs($value,
-            $experiment != null
-                ? new Experiment($experiment)
-                : null, $context));
+        $this->_fireImpression(new ImpressionArgs($value, $context));
     }
 
     /**

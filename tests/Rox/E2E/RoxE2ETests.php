@@ -167,9 +167,7 @@ class RoxE2ETests extends RoxTestCase
         $this->assertEquals("flagForImpressionWithExperimentAndContext", TestVars::$impressionReturnedArgs->getReportingValue()->getName());
 
         $this->assertNotNull(TestVars::$impressionReturnedArgs);
-        $this->assertNotNull(TestVars::$impressionReturnedArgs->getExperiment());
-        $this->assertEquals("5df8d8b930fcc301c34ad331", TestVars::$impressionReturnedArgs->getExperiment()->getIdentifier());
-        $this->assertEquals("flag for impression with experiment and context", TestVars::$impressionReturnedArgs->getExperiment()->getName());
+        $this->assertTrue(TestVars::$impressionReturnedArgs->getReportingValue()->isTargeting());
 
         $this->assertEquals("val", TestVars::$impressionReturnedArgs->getContext()->get("var"));
     }

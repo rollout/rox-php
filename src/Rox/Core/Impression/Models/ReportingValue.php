@@ -61,6 +61,6 @@ class ReportingValue
      */
     public function __toString()
     {
-        return "{$this->_name}, {$this->_value}";
+        return "{$this->_name}, {$this->_value}, {$this->_targeting}";
     }
 }

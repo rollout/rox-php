@@ -4,7 +4,6 @@ namespace Rox\Core\Impression;
 
 use Rox\Core\Configuration\Models\ExperimentModel;
 use Rox\Core\Context\ContextInterface;
-use Rox\Core\Impression\Models\Experiment;
 use Rox\Core\Impression\Models\ReportingValue;
 
 class ImpressionInvoker implements ImpressionInvokerInterface
@@ -42,9 +41,7 @@ class ImpressionInvoker implements ImpressionInvokerInterface
      */
     private function _fireImpression(ReportingValue $value, $experiment, $context)
     {
-        $args = new ImpressionArgs($value,
-            $experiment != null ? new Experiment($experiment) : null,
-            $context);
+        $args = new ImpressionArgs($value, $context);
         foreach ($this->_handlers as $handler) {
             $handler($args);
         }
