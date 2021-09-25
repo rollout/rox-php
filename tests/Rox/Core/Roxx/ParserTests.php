@@ -53,6 +53,7 @@ class ParserTests extends RoxTestCase
     {
         $parser = new Parser();
 
+        $this->assertSame($parser->evaluateExpression("\"\"")->stringValue(), "");
         $this->assertSame($parser->evaluateExpression("true")->stringValue(), "true");
         $this->assertSame($parser->evaluateExpression("\"red\"")->stringValue(), "red");
         $this->assertSame($parser->evaluateExpression("and(true, or(true, true))")->boolValue(), true);
