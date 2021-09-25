@@ -84,7 +84,7 @@ class RoxE2ETests extends RoxTestCase
     public function testRegisterAfterSetup()
     {
         $this->assertTrue(ContainerTwo::getInstance()->flag2->isEnabled());
-        $this->assertEquals("red", ContainerTwo::getInstance()->variant2->getValue()); 
+        $this->assertEquals("red", ContainerTwo::getInstance()->variant2->getValue());
         Rox::register("afterSetup", ContainerTwo::getInstance());
         $this->assertFalse(ContainerTwo::getInstance()->flag2->isEnabled());
         $this->assertEquals("green", ContainerTwo::getInstance()->variant2->getValue());
@@ -131,6 +131,19 @@ class RoxE2ETests extends RoxTestCase
 
         $this->assertEquals(Container::getInstance()->variantWithContext->getValue($somePositiveContext), "blue");
         $this->assertEquals(Container::getInstance()->variantWithContext->getValue($someNegativeContext), "red");
+    }
+
+    public function testVariantWithGlobalContext()
+    {
+        $somePositiveContext = (new ContextBuilder())->build([
+            "isDuckAndCover" => true
+        ]);
+
+        $this->assertEquals(Container::getInstance()->variantWithContext->getValue(), "red");
+        Rox::setContext($somePositiveContext);
+        $this->assertEquals(Container::getInstance()->variantWithContext->getValue(), "blue");
+        Rox::setContext(null);
+        $this->assertEquals(Container::getInstance()->variantWithContext->getValue(), "red");
     }
 
     public function testTargetGroupsAllAnyNone()

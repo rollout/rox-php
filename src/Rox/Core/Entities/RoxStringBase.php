@@ -43,11 +43,6 @@ abstract class RoxStringBase
     private $_parser;
 
     /**
-     * @var ContextInterface $_globalContext
-     */
-    private $_globalContext;
-
-    /**
      * @var ImpressionInvokerInterface $_impressionInvoker
      */
     private $_impressionInvoker;
@@ -235,11 +230,6 @@ abstract class RoxStringBase
         $this->_impressionInvoker = $impressionInvoker;
     }
 
-    public function setContext(ContextInterface $globalContext)
-    {
-        $this->_globalContext = $globalContext;
-    }
-
     /**
      * @param ContextInterface|null $context
      * @param string|null $alternativeDefaultValue
@@ -322,7 +312,8 @@ abstract class RoxStringBase
      */
     private function _getExperimentValue($context, $evaluationContext = null)
     {
-        $mergedContext = new MergedContext($this->_globalContext, $context);
+        $globalContext = ($this->_parser != null) ? $this->_parser->getGlobalContext() : null;
+        $mergedContext = new MergedContext($globalContext, $context);
         if ($this->_parser != null && $this->_condition) {
             return $this->_parser->evaluateExpression($this->_condition, $mergedContext, $evaluationContext);
         }

@@ -131,7 +131,11 @@ class RoxStringTests extends RoxFlagsTestCase
 
         $this->assertEquals('1', $variant->getValue(null));
 
-        $parser = \Mockery::mock(ParserInterface::class);
+        $parser = \Mockery::mock(ParserInterface::class)
+            ->shouldReceive('getGlobalContext')
+            ->andReturn(null)
+            ->getMock();
+
         $variant->setForEvaluation($parser, null, null);
 
         $this->assertEquals('1', $variant->getValue(null));
@@ -144,6 +148,9 @@ class RoxStringTests extends RoxFlagsTestCase
     public function testWillExpressionValueWhenResultNotInOptions()
     {
         $parser = \Mockery::mock(ParserInterface::class)
+            ->shouldReceive('getGlobalContext')
+            ->andReturn(null)
+            ->getMock()
             ->shouldReceive('evaluateExpression')
             ->andReturn(new EvaluationResult('xxx'))
             ->getMock();
@@ -160,6 +167,9 @@ class RoxStringTests extends RoxFlagsTestCase
     public function testWillReturnValueWhenOnEvaluation()
     {
         $parser = \Mockery::mock(ParserInterface::class)
+            ->shouldReceive('getGlobalContext')
+            ->andReturn(null)
+            ->getMock()
             ->shouldReceive('evaluateExpression')
             ->andReturn(new EvaluationResult('2'))
             ->getMock();
@@ -176,6 +186,9 @@ class RoxStringTests extends RoxFlagsTestCase
     public function testWillRaiseImpression()
     {
         $parser = \Mockery::mock(ParserInterface::class)
+            ->shouldReceive('getGlobalContext')
+            ->andReturn(null)
+            ->getMock()
             ->shouldReceive('evaluateExpression')
             ->andReturn(new EvaluationResult('2'))
             ->getMock();

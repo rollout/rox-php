@@ -195,9 +195,9 @@ class Core
      * @param RoxOptionsInterface|null $roxOptions
      */
     public function setup(
-        SdkSettingsInterface $sdkSettings,
+        SdkSettingsInterface      $sdkSettings,
         DevicePropertiesInterface $deviceProperties,
-        $roxOptions)
+                                  $roxOptions)
     {
         $roxyUrl = ($roxOptions != null) ? $roxOptions->getRoxyURL() : null;
         if ($roxyUrl == null) {
@@ -320,13 +320,11 @@ class Core
     }
 
     /**
-     * @param ContextInterface $context
+     * @param ContextInterface|null $context
      */
-    public function setContext(ContextInterface $context)
+    public function setContext($context)
     {
-        foreach (array_values($this->_flagRepository->getAllFlags()) as $flag) {
-            $flag->setContext($context);
-        }
+        $this->_parser->setGlobalContext($context);
     }
 
     /**

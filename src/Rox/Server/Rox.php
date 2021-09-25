@@ -101,9 +101,9 @@ class Rox
     }
 
     /**
-     * @param ContextInterface $context
+     * @param ContextInterface|null $context
      */
-    public static function setContext(ContextInterface $context)
+    public static function setContext($context)
     {
         self::getCore()->setContext($context);
     }

@@ -19,4 +19,14 @@ interface ParserInterface
      * @param callable $operation
      */
     function addOperator($name, $operation);
+
+    /**
+     * @param ContextInterface $context
+     */
+    function setGlobalContext($context);
+
+    /**
+     * @return ContextInterface|null
+     */
+    function getGlobalContext();
 }

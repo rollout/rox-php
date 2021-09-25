@@ -23,6 +23,11 @@ class Parser implements ParserInterface
     private $_operatorsMap = [];
 
     /**
+     * @var ContextInterface $_globalContext
+     */
+    private $_globalContext;
+
+    /**
      * Parser constructor.
      * @throws Exception
      */
@@ -265,5 +270,15 @@ class Parser implements ParserInterface
         }
 
         return new EvaluationResult($result, $context);
+    }
+
+    function setGlobalContext($context)
+    {
+        $this->_globalContext = $context;
+    }
+
+    function getGlobalContext()
+    {
+        return $this->_globalContext;
     }
 }
