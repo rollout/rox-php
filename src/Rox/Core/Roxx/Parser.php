@@ -7,7 +7,7 @@ use Psr\Log\LoggerInterface;
 use Rox\Core\Context\ContextBuilder;
 use Rox\Core\Context\ContextInterface;
 use Rox\Core\Logging\LoggerFactory;
-use Rox\Core\Utils\DotNetCompat;
+use Rox\Core\Utils\NumericUtils;
 use Rox\Core\Utils\TimeUtils;
 
 class Parser implements ParserInterface
@@ -105,6 +105,22 @@ class Parser implements ParserInterface
             $stack->push($op1 !== $op2);
         });
 
+        $this->addOperator("numne", function (ParserInterface $parser, StackInterface $stack, ContextInterface $context) {
+            $op1 = $stack->pop();
+            $op2 = $stack->pop();
+
+            $decimal1 = 0;
+            $decimal2 = 0;
+            $result = false;
+
+            if (NumericUtils::parseNumber($op1, $decimal1) &&
+                NumericUtils::parseNumber($op2, $decimal2)) {
+                $result = !NumericUtils::numbersEqual($decimal1, $decimal2);
+            }
+
+            $stack->push($result);
+        });
+
         $this->addOperator("eq", function (ParserInterface $parser, StackInterface $stack, ContextInterface $context) {
             $op1 = $stack->pop();
             $op2 = $stack->pop();
@@ -117,15 +133,28 @@ class Parser implements ParserInterface
                 $op2 = false;
             }
 
-            if (DotNetCompat::isNumericStrict($op1)) {
-                $op1 = (float)$op1; // cast int to float for comparison
-            }
-
-            if (DotNetCompat::isNumericStrict($op2)) {
-                $op2 = (float)$op2; // cast int to float for comparison
+            if (NumericUtils::isNumericStrict($op1) && NumericUtils::isNumericStrict($op2)) {
+                $stack->push(NumericUtils::numbersEqual($op1, $op2));
+                return;
             }
 
             $stack->push($op1 === $op2);
+        });
+
+        $this->addOperator("numeq", function (ParserInterface $parser, StackInterface $stack, ContextInterface $context) {
+            $op1 = $stack->pop();
+            $op2 = $stack->pop();
+
+            $decimal1 = 0;
+            $decimal2 = 0;
+            $result = false;
+
+            if (NumericUtils::parseNumber($op1, $decimal1) &&
+                NumericUtils::parseNumber($op2, $decimal2)) {
+                $result = NumericUtils::numbersEqual($decimal1, $decimal2);
+            }
+
+            $stack->push($result);
         });
 
         $this->addOperator("not",

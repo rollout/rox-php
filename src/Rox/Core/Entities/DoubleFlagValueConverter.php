@@ -5,6 +5,7 @@ namespace Rox\Core\Entities;
 
 
 use Psr\Log\LoggerInterface;
+use Rox\Core\Utils\NumericUtils;
 
 final class DoubleFlagValueConverter implements FlagValueConverter
 {
@@ -34,15 +35,10 @@ final class DoubleFlagValueConverter implements FlagValueConverter
      */
     function normalizeValue($stringValue, $alternativeValue, LoggerInterface $log = null)
     {
-        if ($stringValue) {
-            if (preg_match('/^\d+(\.\d*)?$/', $stringValue) &&
-                ((($doubleValue = floatval($stringValue)) !== 0.0) ||
-                    preg_match('/^0+(\.0*)?$/', $stringValue))) {
-                return $doubleValue;
-            } else if ($log) {
-                $log->warning("Experiment type mismatch (double), returning default value");
-            }
+        if ($stringValue && NumericUtils::parseNumber($stringValue, $doubleValue)) {
+            return $doubleValue;
         }
+        $log->warning("Experiment type mismatch (double), returning default value");
         return floatval($alternativeValue);
     }
 }

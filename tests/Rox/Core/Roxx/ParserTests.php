@@ -60,6 +60,39 @@ class ParserTests extends RoxTestCase
         $this->assertSame($parser->evaluateExpression("not(and(false, or(false, true)))")->boolValue(), true);
     }
 
+    public function testNumeqExpressionsEvaluation()
+    {
+        $parser = new Parser();
+
+        $this->assertSame($parser->evaluateExpression("numeq(\"la la\", \"la la\")")->boolValue(), false);
+        $this->assertSame($parser->evaluateExpression("numeq(\"la la\", \"la,la\")")->boolValue(), false);
+        $this->assertSame($parser->evaluateExpression("numeq(\"lala\", \"lala\")")->boolValue(), false);
+
+        $this->assertSame($parser->evaluateExpression("numeq(\"10\", \"10\")")->boolValue(), true);
+        $this->assertSame($parser->evaluateExpression("numeq(\"10\", 10)")->boolValue(), true);
+        $this->assertSame($parser->evaluateExpression("numeq(10, \"10\")")->boolValue(), true);
+        $this->assertSame($parser->evaluateExpression("numeq(10, 10)")->boolValue(), true);
+
+        $this->assertSame($parser->evaluateExpression("numeq(\"10\", \"11\")")->boolValue(), false);
+        $this->assertSame($parser->evaluateExpression("numeq(\"10\", 11)")->boolValue(), false);
+        $this->assertSame($parser->evaluateExpression("numeq(10, \"11\")")->boolValue(), false);
+        $this->assertSame($parser->evaluateExpression("numeq(10, 11)")->boolValue(), false);
+
+        $this->assertSame($parser->evaluateExpression("numne(\"la la\", \"la la\")")->boolValue(), false);
+        $this->assertSame($parser->evaluateExpression("numne(\"la la\", \"la,la\")")->boolValue(), false);
+        $this->assertSame($parser->evaluateExpression("numne(\"lala\", \"lala\")")->boolValue(), false);
+
+        $this->assertSame($parser->evaluateExpression("numne(\"10\", \"10\")")->boolValue(), false);
+        $this->assertSame($parser->evaluateExpression("numne(\"10\", 10)")->boolValue(), false);
+        $this->assertSame($parser->evaluateExpression("numne(10, \"10\")")->boolValue(), false);
+        $this->assertSame($parser->evaluateExpression("numne(10, 10)")->boolValue(), false);
+
+        $this->assertSame($parser->evaluateExpression("numne(\"10\", \"11\")")->boolValue(), true);
+        $this->assertSame($parser->evaluateExpression("numne(\"10\", 11)")->boolValue(), true);
+        $this->assertSame($parser->evaluateExpression("numne(10, \"11\")")->boolValue(), true);
+        $this->assertSame($parser->evaluateExpression("numne(10, 11)")->boolValue(), true);
+    }
+
     public function testEqExpressionsEvaluation()
     {
         $parser = new Parser();
@@ -67,6 +100,9 @@ class ParserTests extends RoxTestCase
         $this->assertSame($parser->evaluateExpression("eq(\"la la\", \"la la\")")->boolValue(), true);
         $this->assertSame($parser->evaluateExpression("eq(\"la la\", \"la,la\")")->boolValue(), false);
         $this->assertSame($parser->evaluateExpression("eq(\"lala\", \"lala\")")->boolValue(), true);
+        $this->assertSame($parser->evaluateExpression("eq(\"10\", \"10\")")->boolValue(), true);
+        $this->assertSame($parser->evaluateExpression("eq(\"10\", 10)")->boolValue(), false);
+        $this->assertSame($parser->evaluateExpression("eq(10, 10)")->boolValue(), true);
         $this->assertSame($parser->evaluateExpression("ne(100.123, 100.321)")->boolValue(), true);
         $this->assertSame($parser->evaluateExpression("not(eq(undefined, undefined))")->boolValue(), false);
         $this->assertSame($parser->evaluateExpression("not(eq(not(undefined), undefined))")->boolValue(), true);
@@ -84,14 +120,23 @@ class ParserTests extends RoxTestCase
         $this->assertSame($parser->evaluateExpression("lt(500, 100)")->boolValue(), false);
         $this->assertSame($parser->evaluateExpression("lt(500, 500)")->boolValue(), false);
         $this->assertSame($parser->evaluateExpression("lt(500, 500.54)")->boolValue(), true);
+        $this->assertSame($parser->evaluateExpression("lt(500, \"500.54\")")->boolValue(), true);
+        $this->assertSame($parser->evaluateExpression("lt(500, \"500.54a\")")->boolValue(), false);
+
         $this->assertSame($parser->evaluateExpression("lte(500, 500)")->boolValue(), true);
+        $this->assertSame($parser->evaluateExpression("lte(\"500\", 501)")->boolValue(), true);
+        $this->assertSame($parser->evaluateExpression("lte(\"501\", \"500\")")->boolValue(), false);
 
         $this->assertSame($parser->evaluateExpression("gt(500, 100)")->boolValue(), true);
         $this->assertSame($parser->evaluateExpression("gt(500, 500)")->boolValue(), false);
+        $this->assertSame($parser->evaluateExpression("gt(500, \"500\")")->boolValue(), false);
         $this->assertSame($parser->evaluateExpression("gt(500.54, 500)")->boolValue(), true);
-        $this->assertSame($parser->evaluateExpression("gte(500, 500)")->boolValue(), true);
+        $this->assertSame($parser->evaluateExpression("gt(\"500.54\", 500)")->boolValue(), true);
+        $this->assertSame($parser->evaluateExpression("gt(\"50a\", 500)")->boolValue(), false);
 
-        $this->assertSame($parser->evaluateExpression("gte(\"500\", 500)")->boolValue(), false);
+        $this->assertSame($parser->evaluateExpression("gte(500, 500)")->boolValue(), true);
+        $this->assertSame($parser->evaluateExpression("gte(\"500\", 500)")->boolValue(), true);
+        $this->assertSame($parser->evaluateExpression("gte(\"505a\", 500)")->boolValue(), false);
     }
 
     public function testSemVerComparisonEvaluation()
