@@ -47,7 +47,7 @@ class RoxE2ETests extends RoxTestCase
             ->setCacheStorage(new VolatileRuntimeStorage())
             ->setLogCacheHitsAndMisses(true));
 
-        Rox::register("", Container::getInstance());
+        Rox::register(Container::getInstance());
         TestCustomPropsCreator::createCustomProps();
 
         Rox::setup("5df8d5e802e23378643705bf", $options);
@@ -85,7 +85,7 @@ class RoxE2ETests extends RoxTestCase
     {
         $this->assertTrue(ContainerTwo::getInstance()->flag2->isEnabled());
         $this->assertEquals("red", ContainerTwo::getInstance()->variant2->getValue());
-        Rox::register("afterSetup", ContainerTwo::getInstance());
+        Rox::register(ContainerTwo::getInstance(), "afterSetup");
         $this->assertFalse(ContainerTwo::getInstance()->flag2->isEnabled());
         $this->assertEquals("green", ContainerTwo::getInstance()->variant2->getValue());
     }

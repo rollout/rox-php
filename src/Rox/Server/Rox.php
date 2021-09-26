@@ -92,10 +92,10 @@ class Rox
     }
 
     /**
-     * @param string $namespace
      * @param object $roxContainer
+     * @param string $namespace
      */
-    public static function register($namespace, $roxContainer)
+    public static function register($roxContainer, $namespace = "")
     {
         self::getCore()->register($namespace, $roxContainer);
     }
