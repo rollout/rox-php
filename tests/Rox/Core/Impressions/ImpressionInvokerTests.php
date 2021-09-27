@@ -2,6 +2,8 @@
 
 namespace Rox\Core\Impressions;
 
+use Exception;
+use Mockery;
 use Rox\Core\Client\DevicePropertiesInterface;
 use Rox\Core\Client\InternalFlagsInterface;
 use Rox\Core\Configuration\Models\ExperimentModel;
@@ -9,6 +11,8 @@ use Rox\Core\Consts\PropertyType;
 use Rox\Core\Context\ContextBuilder;
 use Rox\Core\CustomProperties\CustomProperty;
 use Rox\Core\CustomProperties\CustomPropertyType;
+use Rox\Core\ErrorHandling\ExceptionTrigger;
+use Rox\Core\ErrorHandling\UserspaceUnhandledErrorInvokerInterface;
 use Rox\Core\Impression\ImpressionArgs;
 use Rox\Core\Impression\Models\ReportingValue;
 use Rox\Core\Impression\XImpressionInvoker;
@@ -20,9 +24,31 @@ use Rox\RoxTestCase;
 
 class ImpressionInvokerTests extends RoxTestCase
 {
+    public function testWillCallUserUnhandledErrorInvoker()
+    {
+        $ex = new Exception("user exception");
+        $internalFlags = Mockery::mock(InternalFlagsInterface::class);
+        $unhandledErrorInvokeCalled = false;
+        $userUnhandledErrorInvoker = Mockery::mock(UserspaceUnhandledErrorInvokerInterface::class)
+            ->shouldReceive('invoke')
+            ->andReturnUsing(function ($sender, $trigger, $ex) use (&$unhandledErrorInvokeCalled) {
+                $this->assertSame(ExceptionTrigger::ImpressionHandler, $trigger);
+                $unhandledErrorInvokeCalled = true;
+            })
+            ->byDefault()
+            ->getMock();
+
+        $impressionInvoker = new XImpressionInvoker($internalFlags, $userUnhandledErrorInvoker, null, null);
+        $impressionInvoker->register(function ($sender, $e) use ($ex) {
+            throw $ex;
+        });
+        $impressionInvoker->invoke(new ReportingValue("test", "value"), null, null);
+        $this->assertTrue($unhandledErrorInvokeCalled);
+    }
+
     public function testWillSetImpressionInvokerEmptyInvokeNotThrowingException()
     {
-        $internalFlags = \Mockery::mock(InternalFlagsInterface::class)
+        $internalFlags = Mockery::mock(InternalFlagsInterface::class)
             ->shouldReceive('isEnabled')
             ->andThrow(\Exception::class)
             ->getMock();
@@ -35,7 +61,7 @@ class ImpressionInvokerTests extends RoxTestCase
 
     public function testWillTestImpressionInvokerInvokeAndParameters()
     {
-        $internalFlags = \Mockery::mock(InternalFlagsInterface::class);
+        $internalFlags = Mockery::mock(InternalFlagsInterface::class);
         $impressionInvoker = new XImpressionInvoker($internalFlags, null, null);
 
         $context = (new ContextBuilder())->build(['obj1' => 1]);
@@ -83,7 +109,7 @@ class ImpressionInvokerTests extends RoxTestCase
 
     public function testWillInvokeAnalyticsWhenNoExperiment()
     {
-        $internalFlags = \Mockery::mock(InternalFlagsInterface::class);
+        $internalFlags = Mockery::mock(InternalFlagsInterface::class);
         $impressionInvoker = new XImpressionInvoker($internalFlags, null, null);
 
         $context = (new ContextBuilder())->build(['obj1' => 1]);
@@ -104,7 +130,7 @@ class ImpressionInvokerTests extends RoxTestCase
 
     public function testWillInvokeAnalyticsOnExperiment()
     {
-        $internalFlags = \Mockery::mock(InternalFlagsInterface::class);
+        $internalFlags = Mockery::mock(InternalFlagsInterface::class);
         $impressionInvoker = new XImpressionInvoker($internalFlags, null, null);
 
         $context = (new ContextBuilder())->build(['obj1' => 1]);
@@ -126,7 +152,7 @@ class ImpressionInvokerTests extends RoxTestCase
 
     public function testWillNotInvokeAnalyticsWhenFlagIsOff()
     {
-        $internalFlags = \Mockery::mock(InternalFlagsInterface::class);
+        $internalFlags = Mockery::mock(InternalFlagsInterface::class);
         $impressionInvoker = new XImpressionInvoker($internalFlags, null, null);
 
         $context = (new ContextBuilder())->build(['obj1' => 1]);
@@ -148,13 +174,13 @@ class ImpressionInvokerTests extends RoxTestCase
 
     public function testWillNotInvokeAnalyticsWhenIsRoxy()
     {
-        $internalFlags = \Mockery::mock(InternalFlagsInterface::class)
+        $internalFlags = Mockery::mock(InternalFlagsInterface::class)
             ->shouldReceive('isEnabled')
             ->with('rox.internal.analytics')
             ->andReturn(true)
             ->getMock();
 
-        $customProps = \Mockery::mock(CustomPropertyRepositoryInterface::class)
+        $customProps = Mockery::mock(CustomPropertyRepositoryInterface::class)
             ->shouldReceive('getCustomProperty')
             ->andReturnUsing(function ($arg) {
                 if ($arg == 'rox.' . PropertyType::getDistinctId()->getName()) {
@@ -164,18 +190,18 @@ class ImpressionInvokerTests extends RoxTestCase
             })
             ->getMock();
 
-        $deviceProps = \Mockery::mock(DevicePropertiesInterface::class)
+        $deviceProps = Mockery::mock(DevicePropertiesInterface::class)
             ->shouldReceive('getDistinctId')
             ->andReturn('stamId')
             ->getMock();
 
-        $analytics = \Mockery::mock(ClientInterface::class)
+        $analytics = Mockery::mock(ClientInterface::class)
             ->shouldNotReceive('track')
             ->getMock();
 
         // FIXME: bad test, it doesn't pass analytics client into constructor and doesn't expect it to be called.
         // FIXME: (ported from .NET code as is).
-        $impressionInvoker = new XImpressionInvoker($internalFlags, $customProps, null);
+        $impressionInvoker = new XImpressionInvoker($internalFlags, null, $customProps, null);
 
         $context = (new ContextBuilder())->build(['obj1' => 1]);
 
@@ -194,13 +220,13 @@ class ImpressionInvokerTests extends RoxTestCase
 
     public function testWillInvokeAnalytics()
     {
-        $internalFlags = \Mockery::mock(InternalFlagsInterface::class)
+        $internalFlags = Mockery::mock(InternalFlagsInterface::class)
             ->shouldReceive('isEnabled')
             ->with('rox.internal.analytics')
             ->andReturn(true)
             ->getMock();
 
-        $customProps = \Mockery::mock(CustomPropertyRepositoryInterface::class)
+        $customProps = Mockery::mock(CustomPropertyRepositoryInterface::class)
             ->shouldReceive('getCustomProperty')
             ->andReturnUsing(function ($arg) {
                 if ($arg == 'rox.' . PropertyType::getDistinctId()->getName()) {
@@ -210,22 +236,22 @@ class ImpressionInvokerTests extends RoxTestCase
             })
             ->getMock();
 
-        $deviceProps = \Mockery::mock(DevicePropertiesInterface::class)
+        $deviceProps = Mockery::mock(DevicePropertiesInterface::class)
             ->shouldReceive('getDistinctId')
             ->andReturn('stamId')
             ->getMock();
 
         $outEvent = [null];
-        $analytics = \Mockery::mock(ClientInterface::class);
+        $analytics = Mockery::mock(ClientInterface::class);
         $analytics->shouldReceive('track')
-            ->with(\Mockery::on(function (Event $args) use (&$outEvent) {
+            ->with(Mockery::on(function (Event $args) use (&$outEvent) {
                 $outEvent[0] = $args;
                 return true;
             }))
             ->once()
             ->getMock();
 
-        $impressionInvoker = new XImpressionInvoker($internalFlags, $customProps, $analytics);
+        $impressionInvoker = new XImpressionInvoker($internalFlags, null, $customProps, $analytics);
 
         $context = (new ContextBuilder())->build(['obj1' => 1]);
 
@@ -250,13 +276,13 @@ class ImpressionInvokerTests extends RoxTestCase
 
     public function testWillInvokeAnalyticsWithStickinessProp()
     {
-        $internalFlags = \Mockery::mock(InternalFlagsInterface::class)
+        $internalFlags = Mockery::mock(InternalFlagsInterface::class)
             ->shouldReceive('isEnabled')
             ->with('rox.internal.analytics')
             ->andReturn(true)
             ->getMock();
 
-        $customProps = \Mockery::mock(CustomPropertyRepositoryInterface::class)
+        $customProps = Mockery::mock(CustomPropertyRepositoryInterface::class)
             ->shouldReceive('getCustomProperty')
             ->andReturnUsing(function ($arg) {
                 if ($arg == 'rox.' . PropertyType::getDistinctId()->getName()) {
@@ -269,22 +295,22 @@ class ImpressionInvokerTests extends RoxTestCase
             })
             ->getMock();
 
-        $deviceProps = \Mockery::mock(DevicePropertiesInterface::class)
+        $deviceProps = Mockery::mock(DevicePropertiesInterface::class)
             ->shouldReceive('getDistinctId')
             ->andReturn('stamId')
             ->getMock();
 
         $outEvent = [null];
-        $analytics = \Mockery::mock(ClientInterface::class);
+        $analytics = Mockery::mock(ClientInterface::class);
         $analytics->shouldReceive('track')
-            ->with(\Mockery::on(function (Event $args) use (&$outEvent) {
+            ->with(Mockery::on(function (Event $args) use (&$outEvent) {
                 $outEvent[0] = $args;
                 return true;
             }))
             ->once()
             ->getMock();
 
-        $impressionInvoker = new XImpressionInvoker($internalFlags, $customProps, $analytics);
+        $impressionInvoker = new XImpressionInvoker($internalFlags, null, $customProps, $analytics);
 
         $context = (new ContextBuilder())->build(['obj1' => 1]);
 
@@ -310,13 +336,13 @@ class ImpressionInvokerTests extends RoxTestCase
 
     public function testWillInvokeAnalyticsWithDefaultPropWhenNoStickinessProp()
     {
-        $internalFlags = \Mockery::mock(InternalFlagsInterface::class)
+        $internalFlags = Mockery::mock(InternalFlagsInterface::class)
             ->shouldReceive('isEnabled')
             ->with('rox.internal.analytics')
             ->andReturn(true)
             ->getMock();
 
-        $customProps = \Mockery::mock(CustomPropertyRepositoryInterface::class)
+        $customProps = Mockery::mock(CustomPropertyRepositoryInterface::class)
             ->shouldReceive('getCustomProperty')
             ->andReturnUsing(function ($arg) {
                 if ($arg == 'rox.' . PropertyType::getDistinctId()->getName()) {
@@ -329,22 +355,22 @@ class ImpressionInvokerTests extends RoxTestCase
             })
             ->getMock();
 
-        $deviceProps = \Mockery::mock(DevicePropertiesInterface::class)
+        $deviceProps = Mockery::mock(DevicePropertiesInterface::class)
             ->shouldReceive('getDistinctId')
             ->andReturn('stamId')
             ->getMock();
 
         $outEvent = [null];
-        $analytics = \Mockery::mock(ClientInterface::class);
+        $analytics = Mockery::mock(ClientInterface::class);
         $analytics->shouldReceive('track')
-            ->with(\Mockery::on(function (Event $args) use (&$outEvent) {
+            ->with(Mockery::on(function (Event $args) use (&$outEvent) {
                 $outEvent[0] = $args;
                 return true;
             }))
             ->once()
             ->getMock();
 
-        $impressionInvoker = new XImpressionInvoker($internalFlags, $customProps, $analytics);
+        $impressionInvoker = new XImpressionInvoker($internalFlags, null, $customProps, $analytics);
 
         $context = (new ContextBuilder())->build(['obj1' => 1]);
 
@@ -370,33 +396,33 @@ class ImpressionInvokerTests extends RoxTestCase
 
     public function testWillInvokeAnalyticsWithBadDistinctId()
     {
-        $internalFlags = \Mockery::mock(InternalFlagsInterface::class)
+        $internalFlags = Mockery::mock(InternalFlagsInterface::class)
             ->shouldReceive('isEnabled')
             ->with('rox.internal.analytics')
             ->andReturn(true)
             ->getMock();
 
-        $customProps = \Mockery::mock(CustomPropertyRepositoryInterface::class)
+        $customProps = Mockery::mock(CustomPropertyRepositoryInterface::class)
             ->shouldReceive('getCustomProperty')
             ->andReturn(null)
             ->getMock();
 
-        $deviceProps = \Mockery::mock(DevicePropertiesInterface::class)
+        $deviceProps = Mockery::mock(DevicePropertiesInterface::class)
             ->shouldReceive('getDistinctId')
             ->andReturn('stamId')
             ->getMock();
 
         $outEvent = [null];
-        $analytics = \Mockery::mock(ClientInterface::class);
+        $analytics = Mockery::mock(ClientInterface::class);
         $analytics->shouldReceive('track')
-            ->with(\Mockery::on(function (Event $args) use (&$outEvent) {
+            ->with(Mockery::on(function (Event $args) use (&$outEvent) {
                 $outEvent[0] = $args;
                 return true;
             }))
             ->once()
             ->getMock();
 
-        $impressionInvoker = new XImpressionInvoker($internalFlags, $customProps, $analytics);
+        $impressionInvoker = new XImpressionInvoker($internalFlags, null, $customProps, $analytics);
 
         $context = (new ContextBuilder())->build(['obj1' => 1]);
 
@@ -423,7 +449,7 @@ class ImpressionInvokerTests extends RoxTestCase
     public function ignoreNoAssertationTest()
     {
         $this->addToAssertionCount(
-            \Mockery::getContainer()->mockery_getExpectationCount()
+            Mockery::getContainer()->mockery_getExpectationCount()
         );
     }
 }

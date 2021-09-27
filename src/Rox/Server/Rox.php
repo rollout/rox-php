@@ -210,6 +210,14 @@ class Rox
     }
 
     /**
+     * @param callable $userspaceUnhandledErrorHandler
+     */
+    public static function setUserspaceUnhandledErrorHandler(callable $userspaceUnhandledErrorHandler)
+    {
+        self::getCore()->setUserspaceUnhandledErrorHandler($userspaceUnhandledErrorHandler);
+    }
+
+    /**
      * @return DynamicApiInterface
      */
     public static function dynamicApi()

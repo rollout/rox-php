@@ -14,4 +14,9 @@ interface DynamicPropertiesInterface
      * @return callable
      */
     function getDynamicPropertiesRule();
+
+    /**
+     * @return bool
+     */
+    function isDefault();
 }

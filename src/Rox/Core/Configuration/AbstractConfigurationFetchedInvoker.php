@@ -2,12 +2,29 @@
 
 namespace Rox\Core\Configuration;
 
+use Exception;
+use Rox\Core\ErrorHandling\ExceptionTrigger;
+use Rox\Core\ErrorHandling\UserspaceUnhandledErrorInvokerInterface;
+
 abstract class AbstractConfigurationFetchedInvoker implements ConfigurationFetchedInvokerInterface
 {
     /**
      * @var callable[] $_eventHandlers
      */
     private $_eventHandlers = [];
+
+    /**
+     * @var UserspaceUnhandledErrorInvokerInterface $_userUnhandledErrorInvoker
+     */
+    protected $_userUnhandledErrorInvoker;
+
+    /**
+     * @param UserspaceUnhandledErrorInvokerInterface $userUnhandledErrorInvoker
+     */
+    public function __construct(UserspaceUnhandledErrorInvokerInterface $userUnhandledErrorInvoker)
+    {
+        $this->_userUnhandledErrorInvoker = $userUnhandledErrorInvoker;
+    }
 
     /**
      * @param callable $handler
@@ -54,7 +71,11 @@ abstract class AbstractConfigurationFetchedInvoker implements ConfigurationFetch
     protected final function fireConfigurationFetched(ConfigurationFetchedArgs $args)
     {
         foreach ($this->_eventHandlers as $eventHandler) {
-            $eventHandler($args);
+            try {
+                $eventHandler($args);
+            } catch (Exception $e) {
+                $this->_userUnhandledErrorInvoker->invoke($this, ExceptionTrigger::ConfigurationFetchedHandler, $e);
+            }
         }
     }
 }

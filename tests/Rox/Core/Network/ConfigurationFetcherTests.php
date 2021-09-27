@@ -3,11 +3,13 @@
 namespace Rox\Core\Network;
 
 use Exception;
+use Mockery;
 use Rox\Core\Client\BUIDInterface;
 use Rox\Core\Client\DevicePropertiesInterface;
 use Rox\Core\Configuration\ConfigurationFetchedArgs;
 use Rox\Core\Configuration\ConfigurationFetchedInvoker;
 use Rox\Core\Consts\PropertyType;
+use Rox\Core\ErrorHandling\UserspaceUnhandledErrorInvokerInterface;
 use Rox\Core\Reporting\ErrorReporterInterface;
 use Rox\RoxTestCase;
 
@@ -32,7 +34,7 @@ class ConfigurationFetcherTests extends RoxTestCase
     {
         parent::setUp();
 
-        $this->_dp = \Mockery::mock(DevicePropertiesInterface::class)
+        $this->_dp = Mockery::mock(DevicePropertiesInterface::class)
             ->shouldReceive('getAllProperties')
             ->andReturn([
                 "app_key" => "123",
@@ -42,13 +44,13 @@ class ConfigurationFetcherTests extends RoxTestCase
             ->byDefault()
             ->getMock();
 
-        $this->_bu = \Mockery::mock(BUIDInterface::class)
+        $this->_bu = Mockery::mock(BUIDInterface::class)
             ->shouldReceive('getQueryStringParts')
             ->andReturn(["buid" => "buid"])
             ->byDefault()
             ->getMock();
 
-        $this->_errorReporter = \Mockery::mock(ErrorReporterInterface::class)
+        $this->_errorReporter = Mockery::mock(ErrorReporterInterface::class)
             ->shouldReceive('report')
             ->byDefault()
             ->getMock();
@@ -56,7 +58,7 @@ class ConfigurationFetcherTests extends RoxTestCase
 
     public function testWillReturnCDNDataWhenSuccessful()
     {
-        $confFetchInvoker = new ConfigurationFetchedInvoker();
+        $confFetchInvoker = new ConfigurationFetchedInvoker(Mockery::mock(UserspaceUnhandledErrorInvokerInterface::class));
 
         $numberOfTimerCalled = [0];
         $confFetchInvoker->register(function (ConfigurationFetchedArgs $e) use (&$numberOfTimerCalled) {
@@ -66,7 +68,7 @@ class ConfigurationFetcherTests extends RoxTestCase
         $response = new TestHttpResponse(200, "{\"a\": \"harti\"}");
 
         $reqData = [null];
-        $request = \Mockery::mock(HttpClientInterface::class)
+        $request = Mockery::mock(HttpClientInterface::class)
             ->shouldReceive('sendGet')
             ->andReturnUsing(function ($req) use ($response, &$reqData) {
                 $reqData[0] = $req;
@@ -89,14 +91,14 @@ class ConfigurationFetcherTests extends RoxTestCase
 
     public function testWillReturnNullWhenCDNFailsWithException()
     {
-        $confFetchInvoker = new ConfigurationFetchedInvoker();
+        $confFetchInvoker = new ConfigurationFetchedInvoker(Mockery::mock(UserspaceUnhandledErrorInvokerInterface::class));
         $numberOfTimerCalled = [0];
 
         $confFetchInvoker->register(function (ConfigurationFetchedArgs $e) use (&$numberOfTimerCalled) {
             $numberOfTimerCalled[0]++;
         });
 
-        $request = \Mockery::mock(HttpClientInterface::class)
+        $request = Mockery::mock(HttpClientInterface::class)
             ->shouldReceive('sendGet')
             ->andThrow(new Exception('not found'))
             ->getMock()
@@ -113,14 +115,14 @@ class ConfigurationFetcherTests extends RoxTestCase
 
     public function testWillReturnNullWhenCDNSucceedWithEmptyResponse()
     {
-        $confFetchInvoker = new ConfigurationFetchedInvoker();
+        $confFetchInvoker = new ConfigurationFetchedInvoker(Mockery::mock(UserspaceUnhandledErrorInvokerInterface::class));
         $numberOfTimerCalled = [0];
 
         $confFetchInvoker->register(function (ConfigurationFetchedArgs $e) use (&$numberOfTimerCalled) {
             $numberOfTimerCalled[0]++;
         });
 
-        $request = \Mockery::mock(HttpClientInterface::class)
+        $request = Mockery::mock(HttpClientInterface::class)
             ->shouldReceive('sendGet')
             ->andReturn(new TestHttpResponse(200, ""))
             ->once()
@@ -142,13 +144,13 @@ class ConfigurationFetcherTests extends RoxTestCase
 
     public function testWillReturnNullWhenCDNSucceedWithNotJsonResponse()
     {
-        $confFetchInvoker = new ConfigurationFetchedInvoker();
+        $confFetchInvoker = new ConfigurationFetchedInvoker(Mockery::mock(UserspaceUnhandledErrorInvokerInterface::class));
         $numberOfTimerCalled = [0];
         $confFetchInvoker->register(function (ConfigurationFetchedArgs $e) use (&$numberOfTimerCalled) {
             $numberOfTimerCalled[0]++;
         });
 
-        $request = \Mockery::mock(HttpClientInterface::class)
+        $request = Mockery::mock(HttpClientInterface::class)
             ->shouldReceive('sendGet')
             ->once()
             ->andReturn(new TestHttpResponse(200, "{fdsadf/:"))
@@ -170,14 +172,14 @@ class ConfigurationFetcherTests extends RoxTestCase
 
     public function testWillReturnNullWhenCDNFails404APIWithException()
     {
-        $confFetchInvoker = new ConfigurationFetchedInvoker();
+        $confFetchInvoker = new ConfigurationFetchedInvoker(Mockery::mock(UserspaceUnhandledErrorInvokerInterface::class));
         $numberOfTimerCalled = [0];
 
         $confFetchInvoker->register(function (ConfigurationFetchedArgs $e) use (&$numberOfTimerCalled) {
             $numberOfTimerCalled[0]++;
         });
 
-        $request = \Mockery::mock(HttpClientInterface::class)
+        $request = Mockery::mock(HttpClientInterface::class)
             ->shouldReceive('sendGet')
             ->andReturn(new TestHttpResponse(HttpResponseInterface::STATUS_NOT_FOUND))
             ->once()
@@ -196,7 +198,7 @@ class ConfigurationFetcherTests extends RoxTestCase
 
     public function testWillReturnAPIDataWhenCDNFailsWithResult404APIOK()
     {
-        $confFetchInvoker = new ConfigurationFetchedInvoker();
+        $confFetchInvoker = new ConfigurationFetchedInvoker(Mockery::mock(UserspaceUnhandledErrorInvokerInterface::class));
         $numberOfTimerCalled = [0];
 
         $confFetchInvoker->register(function (ConfigurationFetchedArgs $e) use (&$numberOfTimerCalled) {
@@ -204,7 +206,7 @@ class ConfigurationFetcherTests extends RoxTestCase
         });
 
         $reqData = [null];
-        $request = \Mockery::mock(HttpClientInterface::class)
+        $request = Mockery::mock(HttpClientInterface::class)
             ->shouldReceive('sendGet')
             ->andReturn(new TestHttpResponse(HttpResponseInterface::STATUS_OK, "{\"result\": \"404\"}"))
             ->once()
@@ -244,14 +246,14 @@ class ConfigurationFetcherTests extends RoxTestCase
 
     public function testWillReturnAPIDataWhenCDNSucceedWithResult200()
     {
-        $confFetchInvoker = new ConfigurationFetchedInvoker();
+        $confFetchInvoker = new ConfigurationFetchedInvoker(Mockery::mock(UserspaceUnhandledErrorInvokerInterface::class));
         $numberOfTimerCalled = [0];
 
         $confFetchInvoker->register(function (ConfigurationFetchedArgs $e) use (&$numberOfTimerCalled) {
             $numberOfTimerCalled[0]++;
         });
 
-        $request = \Mockery::mock(HttpClientInterface::class)
+        $request = Mockery::mock(HttpClientInterface::class)
             ->shouldReceive('sendGet')
             ->andReturn(new TestHttpResponse(200, "{\"result\": \"200\"}"))
             ->once()
@@ -271,14 +273,14 @@ class ConfigurationFetcherTests extends RoxTestCase
 
     public function testWillReturnAPIDataWhenCDNFails404APIOK()
     {
-        $confFetchInvoker = new ConfigurationFetchedInvoker();
+        $confFetchInvoker = new ConfigurationFetchedInvoker(Mockery::mock(UserspaceUnhandledErrorInvokerInterface::class));
         $numberOfTimerCalled = [0];
 
         $confFetchInvoker->register(function (ConfigurationFetchedArgs $e) use (&$numberOfTimerCalled) {
             $numberOfTimerCalled[0]++;
         });
 
-        $request = \Mockery::mock(HttpClientInterface::class)
+        $request = Mockery::mock(HttpClientInterface::class)
             ->shouldReceive('sendGet')
             ->andReturn(new TestHttpResponse(HttpResponseInterface::STATUS_NOT_FOUND))
             ->once()
@@ -298,14 +300,14 @@ class ConfigurationFetcherTests extends RoxTestCase
 
     public function testWillReturnNullDataWhenBothNotFound()
     {
-        $confFetchInvoker = new ConfigurationFetchedInvoker();
+        $confFetchInvoker = new ConfigurationFetchedInvoker(Mockery::mock(UserspaceUnhandledErrorInvokerInterface::class));
         $numberOfTimerCalled = [0];
 
         $confFetchInvoker->register(function (ConfigurationFetchedArgs $e) use (&$numberOfTimerCalled) {
             $numberOfTimerCalled[0]++;
         });
 
-        $request = \Mockery::mock(HttpClientInterface::class)
+        $request = Mockery::mock(HttpClientInterface::class)
             ->shouldReceive('sendGet')
             ->andReturn(new TestHttpResponse(HttpResponseInterface::STATUS_NOT_FOUND))
             ->once()

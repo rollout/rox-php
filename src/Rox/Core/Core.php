@@ -29,6 +29,8 @@ use Rox\Core\CustomProperties\DynamicProperties;
 use Rox\Core\CustomProperties\DynamicPropertiesInterface;
 use Rox\Core\Entities\EntitiesProviderInterface;
 use Rox\Core\Entities\FlagSetter;
+use Rox\Core\ErrorHandling\UserspaceUnhandledErrorInvoker;
+use Rox\Core\ErrorHandling\UserspaceUnhandledErrorInvokerInterface;
 use Rox\Core\Impression\ImpressionInvoker;
 use Rox\Core\Impression\ImpressionInvokerInterface;
 use Rox\Core\Impression\XImpressionInvoker;
@@ -59,7 +61,6 @@ use Rox\Core\Security\APIKeyVerifier;
 use Rox\Core\Security\SignatureVerifier;
 use Rox\Core\XPack\Analytics\AnalyticsClient;
 use Rox\Core\XPack\Client\XBUID;
-use Rox\Core\XPack\Configuration\XConfigurationFetchedInvoker;
 use Rox\Core\XPack\Network\StateSender;
 use Rox\Core\XPack\Reporting\XErrorReporter;
 use Rox\Core\XPack\Security\XAPIKeyVerifier;
@@ -166,6 +167,11 @@ class Core
     private $_dynamicProperties;
 
     /**
+     * @var UserspaceUnhandledErrorInvokerInterface $_userUnhandledErrorInvoker
+     */
+    private $_userUnhandledErrorInvoker;
+
+    /**
      * @var LoggerInterface $_log
      */
     private $_log;
@@ -180,13 +186,19 @@ class Core
         $this->_targetGroupRepository = new TargetGroupRepository();
         $this->_experimentRepository = new ExperimentRepository();
         $this->_dynamicProperties = new DynamicProperties();
-        $this->_parser = new Parser();
+        $this->_userUnhandledErrorInvoker = new UserspaceUnhandledErrorInvoker();
+        $this->_parser = new Parser($this->_userUnhandledErrorInvoker);
         $experimentsExtensions = new ExperimentsExtensions($this->_parser, $this->_targetGroupRepository, $this->_flagRepository, $this->_experimentRepository);
         $propertiesExtensions = new PropertiesExtensions($this->_parser, $this->_customPropertyRepository, $this->_dynamicProperties);
         $experimentsExtensions->extend();
         $propertiesExtensions->extend();
         $this->_registerer = new Registerer($this->_flagRepository);
         $this->_log = LoggerFactory::getInstance()->createLogger(self::class);
+    }
+
+    public function setUserspaceUnhandledErrorHandler(callable $userspaceUnhandledErrorHandler)
+    {
+        $this->_userUnhandledErrorInvoker->register($userspaceUnhandledErrorHandler);
     }
 
     /**
@@ -228,21 +240,24 @@ class Core
         $apiKeyVerifier = null;
 
         $this->_errorReporter = new XErrorReporter($httpClientFactory->createHttpClient(), $deviceProperties, $buid);
+        $this->_configurationFetchedInvoker = new ConfigurationFetchedInvoker($this->_userUnhandledErrorInvoker);
 
         if ($roxyUrl != null) {
-            $this->_configurationFetchedInvoker = new ConfigurationFetchedInvoker();
             $this->_configurationFetcher = new ConfigurationFetcherRoxy($httpClient, $deviceProperties, $buid, $this->_configurationFetchedInvoker, $roxyUrl, $this->_errorReporter);
-            $this->_impressionInvoker = new ImpressionInvoker();
+            $this->_impressionInvoker = new ImpressionInvoker($this->_userUnhandledErrorInvoker);
             $signature = new SignatureVerifier();
             $apiKeyVerifier = new APIKeyVerifier();
         } else {
             $stateSenderHttpClient = $this->_createHttpClientFactory($roxOptions, self::STATE_STORE_CACHE_TTL_SECONDS)
                 ->createHttpClient();
             $this->_stateSender = new StateSender($stateSenderHttpClient, $deviceProperties, $this->_flagRepository, $this->_customPropertyRepository);
-            $this->_configurationFetchedInvoker = new XConfigurationFetchedInvoker($this);
             $this->_configurationFetcher = new ConfigurationFetcher($httpClient, $buid, $deviceProperties, $this->_configurationFetchedInvoker, $this->_errorReporter);
-            $this->_impressionInvoker = new XImpressionInvoker($this->_internalFlags, $this->_customPropertyRepository,
-                new AnalyticsClient($this->_deviceProperties, $this->_internalFlags, $httpClientFactory->createHttpClient()));
+            $analyticsClient = new AnalyticsClient($this->_deviceProperties, $this->_internalFlags, $httpClientFactory->createHttpClient());
+            $this->_impressionInvoker = new XImpressionInvoker(
+                $this->_internalFlags,
+                $this->_userUnhandledErrorInvoker,
+                $this->_customPropertyRepository,
+                $analyticsClient);
             $signature = new XSignatureVerifier();
             $apiKeyVerifier = new XAPIKeyVerifier($sdkSettings);
         }

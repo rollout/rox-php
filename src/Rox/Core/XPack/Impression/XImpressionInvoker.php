@@ -9,6 +9,8 @@ use Rox\Core\Configuration\Models\ExperimentModel;
 use Rox\Core\Consts\PropertyType;
 use Rox\Core\Context\ContextInterface;
 use Rox\Core\CustomProperties\CustomPropertyType;
+use Rox\Core\ErrorHandling\ExceptionTrigger;
+use Rox\Core\ErrorHandling\UserspaceUnhandledErrorInvokerInterface;
 use Rox\Core\Impression\Models\ReportingValue;
 use Rox\Core\Logging\LoggerFactory;
 use Rox\Core\Repositories\CustomPropertyRepositoryInterface;
@@ -43,18 +45,25 @@ class XImpressionInvoker implements ImpressionInvokerInterface
     private $_eventHandlers = [];
 
     /**
+     * @var UserspaceUnhandledErrorInvokerInterface $_userUnhandledErrorInvoker
+     */
+    protected $_userUnhandledErrorInvoker;
+
+    /**
      * XImpressionInvoker constructor.
      * @param InternalFlagsInterface $internalFlags
      * @param CustomPropertyRepositoryInterface|null $customPropertyRepository
      * @param ClientInterface|null $analyticsClient
      */
     public function __construct(
-        InternalFlagsInterface            $internalFlags,
-        CustomPropertyRepositoryInterface $customPropertyRepository = null,
-        ClientInterface                   $analyticsClient = null)
+        InternalFlagsInterface                  $internalFlags,
+        UserspaceUnhandledErrorInvokerInterface $userUnhandledErrorInvoker = null,
+        CustomPropertyRepositoryInterface       $customPropertyRepository = null,
+        ClientInterface                         $analyticsClient = null)
     {
         $this->_log = LoggerFactory::getInstance()->createLogger(self::class);
         $this->_customPropertyRepository = $customPropertyRepository;
+        $this->_userUnhandledErrorInvoker = $userUnhandledErrorInvoker;
         $this->_internalFlags = $internalFlags;
         $this->_analyticsClient = $analyticsClient;
     }
@@ -115,7 +124,14 @@ class XImpressionInvoker implements ImpressionInvokerInterface
     private function _fireImpression(ImpressionArgs $args)
     {
         foreach ($this->_eventHandlers as $handler) {
-            $handler($args);
+            try {
+                $handler($args);
+            } catch (Exception $e) {
+                if ($this->_userUnhandledErrorInvoker) {
+                    $this->_userUnhandledErrorInvoker
+                        ->invoke($this, ExceptionTrigger::ImpressionHandler, $e);
+                }
+            }
         }
     }
 }

@@ -2,6 +2,7 @@
 
 namespace Rox\Core\Roxx;
 
+use Mockery;
 use Rox\Core\Client\InternalFlagsInterface;
 use Rox\Core\Configuration\Models\ExperimentModel;
 use Rox\Core\Context\ContextBuilder;
@@ -11,6 +12,7 @@ use Rox\Core\CustomProperties\CustomPropertyRepository;
 use Rox\Core\CustomProperties\CustomPropertyType;
 use Rox\Core\CustomProperties\DynamicProperties;
 use Rox\Core\Entities\FlagSetter;
+use Rox\Core\ErrorHandling\UserspaceUnhandledErrorInvokerInterface;
 use Rox\Core\Impression\ImpressionArgs;
 use Rox\Core\Impression\XImpressionInvoker;
 use Rox\Core\Repositories\ExperimentRepository;
@@ -26,7 +28,7 @@ class ExperimentsExtensionsTests extends RoxTestCase
 {
     public function testCustomPropertyWithSimpleValue()
     {
-        $parser = new Parser();
+        $parser = new Parser(Mockery::mock(UserspaceUnhandledErrorInvokerInterface::class));
         $targetGroupsRepository = new TargetGroupRepository();
         $experimentsExtensions = new ExperimentsExtensions($parser, $targetGroupsRepository,
             \Mockery::mock(FlagRepositoryInterface::class),
@@ -38,7 +40,7 @@ class ExperimentsExtensionsTests extends RoxTestCase
 
     public function testIsInPercentageRange()
     {
-        $parser = new Parser();
+        $parser = new Parser(Mockery::mock(UserspaceUnhandledErrorInvokerInterface::class));
         $targetGroupsRepository = new TargetGroupRepository();
         $experimentsExtensions =
             new ExperimentsExtensions($parser, $targetGroupsRepository,
@@ -51,7 +53,7 @@ class ExperimentsExtensionsTests extends RoxTestCase
 
     public function testNotIsInPercentageRange()
     {
-        $parser = new Parser();
+        $parser = new Parser(Mockery::mock(UserspaceUnhandledErrorInvokerInterface::class));
         $targetGroupsRepository = new TargetGroupRepository();
         $experimentsExtensions =
             new ExperimentsExtensions($parser, $targetGroupsRepository,
@@ -65,7 +67,7 @@ class ExperimentsExtensionsTests extends RoxTestCase
 
     public function testGetBucket()
     {
-        $parser = new Parser();
+        $parser = new Parser(Mockery::mock(UserspaceUnhandledErrorInvokerInterface::class));
         $targetGroupsRepository = new TargetGroupRepository();
         $experimentsExtensions =
             new ExperimentsExtensions($parser, $targetGroupsRepository,
@@ -79,7 +81,7 @@ class ExperimentsExtensionsTests extends RoxTestCase
 
     public function testFlagValueNoFlagNoExperiment()
     {
-        $parser = new Parser();
+        $parser = new Parser(Mockery::mock(UserspaceUnhandledErrorInvokerInterface::class));
         $targetGroupsRepository = new TargetGroupRepository();
         $experimentRepository = new ExperimentRepository();
         $flagRepository = new FlagRepository();
@@ -93,7 +95,7 @@ class ExperimentsExtensionsTests extends RoxTestCase
 
     public function testFlagValueNoFlagEvaluateExperiment()
     {
-        $parser = new Parser();
+        $parser = new Parser(Mockery::mock(UserspaceUnhandledErrorInvokerInterface::class));
         $targetGroupsRepository = new TargetGroupRepository();
         $experimentRepository = new ExperimentRepository();
         $flagRepository = new FlagRepository();
@@ -112,7 +114,7 @@ class ExperimentsExtensionsTests extends RoxTestCase
 
     public function testFlagValueFlagEvaluationDefault()
     {
-        $parser = new Parser();
+        $parser = new Parser(Mockery::mock(UserspaceUnhandledErrorInvokerInterface::class));
         $targetGroupsRepository = new TargetGroupRepository();
         $experimentRepository = new ExperimentRepository();
         $flagRepository = new FlagRepository();
@@ -128,7 +130,7 @@ class ExperimentsExtensionsTests extends RoxTestCase
 
     public function testFlagDependencyValue()
     {
-        $parser = new Parser();
+        $parser = new Parser(Mockery::mock(UserspaceUnhandledErrorInvokerInterface::class));
         $targetGroupsRepository = new TargetGroupRepository();
         $experimentRepository = new ExperimentRepository();
         $flagRepository = new FlagRepository();
@@ -151,7 +153,7 @@ class ExperimentsExtensionsTests extends RoxTestCase
 
     public function testFlagDependencyImpressionHandler()
     {
-        $parser = new Parser();
+        $parser = new Parser(Mockery::mock(UserspaceUnhandledErrorInvokerInterface::class));
         $targetGroupsRepository = new TargetGroupRepository();
         $experimentRepository = new ExperimentRepository();
         $flagRepository = new FlagRepository();
@@ -189,7 +191,7 @@ class ExperimentsExtensionsTests extends RoxTestCase
 
     public function testFlagDependency2LevelsBottomNotExists()
     {
-        $parser = new Parser();
+        $parser = new Parser(Mockery::mock(UserspaceUnhandledErrorInvokerInterface::class));
         $targetGroupsRepository = new TargetGroupRepository();
         $experimentRepository = new ExperimentRepository();
         $flagRepository = new FlagRepository();
@@ -213,7 +215,7 @@ class ExperimentsExtensionsTests extends RoxTestCase
 
     public function testFlagDependencyUnexistingFlagButExistingExperiment()
     {
-        $parser = new Parser();
+        $parser = new Parser(Mockery::mock(UserspaceUnhandledErrorInvokerInterface::class));
         $flagRepository = new FlagRepository();
         $targetGroupRepository = new TargetGroupRepository();
         $experimentRepository = new ExperimentRepository();
@@ -242,7 +244,7 @@ class ExperimentsExtensionsTests extends RoxTestCase
 
     public function testFlagDependencyUnexistingFlagAndExperimentUndefined()
     {
-        $parser = new Parser();
+        $parser = new Parser(Mockery::mock(UserspaceUnhandledErrorInvokerInterface::class));
         $flagRepository = new FlagRepository();
         $targetGroupRepository = new TargetGroupRepository();
         $experimentRepository = new ExperimentRepository();
@@ -271,7 +273,7 @@ class ExperimentsExtensionsTests extends RoxTestCase
 
     public function testFlagDependencyWithContext()
     {
-        $parser = new Parser();
+        $parser = new Parser(Mockery::mock(UserspaceUnhandledErrorInvokerInterface::class));
         $flagRepository = new FlagRepository();
         $targetGroupRepository = new TargetGroupRepository();
         $experimentRepository = new ExperimentRepository();
@@ -301,7 +303,7 @@ class ExperimentsExtensionsTests extends RoxTestCase
 
     public function testFlagDependencyWithContextUsedOnExperimentWithNoFlag()
     {
-        $parser = new Parser();
+        $parser = new Parser(Mockery::mock(UserspaceUnhandledErrorInvokerInterface::class));
         $flagRepository = new FlagRepository();
         $targetGroupRepository = new TargetGroupRepository();
         $experimentRepository = new ExperimentRepository();
@@ -330,7 +332,7 @@ class ExperimentsExtensionsTests extends RoxTestCase
 
     public function testFlagDependencyWithContext2LevelMidLevelNoFlagEvalExperiment()
     {
-        $parser = new Parser();
+        $parser = new Parser(Mockery::mock(UserspaceUnhandledErrorInvokerInterface::class));
         $flagRepository = new FlagRepository();
         $targetGroupRepository = new TargetGroupRepository();
         $experimentRepository = new ExperimentRepository();

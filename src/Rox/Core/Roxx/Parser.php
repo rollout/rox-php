@@ -6,6 +6,8 @@ use Exception;
 use Psr\Log\LoggerInterface;
 use Rox\Core\Context\ContextBuilder;
 use Rox\Core\Context\ContextInterface;
+use Rox\Core\ErrorHandling\UserspaceHandlerException;
+use Rox\Core\ErrorHandling\UserspaceUnhandledErrorInvokerInterface;
 use Rox\Core\Logging\LoggerFactory;
 use Rox\Core\Utils\NumericUtils;
 use Rox\Core\Utils\TimeUtils;
@@ -23,16 +25,22 @@ class Parser implements ParserInterface
     private $_operatorsMap = [];
 
     /**
+     * @var UserspaceUnhandledErrorInvokerInterface $_userUnhandledErrorInvoker
+     */
+    private $_userUnhandledErrorInvoker;
+
+    /**
      * @var ContextInterface $_globalContext
      */
     private $_globalContext;
 
     /**
      * Parser constructor.
-     * @throws Exception
+     * @param UserspaceUnhandledErrorInvokerInterface|null $userUnhandledErrorInvoker
      */
-    public function __construct()
+    public function __construct($userUnhandledErrorInvoker)
     {
+        $this->_userUnhandledErrorInvoker = $userUnhandledErrorInvoker;
         $this->_log = LoggerFactory::getInstance()->createLogger(self::class);
         $this->_setBasicOperators();
     }
@@ -261,6 +269,19 @@ class Parser implements ParserInterface
             }
 
             $result = $stack->pop();
+
+        } catch (UserspaceHandlerException $ex) {
+
+            $this->_log->warning("Roxx Exception: Failed evaluate expression, user unhandled expression {$ex->getMessage()}", [
+                'exception' => $ex
+            ]);
+
+            if ($this->_userUnhandledErrorInvoker) {
+                $this->_userUnhandledErrorInvoker->invoke(
+                    $ex->getExceptionSource(),
+                    $ex->getExceptionTrigger(),
+                    $ex->getException());
+            }
 
         } catch (Exception $exception) {
 

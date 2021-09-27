@@ -4,10 +4,12 @@
 namespace Rox\Server\Flags;
 
 
+use Mockery;
 use Rox\Core\Client\InternalFlagsInterface;
 use Rox\Core\Configuration\Models\ExperimentModel;
 use Rox\Core\Entities\FlagSetter;
 use Rox\Core\Entities\RoxStringBase;
+use Rox\Core\ErrorHandling\UserspaceUnhandledErrorInvokerInterface;
 use Rox\Core\Impression\ImpressionArgs;
 use Rox\Core\Impression\ImpressionInvoker;
 use Rox\Core\Impression\XImpressionInvoker;
@@ -55,18 +57,24 @@ class RoxFlagsTestCase extends RoxTestCase
     {
         parent::setUp();
 
-        $internalFlags = \Mockery::mock(InternalFlagsInterface::class)
+        $internalFlags = Mockery::mock(InternalFlagsInterface::class)
             ->shouldReceive('isEnabled')
             ->andReturn(false)
             ->byDefault()
             ->getMock();
 
-        $this->_impressionInvoker = new XImpressionInvoker($internalFlags, null, null);
+        $userUnhandledErrorInvoker = Mockery::mock(UserspaceUnhandledErrorInvokerInterface::class)
+            ->shouldReceive('invoke')
+            ->andReturn()
+            ->byDefault()
+            ->getMock();
+
+        $this->_impressionInvoker = new XImpressionInvoker($internalFlags, $userUnhandledErrorInvoker, null);
         $this->_impressionInvoker->register(function (ImpressionArgs $e) {
             $this->_lastImpression = $e;
         });
 
-        $this->_parser = new Parser();
+        $this->_parser = new Parser(Mockery::mock(UserspaceUnhandledErrorInvokerInterface::class));
         $this->_flagRepo = new FlagRepository();
         $this->_expRepo = new ExperimentRepository();
         $this->_flagSetter = new FlagSetter($this->_flagRepo, $this->_parser, $this->_expRepo, $this->_impressionInvoker);
