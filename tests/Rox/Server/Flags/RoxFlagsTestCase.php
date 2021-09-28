@@ -53,7 +53,7 @@ class RoxFlagsTestCase extends RoxTestCase
      */
     private $_lastImpression;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 

@@ -17,10 +17,7 @@ class RoxFlag extends RoxStringBase implements BooleanFlagInterface
     public function __construct($defaultValue = false)
     {
         parent::__construct(
-            FlagValueConverters::getInstance()
-                ->getBool()
-                ->convertToString(
-                    $this->checkValueType($defaultValue)),
+            $this->checkValueType($defaultValue),
             [BoolFlagValueConverter::FLAG_FALSE_VALUE,
                 BoolFlagValueConverter::FLAG_TRUE_VALUE]);
     }

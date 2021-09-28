@@ -10,7 +10,7 @@ Please see the detailed instructions in our docs how to [add Rollout to your pro
 
 ## Requirements
 
-PHP 5.6 or later.
+PHP 7.3 or later.
 
 The following extensions should be enabled in php.ini:
 

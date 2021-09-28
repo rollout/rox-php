@@ -17,7 +17,7 @@ class ConfigurationFetcherRoxyTests extends RoxTestCase
     private $_dp;
     private $_bu;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 

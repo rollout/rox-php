@@ -22,7 +22,7 @@ class RoxE2ETests extends RoxTestCase
      */
     private static $_staticLoggerFactory;
 
-    public static function setUpBeforeClass()
+    public static function setUpBeforeClass(): void
     {
         $_ENV[Environment::ENV_VAR_NAME] = Environment::QA;
 
@@ -53,12 +53,12 @@ class RoxE2ETests extends RoxTestCase
         Rox::setup("5df8d5e802e23378643705bf", $options);
     }
 
-    public static function tearDownAfterClass()
+    public static function tearDownAfterClass(): void
     {
         Rox::shutdown();
     }
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 

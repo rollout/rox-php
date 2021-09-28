@@ -154,6 +154,6 @@ class FlagSetterTests extends RoxTestCase
         $this->assertEquals($flagRepo->getFlag("f1")->getImpressionInvoker(), $impressionInvoker);
         $this->assertEquals($flagRepo->getFlag("f2")->getImpressionInvoker(), $impressionInvoker);
         $this->assertEquals($flagRepo->getFlag("f1")->getExperiment()->getId(), "1");
-        $this->assertNull($flagRepo->getFlag("f2")->getExperiment(), null);
+        $this->assertNull($flagRepo->getFlag("f2")->getExperiment());
     }
 }

@@ -2,6 +2,7 @@
 
 namespace Rox;
 
+use Mockery;
 use PHPUnit\Framework\TestCase;
 use Psr\Log\LogLevel;
 use Rox\Core\Logging\LoggerFactory;
@@ -24,7 +25,7 @@ abstract class RoxTestCase extends TestCase
      */
     private $_noErrorsExpected;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -35,11 +36,11 @@ abstract class RoxTestCase extends TestCase
         $this->_noErrorsExpected = false;
     }
 
-    protected function tearDown()
+    protected function tearDown(): void
     {
         parent::tearDown();
 
-        \Mockery::close();
+        Mockery::close();
 
         $testLogger = $this->_loggerFactory->getLogger();
         if ($this->_noWarningsExpected) {

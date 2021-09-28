@@ -17,7 +17,7 @@ class DynamicApiTests extends RoxFlagsTestCase
      */
     private $_ep;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 

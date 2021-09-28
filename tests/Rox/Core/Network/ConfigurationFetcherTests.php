@@ -30,7 +30,7 @@ class ConfigurationFetcherTests extends RoxTestCase
      */
     private $_errorReporter;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 

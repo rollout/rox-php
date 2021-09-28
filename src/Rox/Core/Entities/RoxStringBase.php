@@ -83,15 +83,16 @@ abstract class RoxStringBase
 
     /**
      * @param mixed $value
-     * @retrun mixed Value.
+     * @return string
      * @throws InvalidArgumentException
      */
     protected function checkValueType($value)
     {
-        if (!$this->getConverter()->isValid($value)) {
+        $converter = $this->getConverter();
+        if (!$converter->isValid($value)) {
             throw new InvalidArgumentException("Invalid value type: ${value}");
         }
-        return $value;
+        return $converter->convertToString($value);
     }
 
     /**
@@ -101,13 +102,16 @@ abstract class RoxStringBase
      */
     protected function checkVariationsType(array $variations)
     {
-        if ($invalidVariations = array_filter($variations, function ($value) {
-            return !$this->getConverter()->isValid($value);
+        $converter = $this->getConverter();
+        if ($invalidVariations = array_filter($variations, function ($value) use ($converter) {
+            return !$converter->isValid($value);
         })) {
             $invalidValue = array_shift($invalidVariations);
             throw new InvalidArgumentException("Invalid variation type: ${invalidValue}");
         }
-        return $variations;
+        return array_map(function ($v) use ($converter) {
+            return $converter->convertToString($v);
+        }, $variations);
     }
 
     /**
