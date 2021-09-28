@@ -39,7 +39,7 @@ class ImpressionInvokerTests extends RoxTestCase
             ->getMock();
 
         $impressionInvoker = new XImpressionInvoker($internalFlags, $userUnhandledErrorInvoker, null, null);
-        $impressionInvoker->register(function ($sender, $e) use ($ex) {
+        $impressionInvoker->register(function () use ($ex) {
             throw $ex;
         });
         $impressionInvoker->invoke(new ReportingValue("test", "value"), null, null);
