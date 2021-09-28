@@ -110,13 +110,7 @@ class Rox
 
     public static function fetch()
     {
-        try {
-            self::getCore()->fetch();
-        } catch (Exception $ex) {
-            self::getLog()->error("Failed in Rox::fetch", [
-                'exception' => $ex
-            ]);
-        }
+        self::getCore()->fetch();
     }
 
     /**
