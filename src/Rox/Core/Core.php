@@ -66,7 +66,7 @@ use Rox\Core\XPack\Reporting\XErrorReporter;
 use Rox\Core\XPack\Security\XAPIKeyVerifier;
 use Rox\Core\XPack\Security\XSignatureVerifier;
 
-class Core
+final class Core
 {
     const MIN_CACHE_TTL_SECONDS = 30;
     const STATE_STORE_CACHE_TTL_SECONDS = 31556952; // 1 year

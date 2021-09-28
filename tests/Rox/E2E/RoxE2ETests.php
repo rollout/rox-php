@@ -31,12 +31,12 @@ class RoxE2ETests extends RoxTestCase
 
         $options = new RoxOptions((new RoxOptionsBuilder())
             ->setConfigurationFetchedHandler(function (ConfigurationFetchedArgs $args) {
-                if ($args != null && $args->getFetcherStatus() == FetcherStatus::AppliedFromNetwork) {
+                if ($args->getFetcherStatus() == FetcherStatus::AppliedFromNetwork) {
                     TestVars::$configurationFetchedCount++;
                 }
             })
             ->setImpressionHandler(function (ImpressionArgs $args) {
-                if ($args != null && $args->getReportingValue() != null) {
+                if ($args->getReportingValue() != null) {
                     if ($args->getReportingValue()->getName() == "flagForImpression") {
                         TestVars::$isImpressionRaised = true;
                     }
@@ -51,6 +51,11 @@ class RoxE2ETests extends RoxTestCase
         TestCustomPropsCreator::createCustomProps();
 
         Rox::setup("5df8d5e802e23378643705bf", $options);
+    }
+
+    public static function tearDownAfterClass()
+    {
+        Rox::shutdown();
     }
 
     protected function setUp()

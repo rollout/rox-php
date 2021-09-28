@@ -5,7 +5,7 @@ namespace Rox\Server;
 use Kevinrob\GuzzleCache\Storage\CacheStorageInterface;
 use Rox\Core\Client\RoxOptionsInterface;
 
-class RoxOptions implements RoxOptionsInterface
+final class RoxOptions implements RoxOptionsInterface
 {
     /**
      * @var string $_devModeKey

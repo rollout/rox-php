@@ -18,7 +18,7 @@ use Rox\Server\Client\ServerProperties;
 use Rox\Server\Flags\ServerEntitiesProvider;
 use RuntimeException;
 
-class Rox
+final class Rox
 {
     /**
      * @var Core $_core
@@ -31,11 +31,26 @@ class Rox
     private static $_log;
 
     /**
+     * @var int $_state
+     * @see RoxState
+     */
+    private static $_state = RoxState::Idle;
+
+    /**
+     * @return int
+     * @see RoxState
+     */
+    public static function getState()
+    {
+        return self::$_state;
+    }
+
+    /**
      * @return Core
      */
     private static function getCore()
     {
-        if (self::$_core == null) {
+        if (!self::$_core) {
             self::$_core = new Core();
         }
         return self::$_core;
@@ -46,7 +61,7 @@ class Rox
      */
     private static function getLog()
     {
-        if (self::$_log == null) {
+        if (!self::$_log) {
             self::$_log = LoggerFactory::getInstance()->createLogger(self::class);
         }
         return self::$_log;
@@ -58,37 +73,72 @@ class Rox
      */
     public static function setup($apiKey, RoxOptions $roxOptions = null)
     {
-        try {
-            if ($roxOptions == null) {
-                $roxOptions = new RoxOptions(new RoxOptionsBuilder());
-            }
-
-            $sdkSettings = new SdkSettings($apiKey, $roxOptions->getDevModeKey());
-            $serverProperties = new ServerProperties($sdkSettings, $roxOptions);
-
-            $props = $serverProperties->getAllProperties();
-            $core = self::getCore();
-            $core->addCustomPropertyIfNotExists(new DeviceProperty(PropertyType::getPlatform()->getName(), CustomPropertyType::getString(), (string)$props[PropertyType::getPlatform()->getName()]));
-            $core->addCustomPropertyIfNotExists(new DeviceProperty(PropertyType::getAppRelease()->getName(), CustomPropertyType::getSemver(), (string)$props[PropertyType::getAppRelease()->getName()]));
-            $core->addCustomPropertyIfNotExists(new DeviceProperty(PropertyType::getDistinctId()->getName(), CustomPropertyType::getString(), function ($c) {
-                return Uuid::uuid4()->toString();
-            }));
-            $core->addCustomPropertyIfNotExists(new DeviceProperty("internal.realPlatform", CustomPropertyType::getString(), (string)$props[PropertyType::getPlatform()->getName()]));
-            $core->addCustomPropertyIfNotExists(new DeviceProperty("internal.customPlatform", CustomPropertyType::getString(), (string)$props[PropertyType::getPlatform()->getName()]));
-            $core->addCustomPropertyIfNotExists(new DeviceProperty("internal.appKey", CustomPropertyType::getString(), $serverProperties->getRolloutKey()));
-            $core->addCustomPropertyIfNotExists(new DeviceProperty("internal." . PropertyType::getLibVersion()->getName(), CustomPropertyType::getSemver(), (string)$props[PropertyType::getLibVersion()->getName()]));
-            $core->addCustomPropertyIfNotExists(new DeviceProperty("internal." . PropertyType::getApiVersion()->getName(), CustomPropertyType::getSemver(), (string)$props[PropertyType::getApiVersion()->getName()]));
-            $core->addCustomPropertyIfNotExists(new DeviceProperty("internal." . PropertyType::getDistinctId()->getName(), CustomPropertyType::getString(), function ($c) {
-                return Uuid::uuid4()->toString();
-            }));
-
-            $core->setup($sdkSettings, $serverProperties, $roxOptions);
-        } catch (Exception $ex) {
-            self::getLog()->error("Failed in Rox::setup", [
-                'exception' => $ex
-            ]);
-            throw new RuntimeException("Rox::setup failed. see innerException", $ex);
+        if (self::$_state !== RoxState::Idle &&
+            self::$_state !== RoxState::Corrupted) {
+            self::getLog()->warning("Rox was already initialized, skipping Setup");
+            return;
         }
+
+        if (self::$_state === RoxState::Corrupted) {
+            self::reset();
+        }
+
+        if (self::$_state === RoxState::Idle) {
+            self::$_state = RoxState::SettingUp;
+
+            try {
+                if (!$roxOptions) {
+                    $roxOptions = new RoxOptions(new RoxOptionsBuilder());
+                }
+
+                $sdkSettings = new SdkSettings($apiKey, $roxOptions->getDevModeKey());
+                $serverProperties = new ServerProperties($sdkSettings, $roxOptions);
+
+                $props = $serverProperties->getAllProperties();
+                $core = self::getCore();
+                $core->addCustomPropertyIfNotExists(new DeviceProperty(PropertyType::getPlatform()->getName(), CustomPropertyType::getString(), (string)$props[PropertyType::getPlatform()->getName()]));
+                $core->addCustomPropertyIfNotExists(new DeviceProperty(PropertyType::getAppRelease()->getName(), CustomPropertyType::getSemver(), (string)$props[PropertyType::getAppRelease()->getName()]));
+                $core->addCustomPropertyIfNotExists(new DeviceProperty(PropertyType::getDistinctId()->getName(), CustomPropertyType::getString(), function ($c) {
+                    return Uuid::uuid4()->toString();
+                }));
+                $core->addCustomPropertyIfNotExists(new DeviceProperty("internal.realPlatform", CustomPropertyType::getString(), (string)$props[PropertyType::getPlatform()->getName()]));
+                $core->addCustomPropertyIfNotExists(new DeviceProperty("internal.customPlatform", CustomPropertyType::getString(), (string)$props[PropertyType::getPlatform()->getName()]));
+                $core->addCustomPropertyIfNotExists(new DeviceProperty("internal.appKey", CustomPropertyType::getString(), $serverProperties->getRolloutKey()));
+                $core->addCustomPropertyIfNotExists(new DeviceProperty("internal." . PropertyType::getLibVersion()->getName(), CustomPropertyType::getSemver(), (string)$props[PropertyType::getLibVersion()->getName()]));
+                $core->addCustomPropertyIfNotExists(new DeviceProperty("internal." . PropertyType::getApiVersion()->getName(), CustomPropertyType::getSemver(), (string)$props[PropertyType::getApiVersion()->getName()]));
+                $core->addCustomPropertyIfNotExists(new DeviceProperty("internal." . PropertyType::getDistinctId()->getName(), CustomPropertyType::getString(), function ($c) {
+                    return Uuid::uuid4()->toString();
+                }));
+
+                $core->setup($sdkSettings, $serverProperties, $roxOptions);
+                self::$_state = RoxState::Set;
+
+            } catch (Exception $ex) {
+                self::$_state = RoxState::Corrupted;
+                self::getLog()->error("Failed in Rox::setup", [
+                    'exception' => $ex
+                ]);
+                throw new RuntimeException("Rox::setup failed. see innerException", $ex);
+            }
+        }
+    }
+
+    public static function shutdown()
+    {
+        if (self::$_state !== RoxState::Set &&
+            self::$_state !== RoxState::Corrupted) {
+            self::getLog()->warning("Rox can only be shutdown when it is already Set up, skipping Shutdown");
+        } else {
+            self::reset();
+        }
+    }
+
+    private static function reset()
+    {
+        self::$_state = RoxState::ShuttingDown;
+        // TODO: call some core->shutdown or something?
+        self::$_core = null;
+        self::$_state = RoxState::Idle;
     }
 
     /**
