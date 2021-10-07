@@ -37,6 +37,8 @@ class ConfigurationFetcherTests extends RoxTestCase
         $this->_dp = Mockery::mock(DevicePropertiesInterface::class)
             ->shouldReceive('getAllProperties')
             ->andReturn([
+                "lib_version" => "1.2.3",
+                "platform" => "PHP-test",
                 "app_key" => "123",
                 "api_version" => "4.0.0",
                 "distinct_id" => "id"
@@ -80,8 +82,14 @@ class ConfigurationFetcherTests extends RoxTestCase
         $result = $confFetcher->fetch();
 
         $this->assertEquals($reqData[0]->getUrl(), "https://conf.rollout.io/123/buid");
-        $this->assertEquals(count($reqData[0]->getQueryParams()), 1);
-        $this->assertEquals($reqData[0]->getQueryParams()[PropertyType::getDistinctId()->getName()], "id");
+
+        $qp = $reqData[0]->getQueryParams();
+        $this->assertEquals(count($qp), 5);
+        $this->assertEquals($qp[PropertyType::getDistinctId()->getName()], "id");
+        $this->assertEquals($qp['realPlatform'], "PHP-test");
+        $this->assertEquals($qp['sdkVersion'], "1.2.3");
+        $this->assertEquals($qp['platformVersion'], php_sapi_name());
+        $this->assertEquals($qp['languageVersion'], PHP_VERSION);
 
         $this->assertEquals("harti", $result->getParsedData()["a"]);
         $this->assertEquals(ConfigurationSource::CDN, $result->getSource());
