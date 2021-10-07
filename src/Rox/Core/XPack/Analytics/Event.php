@@ -181,11 +181,11 @@ class Event implements JsonSerializable
     }
 
     /**
-     * @return string
+     * @return array
      */
     public function jsonSerialize()
     {
-        return json_encode([
+        return [
             'flag' => $this->_flag,
             'value' => $this->_value,
             'distinctId' => $this->_distinctId,
@@ -193,6 +193,6 @@ class Event implements JsonSerializable
             'experimentVersion' => $this->_experimentVersion,
             'type' => $this->_type,
             'time' => $this->_time
-        ]);
+        ];
     }
 }
