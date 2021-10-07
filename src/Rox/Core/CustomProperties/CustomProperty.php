@@ -63,15 +63,15 @@ class CustomProperty implements CustomPropertyInterface, JsonSerializable
     }
 
     /**
-     * @return string
+     * @return array
      */
     public function jsonSerialize()
     {
-        return json_encode([
+        return [
             "name" => $this->_name,
             "type" => $this->_type->getType(),
             "externalType" => $this->_type->getExternalType()
-        ]);
+        ];
     }
 
     /**
@@ -79,6 +79,6 @@ class CustomProperty implements CustomPropertyInterface, JsonSerializable
      */
     public function __toString()
     {
-        return $this->jsonSerialize();
+        return json_encode($this->jsonSerialize());
     }
 }
