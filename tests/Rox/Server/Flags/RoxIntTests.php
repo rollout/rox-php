@@ -118,4 +118,12 @@ class RoxIntTests extends RoxFlagsTestCase
         $this->assertEquals(2, $variant->getValue($context));
         $this->checkLastImpression('test', '2', true, 'key', 55);
     }
+
+    public function testWillNotReturnDefaultValueWhenValueIsSetToZeroInDashboard()
+    {
+        $variant = new RoxInt(1, [0]);
+        $this->setupFlag($variant, 'test', '0');
+        $this->assertEquals(0, $variant->getValue());
+        $this->checkLastImpression('test', '0', true);
+    }
 }

@@ -116,4 +116,12 @@ class RoxDoubleTests extends RoxFlagsTestCase
         $this->assertEquals(2.2, $variant->getValue($context));
         $this->checkLastImpression('test', '2.2', true, 'key', 55);
     }
+
+    public function testWillNotReturnDefaultValueWhenValueIsSetToZeroInDashboard()
+    {
+        $variant = new RoxDouble(1.1, [0.0]);
+        $this->setupFlag($variant, 'test', '0.0');
+        $this->assertEquals(0.0, $variant->getValue());
+        $this->checkLastImpression('test', '0', true);
+    }
 }

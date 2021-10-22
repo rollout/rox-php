@@ -33,6 +33,8 @@ final class StringFlagValueConverter implements FlagValueConverter
      */
     function normalizeValue($stringValue, $alternativeValue, LoggerInterface $log = null)
     {
-        return $stringValue ?: $alternativeValue;
+        return is_string($stringValue)
+            ? $stringValue
+            : $alternativeValue;
     }
 }

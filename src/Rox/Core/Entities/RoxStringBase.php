@@ -67,7 +67,7 @@ abstract class RoxStringBase
         if (is_null($defaultValue)) {
             throw new InvalidArgumentException("Default value cannot be null");
         }
-        if (in_array(null, $variations)) {
+        if (in_array(null, $variations, true)) {
             throw new InvalidArgumentException("Variation cannot be null");
         }
         if (!in_array($defaultValue, $variations)) {
@@ -181,14 +181,6 @@ abstract class RoxStringBase
     public function setParser($parser)
     {
         $this->_parser = $parser;
-    }
-
-    /**
-     * @return ContextInterface
-     */
-    public function getGlobalContext()
-    {
-        return $this->_globalContext;
     }
 
     /**
@@ -318,7 +310,7 @@ abstract class RoxStringBase
     {
         $globalContext = ($this->_parser != null) ? $this->_parser->getGlobalContext() : null;
         $mergedContext = new MergedContext($globalContext, $context);
-        if ($this->_parser != null && $this->_condition) {
+        if ($this->_parser && isset($this->_condition) && ($this->_condition !== '')) {
             return $this->_parser->evaluateExpression($this->_condition, $mergedContext, $evaluationContext);
         }
         return new EvaluationResult(null, $mergedContext);

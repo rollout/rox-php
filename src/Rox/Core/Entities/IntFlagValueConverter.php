@@ -33,7 +33,7 @@ final class IntFlagValueConverter implements FlagValueConverter
      */
     function normalizeValue($stringValue, $alternativeValue, LoggerInterface $log = null)
     {
-        if ($stringValue) {
+        if (!is_null($stringValue)) {
             if (!preg_match('/\d+\.\d+/', $stringValue) && ((($intValue = intval($stringValue)) !== 0) || $stringValue === '0')) {
                 return $intValue;
             } else if ($log) {

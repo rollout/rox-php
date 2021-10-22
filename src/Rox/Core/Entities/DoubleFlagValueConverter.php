@@ -35,7 +35,7 @@ final class DoubleFlagValueConverter implements FlagValueConverter
      */
     function normalizeValue($stringValue, $alternativeValue, LoggerInterface $log = null)
     {
-        if ($stringValue && NumericUtils::parseNumber($stringValue, $doubleValue)) {
+        if (!is_null($stringValue) && NumericUtils::parseNumber($stringValue, $doubleValue)) {
             return $doubleValue;
         }
         $log->warning("Experiment type mismatch (double), returning default value");

@@ -213,4 +213,12 @@ class RoxStringTests extends RoxFlagsTestCase
         $this->assertEquals('2', $variant->getValue());
         $this->assertTrue($isImpressionRaised[0]);
     }
+
+    public function testWillNotReturnDefaultValueWhenValueIsSetToEmptyStringInDashboard()
+    {
+        $variant = new RoxString('val', ['']);
+        $this->setupFlag($variant, 'test', '""');
+        $this->assertEquals('', $variant->getValue());
+        $this->checkLastImpression('test', '', true);
+    }
 }
