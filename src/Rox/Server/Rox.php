@@ -142,12 +142,20 @@ final class Rox
     }
 
     /**
-     * @param object $roxContainer
      * @param string $namespace
+     * @param object $roxContainer
      */
-    public static function register($roxContainer, $namespace = "")
+    public static function register()
     {
-        self::getCore()->register($namespace, $roxContainer);
+        if (func_num_args() == 2) {
+            self::getCore()->register(
+                func_get_arg(0), // ns
+                func_get_arg(1)); // container
+        } else {
+            self::getCore()->register("",
+                func_get_arg(0));
+        }
+
     }
 
     /**

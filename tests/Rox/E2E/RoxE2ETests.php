@@ -90,7 +90,7 @@ class RoxE2ETests extends RoxTestCase
     {
         $this->assertTrue(ContainerTwo::getInstance()->flag2->isEnabled());
         $this->assertEquals("red", ContainerTwo::getInstance()->variant2->getValue());
-        Rox::register(ContainerTwo::getInstance(), "afterSetup");
+        Rox::register("afterSetup", ContainerTwo::getInstance());
         $this->assertFalse(ContainerTwo::getInstance()->flag2->isEnabled());
         $this->assertEquals("green", ContainerTwo::getInstance()->variant2->getValue());
     }
