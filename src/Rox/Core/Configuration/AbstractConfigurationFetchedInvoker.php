@@ -74,7 +74,7 @@ abstract class AbstractConfigurationFetchedInvoker implements ConfigurationFetch
             try {
                 $eventHandler($args);
             } catch (Exception $e) {
-                $this->_userUnhandledErrorInvoker->invoke($this, ExceptionTrigger::ConfigurationFetchedHandler, $e);
+                $this->_userUnhandledErrorInvoker->invoke($eventHandler, ExceptionTrigger::ConfigurationFetchedHandler, $e);
             }
         }
     }

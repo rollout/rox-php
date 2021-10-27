@@ -63,7 +63,7 @@ class ImpressionInvoker implements ImpressionInvokerInterface
                 $handler($args);
             } catch (Exception $e) {
                 $this->_userUnhandledErrorInvoker
-                    ->invoke($this, ExceptionTrigger::ImpressionHandler, $e);
+                    ->invoke($handler, ExceptionTrigger::ImpressionHandler, $e);
             }
         }
     }

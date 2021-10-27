@@ -129,7 +129,7 @@ class XImpressionInvoker implements ImpressionInvokerInterface
             } catch (Exception $e) {
                 if ($this->_userUnhandledErrorInvoker) {
                     $this->_userUnhandledErrorInvoker
-                        ->invoke($this, ExceptionTrigger::ImpressionHandler, $e);
+                        ->invoke($handler, ExceptionTrigger::ImpressionHandler, $e);
                 }
             }
         }
