@@ -2,6 +2,7 @@
 
 namespace Rox\Core\Roxx;
 
+use Mockery;
 use Rox\Core\Client\InternalFlagsInterface;
 use Rox\Core\Configuration\Models\ExperimentModel;
 use Rox\Core\Context\ContextBuilder;
@@ -10,9 +11,8 @@ use Rox\Core\CustomProperties\CustomProperty;
 use Rox\Core\CustomProperties\CustomPropertyRepository;
 use Rox\Core\CustomProperties\CustomPropertyType;
 use Rox\Core\CustomProperties\DynamicProperties;
-use Rox\Core\Entities\Flag;
 use Rox\Core\Entities\FlagSetter;
-use Rox\Core\Entities\Variant;
+use Rox\Core\ErrorHandling\UserspaceUnhandledErrorInvokerInterface;
 use Rox\Core\Impression\ImpressionArgs;
 use Rox\Core\Impression\XImpressionInvoker;
 use Rox\Core\Repositories\ExperimentRepository;
@@ -21,12 +21,14 @@ use Rox\Core\Repositories\FlagRepository;
 use Rox\Core\Repositories\FlagRepositoryInterface;
 use Rox\Core\Repositories\TargetGroupRepository;
 use Rox\RoxTestCase;
+use Rox\Server\Flags\RoxFlag;
+use Rox\Server\Flags\RoxString;
 
 class ExperimentsExtensionsTests extends RoxTestCase
 {
     public function testCustomPropertyWithSimpleValue()
     {
-        $parser = new Parser();
+        $parser = new Parser(Mockery::mock(UserspaceUnhandledErrorInvokerInterface::class));
         $targetGroupsRepository = new TargetGroupRepository();
         $experimentsExtensions = new ExperimentsExtensions($parser, $targetGroupsRepository,
             \Mockery::mock(FlagRepositoryInterface::class),
@@ -38,7 +40,7 @@ class ExperimentsExtensionsTests extends RoxTestCase
 
     public function testIsInPercentageRange()
     {
-        $parser = new Parser();
+        $parser = new Parser(Mockery::mock(UserspaceUnhandledErrorInvokerInterface::class));
         $targetGroupsRepository = new TargetGroupRepository();
         $experimentsExtensions =
             new ExperimentsExtensions($parser, $targetGroupsRepository,
@@ -51,7 +53,7 @@ class ExperimentsExtensionsTests extends RoxTestCase
 
     public function testNotIsInPercentageRange()
     {
-        $parser = new Parser();
+        $parser = new Parser(Mockery::mock(UserspaceUnhandledErrorInvokerInterface::class));
         $targetGroupsRepository = new TargetGroupRepository();
         $experimentsExtensions =
             new ExperimentsExtensions($parser, $targetGroupsRepository,
@@ -65,7 +67,7 @@ class ExperimentsExtensionsTests extends RoxTestCase
 
     public function testGetBucket()
     {
-        $parser = new Parser();
+        $parser = new Parser(Mockery::mock(UserspaceUnhandledErrorInvokerInterface::class));
         $targetGroupsRepository = new TargetGroupRepository();
         $experimentsExtensions =
             new ExperimentsExtensions($parser, $targetGroupsRepository,
@@ -79,7 +81,7 @@ class ExperimentsExtensionsTests extends RoxTestCase
 
     public function testFlagValueNoFlagNoExperiment()
     {
-        $parser = new Parser();
+        $parser = new Parser(Mockery::mock(UserspaceUnhandledErrorInvokerInterface::class));
         $targetGroupsRepository = new TargetGroupRepository();
         $experimentRepository = new ExperimentRepository();
         $flagRepository = new FlagRepository();
@@ -93,7 +95,7 @@ class ExperimentsExtensionsTests extends RoxTestCase
 
     public function testFlagValueNoFlagEvaluateExperiment()
     {
-        $parser = new Parser();
+        $parser = new Parser(Mockery::mock(UserspaceUnhandledErrorInvokerInterface::class));
         $targetGroupsRepository = new TargetGroupRepository();
         $experimentRepository = new ExperimentRepository();
         $flagRepository = new FlagRepository();
@@ -112,7 +114,7 @@ class ExperimentsExtensionsTests extends RoxTestCase
 
     public function testFlagValueFlagEvaluationDefault()
     {
-        $parser = new Parser();
+        $parser = new Parser(Mockery::mock(UserspaceUnhandledErrorInvokerInterface::class));
         $targetGroupsRepository = new TargetGroupRepository();
         $experimentRepository = new ExperimentRepository();
         $flagRepository = new FlagRepository();
@@ -121,14 +123,14 @@ class ExperimentsExtensionsTests extends RoxTestCase
             new ExperimentsExtensions($parser, $targetGroupsRepository, $flagRepository, $experimentRepository);
         $experimentsExtensions->extend();
 
-        $v = new Variant("op1", ["op2"]);
+        $v = new RoxString("op1", ["op2"]);
         $flagRepository->addFlag($v, "f1");
         $this->assertEquals("op1", $parser->evaluateExpression("flagValue(\"f1\")")->stringValue());
     }
 
     public function testFlagDependencyValue()
     {
-        $parser = new Parser();
+        $parser = new Parser(Mockery::mock(UserspaceUnhandledErrorInvokerInterface::class));
         $targetGroupsRepository = new TargetGroupRepository();
         $experimentRepository = new ExperimentRepository();
         $flagRepository = new FlagRepository();
@@ -137,10 +139,10 @@ class ExperimentsExtensionsTests extends RoxTestCase
             new ExperimentsExtensions($parser, $targetGroupsRepository, $flagRepository, $experimentRepository);
         $experimentsExtensions->extend();
 
-        $f = new Flag();
+        $f = new RoxFlag();
         $flagRepository->addFlag($f, "f1");
 
-        $v = new Variant("blue", ["red", "green"]);
+        $v = new RoxString("blue", ["red", "green"]);
         $flagRepository->addFlag($v, "v1");
         $v->setCondition("ifThen(eq(\"true\", flagValue(\"f1\")), \"red\", \"green\")");
         $v->setParser($parser);
@@ -151,7 +153,7 @@ class ExperimentsExtensionsTests extends RoxTestCase
 
     public function testFlagDependencyImpressionHandler()
     {
-        $parser = new Parser();
+        $parser = new Parser(Mockery::mock(UserspaceUnhandledErrorInvokerInterface::class));
         $targetGroupsRepository = new TargetGroupRepository();
         $experimentRepository = new ExperimentRepository();
         $flagRepository = new FlagRepository();
@@ -161,12 +163,12 @@ class ExperimentsExtensionsTests extends RoxTestCase
             new ExperimentsExtensions($parser, $targetGroupsRepository, $flagRepository, $experimentRepository);
         $experimentsExtensions->extend();
 
-        $f = new Flag();
+        $f = new RoxFlag();
         $flagRepository->addFlag($f, "f1");
         $f->setImpressionInvoker($ii);
 
         $impressionList = [];
-        $v = new Variant("blue", ["red", "green"]);
+        $v = new RoxString("blue", ["red", "green"]);
         $flagRepository->addFlag($v, "v1");
         $v->setCondition("ifThen(eq(\"true\", flagValue(\"f1\")), \"red\", \"green\")");
         $v->setParser($parser);
@@ -178,7 +180,7 @@ class ExperimentsExtensionsTests extends RoxTestCase
 
         $this->assertEquals("green", $v->getValue());
 
-        $this->assertEquals(2, count($impressionList));
+        $this->assertCount(2, $impressionList);
 
         $this->assertEquals("f1", $impressionList[0]->getReportingValue()->getName());
         $this->assertEquals("false", $impressionList[0]->getReportingValue()->getValue());
@@ -189,7 +191,7 @@ class ExperimentsExtensionsTests extends RoxTestCase
 
     public function testFlagDependency2LevelsBottomNotExists()
     {
-        $parser = new Parser();
+        $parser = new Parser(Mockery::mock(UserspaceUnhandledErrorInvokerInterface::class));
         $targetGroupsRepository = new TargetGroupRepository();
         $experimentRepository = new ExperimentRepository();
         $flagRepository = new FlagRepository();
@@ -198,12 +200,12 @@ class ExperimentsExtensionsTests extends RoxTestCase
             new ExperimentsExtensions($parser, $targetGroupsRepository, $flagRepository, $experimentRepository);
         $experimentsExtensions->extend();
 
-        $f = new Flag();
+        $f = new RoxFlag();
         $flagRepository->addFlag($f, "f1");
         $f->setParser($parser);
         $f->setCondition("flagValue(\"someFlag\")");
 
-        $v = new Variant("blue", ["red", "green"]);
+        $v = new RoxString("blue", ["red", "green"]);
         $flagRepository->addFlag($v, "v1");
         $v->setCondition("ifThen(eq(\"true\", flagValue(\"f1\")), \"red\", \"green\")");
         $v->setParser($parser);
@@ -213,7 +215,7 @@ class ExperimentsExtensionsTests extends RoxTestCase
 
     public function testFlagDependencyUnexistingFlagButExistingExperiment()
     {
-        $parser = new Parser();
+        $parser = new Parser(Mockery::mock(UserspaceUnhandledErrorInvokerInterface::class));
         $flagRepository = new FlagRepository();
         $targetGroupRepository = new TargetGroupRepository();
         $experimentRepository = new ExperimentRepository();
@@ -230,7 +232,7 @@ class ExperimentsExtensionsTests extends RoxTestCase
             new ExperimentsExtensions($parser, $targetGroupRepository, $flagRepository, $experimentRepository);
         $experimentsExtensions->extend();
 
-        $colorVar = new Variant("red", ["red", "green", "blue"]);
+        $colorVar = new RoxString("red", ["red", "green", "blue"]);
 
         $colorVar->setParser($parser);
         $flagRepository->addFlag($colorVar, "colorVar");
@@ -242,7 +244,7 @@ class ExperimentsExtensionsTests extends RoxTestCase
 
     public function testFlagDependencyUnexistingFlagAndExperimentUndefined()
     {
-        $parser = new Parser();
+        $parser = new Parser(Mockery::mock(UserspaceUnhandledErrorInvokerInterface::class));
         $flagRepository = new FlagRepository();
         $targetGroupRepository = new TargetGroupRepository();
         $experimentRepository = new ExperimentRepository();
@@ -259,7 +261,7 @@ class ExperimentsExtensionsTests extends RoxTestCase
             new ExperimentsExtensions($parser, $targetGroupRepository, $flagRepository, $experimentRepository);
         $experimentsExtensions->extend();
 
-        $colorVar = new Variant("red", ["red", "green", "blue"]);
+        $colorVar = new RoxString("red", ["red", "green", "blue"]);
 
         $colorVar->setParser($parser);
         $flagRepository->addFlag($colorVar, "colorVar");
@@ -271,7 +273,7 @@ class ExperimentsExtensionsTests extends RoxTestCase
 
     public function testFlagDependencyWithContext()
     {
-        $parser = new Parser();
+        $parser = new Parser(Mockery::mock(UserspaceUnhandledErrorInvokerInterface::class));
         $flagRepository = new FlagRepository();
         $targetGroupRepository = new TargetGroupRepository();
         $experimentRepository = new ExperimentRepository();
@@ -284,24 +286,24 @@ class ExperimentsExtensionsTests extends RoxTestCase
             return (bool)$context->get("isPropOn");
         }));
 
-        $flag1 = new Flag();
+        $flag1 = new RoxFlag();
         $flag1->setCondition("property(\"prop\")");
         $flag1->setParser($parser);
         $flagRepository->addFlag($flag1, "flag1");
 
-        $flag2 = new Flag();
+        $flag2 = new RoxFlag();
         $flag2->setCondition("flagValue(\"flag1\")");
         $flag2->setParser($parser);
         $flagRepository->addFlag($flag2, "flag2");
 
-        $flagValue = $flag2->getValue((new ContextBuilder())->build(["isPropOn" => true]));
+        $flagValue = $flag2->isEnabled((new ContextBuilder())->build(["isPropOn" => true]));
 
-        $this->assertEquals("true", $flagValue);
+        $this->assertTrue($flagValue);
     }
 
     public function testFlagDependencyWithContextUsedOnExperimentWithNoFlag()
     {
-        $parser = new Parser();
+        $parser = new Parser(Mockery::mock(UserspaceUnhandledErrorInvokerInterface::class));
         $flagRepository = new FlagRepository();
         $targetGroupRepository = new TargetGroupRepository();
         $experimentRepository = new ExperimentRepository();
@@ -314,7 +316,7 @@ class ExperimentsExtensionsTests extends RoxTestCase
             return (bool)$context->get("isPropOn");
         }));
 
-        $flag3 = new Flag();
+        $flag3 = new RoxFlag();
         $flag3->setCondition("flagValue(\"flag2\")");
         $flag3->setParser($parser);
         $flagRepository->addFlag($flag3, "flag3");
@@ -323,14 +325,14 @@ class ExperimentsExtensionsTests extends RoxTestCase
 
         $experimentRepository->setExperiments($experimentModels);
 
-        $flagValue = $flag3->getValue((new ContextBuilder())->build(["isPropOn" => true]));
+        $flagValue = $flag3->isEnabled((new ContextBuilder())->build(["isPropOn" => true]));
 
-        $this->assertEquals("true", $flagValue);
+        $this->assertTrue($flagValue);
     }
 
     public function testFlagDependencyWithContext2LevelMidLevelNoFlagEvalExperiment()
     {
-        $parser = new Parser();
+        $parser = new Parser(Mockery::mock(UserspaceUnhandledErrorInvokerInterface::class));
         $flagRepository = new FlagRepository();
         $targetGroupRepository = new TargetGroupRepository();
         $experimentRepository = new ExperimentRepository();
@@ -343,12 +345,12 @@ class ExperimentsExtensionsTests extends RoxTestCase
             return (bool)$context->get("isPropOn");
         }));
 
-        $flag1 = new Flag();
+        $flag1 = new RoxFlag();
         $flag1->setCondition("property(\"prop\")");
         $flag1->setParser($parser);
         $flagRepository->addFlag($flag1, "flag1");
 
-        $flag3 = new Flag();
+        $flag3 = new RoxFlag();
         $flag3->setCondition("flagValue(\"flag2\")");
         $flag3->setParser($parser);
         $flagRepository->addFlag($flag3, "flag3");
@@ -357,8 +359,8 @@ class ExperimentsExtensionsTests extends RoxTestCase
 
         $experimentRepository->setExperiments($experimentModels);
 
-        $flagValue = $flag3->getValue((new ContextBuilder())->build(["isPropOn" => true]));
+        $flagValue = $flag3->isEnabled((new ContextBuilder())->build(["isPropOn" => true]));
 
-        $this->assertEquals("true", $flagValue);
+        $this->assertTrue($flagValue);
     }
 }

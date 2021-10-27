@@ -28,7 +28,15 @@ class DynamicProperties implements DynamicPropertiesInterface
         return $this->_handler != null
             ? $this->_handler
             : function ($propName, ContextInterface $context) {
-                return ($context != null) ? $context->get($propName) : null;
+                return $context->get($propName);
             };
+    }
+
+    /**
+     * @return bool
+     */
+    function isDefault()
+    {
+        return !$this->_handler;
     }
 }

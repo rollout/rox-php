@@ -67,9 +67,9 @@ class StateSender
      * @param CustomPropertyRepositoryInterface $customPropertyRepository
      */
     public function __construct(
-        HttpClientInterface $request,
-        DevicePropertiesInterface $deviceProperties,
-        FlagRepositoryInterface $flagRepository,
+        HttpClientInterface               $request,
+        DevicePropertiesInterface         $deviceProperties,
+        FlagRepositoryInterface           $flagRepository,
         CustomPropertyRepositoryInterface $customPropertyRepository)
     {
         $this->_relevantAPICallParams = [
@@ -124,12 +124,12 @@ class StateSender
         $keys = array_keys($allFlags);
         sort($keys);
         return array_map(function ($key) use (&$allFlags) {
-            $var = /*Variant*/
+            $var = /*RoxStringBase*/
                 $allFlags[$key];
             return [
                 'name' => $var->getName(),
                 'defaultValue' => $var->getDefaultValue(),
-                'options' => $var->getOptions(),
+                'options' => $var->getVariations(),
             ];
         }, $keys);
     }
@@ -235,7 +235,12 @@ class StateSender
                 $responseAsString = $fetchResult->getContent()->readAsString();
                 $responseJSON = json_decode($responseAsString, true);
 
-                if (array_key_exists("result", $responseJSON)) {
+                if (!is_array($responseJSON)) {
+                    $this->_log->error(
+                        sprintf("Failed to send state. The returned response is not a valid JSON: %s, Source: %s",
+                            $responseAsString,
+                            ConfigurationSource::toString($source)));
+                } else if (array_key_exists("result", $responseJSON)) {
                     $responseResultValue = $responseJSON["result"];
                     if ((int)$responseResultValue == 404) {
                         $shouldRetry = true;

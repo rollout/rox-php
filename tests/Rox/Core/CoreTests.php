@@ -21,7 +21,7 @@ class CoreTests extends RoxTestCase
      */
     private $_mockedOptions;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 

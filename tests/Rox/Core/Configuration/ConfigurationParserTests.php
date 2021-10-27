@@ -2,14 +2,14 @@
 
 namespace Rox\Core\Configuration;
 
+use Mockery;
 use Rox\Core\Client\SdkSettingsInterface;
-use Rox\Core\Core;
+use Rox\Core\ErrorHandling\UserspaceUnhandledErrorInvokerInterface;
 use Rox\Core\Network\ConfigurationFetchResult;
 use Rox\Core\Network\ConfigurationSource;
 use Rox\Core\Reporting\ErrorReporterInterface;
 use Rox\Core\Security\APIKeyVerifierInterface;
 use Rox\Core\Security\SignatureVerifierInterface;
-use Rox\Core\XPack\Configuration\XConfigurationFetchedInvoker;
 use Rox\RoxTestCase;
 
 class ConfigurationParserTests extends RoxTestCase
@@ -44,34 +44,35 @@ class ConfigurationParserTests extends RoxTestCase
      */
     private $_cfiEvent;
 
-    protected function setUp()
+    protected function setUp(): void
     {
         parent::setUp();
 
-        $this->_sdk = \Mockery::mock(SdkSettingsInterface::class)
+        $this->_sdk = Mockery::mock(SdkSettingsInterface::class)
             ->shouldReceive('getApiKey')
             ->andReturn("12345")
             ->byDefault()
             ->getMock();
 
-        $this->_sf = \Mockery::mock(SignatureVerifierInterface::class)
+        $this->_sf = Mockery::mock(SignatureVerifierInterface::class)
             ->shouldReceive('verify')
             ->andReturn(true)
             ->byDefault()
             ->getMock();
 
-        $this->_kf = \Mockery::mock(APIKeyVerifierInterface::class)
+        $this->_kf = Mockery::mock(APIKeyVerifierInterface::class)
             ->shouldReceive('verify')
             ->andReturn(true)
             ->byDefault()
             ->getMock();
 
-        $this->_errRe = \Mockery::mock(ErrorReporterInterface::class)
+        $this->_errRe = Mockery::mock(ErrorReporterInterface::class)
             ->shouldReceive('report')
             ->byDefault()
             ->getMock();
 
-        $this->_cfi = new XConfigurationFetchedInvoker(\Mockery::mock(Core::class));
+        $this->_cfi = new ConfigurationFetchedInvoker(
+            Mockery::mock(UserspaceUnhandledErrorInvokerInterface::class));
 
         $this->_cfi->register(function (ConfigurationFetchedArgs $e) {
             $this->_cfiEvent = $e;

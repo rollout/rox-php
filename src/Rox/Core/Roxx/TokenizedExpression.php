@@ -89,7 +89,7 @@ class TokenizedExpression
             if ($s == Symbols::RoxxFalse) return new Node(Node::TYPE_RAND, false);
             if ($s == Symbols::RoxxUndefined) return new Node(Node::TYPE_RAND, TokenType::getUndefined());
             if ($tokenType === TokenType::getString())
-                return new Node(Node::TYPE_RAND, substr($s, 1, strlen($s) - 1));
+                return new Node(Node::TYPE_RAND, substr($s, 1, strlen($s) - 2));
             if ($tokenType === TokenType::getNumber()) {
                 if (is_numeric($s)) {
                     if (strpos($s, ".") !== false) {

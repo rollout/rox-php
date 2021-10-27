@@ -23,16 +23,6 @@ class Event implements JsonSerializable
     private $_distinctId;
 
     /**
-     * @var string $_experimentId
-     */
-    private $_experimentId;
-
-    /**
-     * @var string $_experimentVersion
-     */
-    private $_experimentVersion;
-
-    /**
      * @var string $_type
      */
     private $_type;
@@ -44,7 +34,6 @@ class Event implements JsonSerializable
 
     public function __construct()
     {
-        $this->_experimentVersion = '0';
         $this->_type = 'IMPRESSION';
         $time = TimeUtils::currentTimeMillis();
         $ms = isset($_ENV['rox.analytics.ms']) ? $_ENV['rox.analytics.ms'] : null;
@@ -111,42 +100,6 @@ class Event implements JsonSerializable
     /**
      * @return string
      */
-    public function getExperimentId()
-    {
-        return $this->_experimentId;
-    }
-
-    /**
-     * @param string $experimentId
-     * @return Event
-     */
-    public function setExperimentId($experimentId)
-    {
-        $this->_experimentId = $experimentId;
-        return $this;
-    }
-
-    /**
-     * @return string
-     */
-    public function getExperimentVersion()
-    {
-        return $this->_experimentVersion;
-    }
-
-    /**
-     * @param string $experimentVersion
-     * @return Event
-     */
-    public function setExperimentVersion($experimentVersion)
-    {
-        $this->_experimentVersion = $experimentVersion;
-        return $this;
-    }
-
-    /**
-     * @return string
-     */
     public function getType()
     {
         return $this->_type;
@@ -189,8 +142,6 @@ class Event implements JsonSerializable
             'flag' => $this->_flag,
             'value' => $this->_value,
             'distinctId' => $this->_distinctId,
-            'experimentId' => $this->_experimentId,
-            'experimentVersion' => $this->_experimentVersion,
             'type' => $this->_type,
             'time' => $this->_time
         ];

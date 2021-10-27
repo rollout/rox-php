@@ -4,6 +4,7 @@ namespace Rox\Core\Roxx;
 
 use Rox\Core\Context\ContextInterface;
 use Rox\Core\Utils\DotNetCompat;
+use Rox\Core\Utils\NumericUtils;
 
 class ValueCompareExtensions
 {
@@ -23,60 +24,64 @@ class ValueCompareExtensions
             $op1 = $stack->pop();
             $op2 = $stack->pop();
 
-            if (!(DotNetCompat::isNumericStrict($op1)) || !(DotNetCompat::isNumericStrict($op2))) {
-                $stack->push(false);
-                return;
+            $decimal1 = 0;
+            $decimal2 = 0;
+            $result = false;
+
+            if (NumericUtils::parseNumber($op1, $decimal1) &&
+                NumericUtils::parseNumber($op2, $decimal2)) {
+                $result = $decimal1 < $decimal2;
             }
 
-            $decimal1 = (float)$op1;
-            $decimal2 = (float)$op2;
-
-            $stack->push($decimal1 < $decimal2);
+            $stack->push($result);
         });
 
         $this->_parser->addOperator("lte", function (ParserInterface $parser, StackInterface $stack, ContextInterface $context) {
             $op1 = $stack->pop();
             $op2 = $stack->pop();
 
-            if (!(DotNetCompat::isNumericStrict($op1)) || !(DotNetCompat::isNumericStrict($op2))) {
-                $stack->push(false);
-                return;
+            $decimal1 = 0;
+            $decimal2 = 0;
+            $result = false;
+
+            if (NumericUtils::parseNumber($op1, $decimal1) &&
+                NumericUtils::parseNumber($op2, $decimal2)) {
+                $result = $decimal1 < $decimal2 || NumericUtils::numbersEqual($decimal1, $decimal2);
             }
 
-            $decimal1 = (float)$op1;
-            $decimal2 = (float)$op2;
-
-            $stack->push($decimal1 <= $decimal2);
+            $stack->push($result);
         });
 
         $this->_parser->addOperator("gt", function (ParserInterface $parser, StackInterface $stack, ContextInterface $context) {
             $op1 = $stack->pop();
             $op2 = $stack->pop();
 
-            if (!(DotNetCompat::isNumericStrict($op1)) || !(DotNetCompat::isNumericStrict($op2))) {
-                $stack->push(false);
-                return;
+            $decimal1 = 0;
+            $decimal2 = 0;
+            $result = false;
+
+            if (NumericUtils::parseNumber($op1, $decimal1) &&
+                NumericUtils::parseNumber($op2, $decimal2)) {
+                $result = $decimal1 > $decimal2;
             }
 
-            $decimal1 = (float)$op1;
-            $decimal2 = (float)$op2;
-
-            $stack->push($decimal1 > $decimal2);
+            $stack->push($result);
         });
 
         $this->_parser->addOperator("gte", function (ParserInterface $parser, StackInterface $stack, ContextInterface $context) {
             $op1 = $stack->pop();
             $op2 = $stack->pop();
 
-            if (!(DotNetCompat::isNumericStrict($op1)) || !(DotNetCompat::isNumericStrict($op2))) {
-                $stack->push(false);
-                return;
+            $decimal1 = 0;
+            $decimal2 = 0;
+            $result = false;
+
+            if (NumericUtils::parseNumber($op1, $decimal1) &&
+                NumericUtils::parseNumber($op2, $decimal2)) {
+                $result = $decimal1 > $decimal2 || NumericUtils::numbersEqual($decimal1, $decimal2);
             }
 
-            $decimal1 = (float)$op1;
-            $decimal2 = (float)$op2;
-
-            $stack->push($decimal1 >= $decimal2);
+            $stack->push($result);
         });
 
         $this->_parser->addOperator("semverNe", function (ParserInterface $parser, StackInterface $stack, ContextInterface $context) {

@@ -2,8 +2,10 @@
 
 namespace Rox\Core\Roxx;
 
+use Mockery;
 use Rox\Core\CustomProperties\CustomPropertyRepository;
 use Rox\Core\CustomProperties\DynamicProperties;
+use Rox\Core\ErrorHandling\UserspaceUnhandledErrorInvokerInterface;
 use Rox\Core\Repositories\ExperimentRepository;
 use Rox\Core\Repositories\FlagRepository;
 use Rox\Core\Repositories\TargetGroupRepository;
@@ -51,8 +53,9 @@ class ParserTests extends RoxTestCase
 
     public function testSimpleExpressionEvaluation()
     {
-        $parser = new Parser();
+        $parser = new Parser(Mockery::mock(UserspaceUnhandledErrorInvokerInterface::class));
 
+        $this->assertSame($parser->evaluateExpression("\"\"")->stringValue(), "");
         $this->assertSame($parser->evaluateExpression("true")->stringValue(), "true");
         $this->assertSame($parser->evaluateExpression("\"red\"")->stringValue(), "red");
         $this->assertSame($parser->evaluateExpression("and(true, or(true, true))")->boolValue(), true);
@@ -60,13 +63,49 @@ class ParserTests extends RoxTestCase
         $this->assertSame($parser->evaluateExpression("not(and(false, or(false, true)))")->boolValue(), true);
     }
 
+    public function testNumeqExpressionsEvaluation()
+    {
+        $parser = new Parser(Mockery::mock(UserspaceUnhandledErrorInvokerInterface::class));
+
+        $this->assertSame($parser->evaluateExpression("numeq(\"la la\", \"la la\")")->boolValue(), false);
+        $this->assertSame($parser->evaluateExpression("numeq(\"la la\", \"la,la\")")->boolValue(), false);
+        $this->assertSame($parser->evaluateExpression("numeq(\"lala\", \"lala\")")->boolValue(), false);
+
+        $this->assertSame($parser->evaluateExpression("numeq(\"10\", \"10\")")->boolValue(), true);
+        $this->assertSame($parser->evaluateExpression("numeq(\"10\", 10)")->boolValue(), true);
+        $this->assertSame($parser->evaluateExpression("numeq(10, \"10\")")->boolValue(), true);
+        $this->assertSame($parser->evaluateExpression("numeq(10, 10)")->boolValue(), true);
+
+        $this->assertSame($parser->evaluateExpression("numeq(\"10\", \"11\")")->boolValue(), false);
+        $this->assertSame($parser->evaluateExpression("numeq(\"10\", 11)")->boolValue(), false);
+        $this->assertSame($parser->evaluateExpression("numeq(10, \"11\")")->boolValue(), false);
+        $this->assertSame($parser->evaluateExpression("numeq(10, 11)")->boolValue(), false);
+
+        $this->assertSame($parser->evaluateExpression("numne(\"la la\", \"la la\")")->boolValue(), false);
+        $this->assertSame($parser->evaluateExpression("numne(\"la la\", \"la,la\")")->boolValue(), false);
+        $this->assertSame($parser->evaluateExpression("numne(\"lala\", \"lala\")")->boolValue(), false);
+
+        $this->assertSame($parser->evaluateExpression("numne(\"10\", \"10\")")->boolValue(), false);
+        $this->assertSame($parser->evaluateExpression("numne(\"10\", 10)")->boolValue(), false);
+        $this->assertSame($parser->evaluateExpression("numne(10, \"10\")")->boolValue(), false);
+        $this->assertSame($parser->evaluateExpression("numne(10, 10)")->boolValue(), false);
+
+        $this->assertSame($parser->evaluateExpression("numne(\"10\", \"11\")")->boolValue(), true);
+        $this->assertSame($parser->evaluateExpression("numne(\"10\", 11)")->boolValue(), true);
+        $this->assertSame($parser->evaluateExpression("numne(10, \"11\")")->boolValue(), true);
+        $this->assertSame($parser->evaluateExpression("numne(10, 11)")->boolValue(), true);
+    }
+
     public function testEqExpressionsEvaluation()
     {
-        $parser = new Parser();
+        $parser = new Parser(Mockery::mock(UserspaceUnhandledErrorInvokerInterface::class));
 
         $this->assertSame($parser->evaluateExpression("eq(\"la la\", \"la la\")")->boolValue(), true);
         $this->assertSame($parser->evaluateExpression("eq(\"la la\", \"la,la\")")->boolValue(), false);
         $this->assertSame($parser->evaluateExpression("eq(\"lala\", \"lala\")")->boolValue(), true);
+        $this->assertSame($parser->evaluateExpression("eq(\"10\", \"10\")")->boolValue(), true);
+        $this->assertSame($parser->evaluateExpression("eq(\"10\", 10)")->boolValue(), false);
+        $this->assertSame($parser->evaluateExpression("eq(10, 10)")->boolValue(), true);
         $this->assertSame($parser->evaluateExpression("ne(100.123, 100.321)")->boolValue(), true);
         $this->assertSame($parser->evaluateExpression("not(eq(undefined, undefined))")->boolValue(), false);
         $this->assertSame($parser->evaluateExpression("not(eq(not(undefined), undefined))")->boolValue(), true);
@@ -79,24 +118,33 @@ class ParserTests extends RoxTestCase
 
     public function testComparisonExpressionsEvaluation()
     {
-        $parser = new Parser();
+        $parser = new Parser(Mockery::mock(UserspaceUnhandledErrorInvokerInterface::class));
 
         $this->assertSame($parser->evaluateExpression("lt(500, 100)")->boolValue(), false);
         $this->assertSame($parser->evaluateExpression("lt(500, 500)")->boolValue(), false);
         $this->assertSame($parser->evaluateExpression("lt(500, 500.54)")->boolValue(), true);
+        $this->assertSame($parser->evaluateExpression("lt(500, \"500.54\")")->boolValue(), true);
+        $this->assertSame($parser->evaluateExpression("lt(500, \"500.54a\")")->boolValue(), false);
+
         $this->assertSame($parser->evaluateExpression("lte(500, 500)")->boolValue(), true);
+        $this->assertSame($parser->evaluateExpression("lte(\"500\", 501)")->boolValue(), true);
+        $this->assertSame($parser->evaluateExpression("lte(\"501\", \"500\")")->boolValue(), false);
 
         $this->assertSame($parser->evaluateExpression("gt(500, 100)")->boolValue(), true);
         $this->assertSame($parser->evaluateExpression("gt(500, 500)")->boolValue(), false);
+        $this->assertSame($parser->evaluateExpression("gt(500, \"500\")")->boolValue(), false);
         $this->assertSame($parser->evaluateExpression("gt(500.54, 500)")->boolValue(), true);
-        $this->assertSame($parser->evaluateExpression("gte(500, 500)")->boolValue(), true);
+        $this->assertSame($parser->evaluateExpression("gt(\"500.54\", 500)")->boolValue(), true);
+        $this->assertSame($parser->evaluateExpression("gt(\"50a\", 500)")->boolValue(), false);
 
-        $this->assertSame($parser->evaluateExpression("gte(\"500\", 500)")->boolValue(), false);
+        $this->assertSame($parser->evaluateExpression("gte(500, 500)")->boolValue(), true);
+        $this->assertSame($parser->evaluateExpression("gte(\"500\", 500)")->boolValue(), true);
+        $this->assertSame($parser->evaluateExpression("gte(\"505a\", 500)")->boolValue(), false);
     }
 
     public function testSemVerComparisonEvaluation()
     {
-        $parser = new Parser();
+        $parser = new Parser(Mockery::mock(UserspaceUnhandledErrorInvokerInterface::class));
 
         $this->assertSame($parser->evaluateExpression("semverLt(\"1.1.0\", \"1.1\")")->boolValue(), false);
         $this->assertSame($parser->evaluateExpression("semverLte(\"1.1.0\", \"1.1\")")->boolValue(), false);
@@ -113,7 +161,7 @@ class ParserTests extends RoxTestCase
 
     public function testComparisonWithUndefinedEvaluation()
     {
-        $parser = new Parser();
+        $parser = new Parser(Mockery::mock(UserspaceUnhandledErrorInvokerInterface::class));
 
         $this->assertSame($parser->evaluateExpression("gte(500, undefined)")->boolValue(), false);
         $this->assertSame($parser->evaluateExpression("gt(500, undefined)")->boolValue(), false);
@@ -128,7 +176,7 @@ class ParserTests extends RoxTestCase
 
     public function testUnknownOperatorEvaluation()
     {
-        $parser = new Parser();
+        $parser = new Parser(Mockery::mock(UserspaceUnhandledErrorInvokerInterface::class));
 
         $this->assertSame($parser->evaluateExpression("NOT_AN_OPERATOR(500, 500)")->boolValue(), false);
         $this->assertSame($parser->evaluateExpression("JUSTAWORD(500, 500)")->boolValue(), false);
@@ -136,7 +184,7 @@ class ParserTests extends RoxTestCase
 
     public function testUndefinedEvaluation()
     {
-        $parser = new Parser();
+        $parser = new Parser(Mockery::mock(UserspaceUnhandledErrorInvokerInterface::class));
 
         $this->assertSame($parser->evaluateExpression("isUndefined(undefined)")->boolValue(), true);
         $this->assertSame($parser->evaluateExpression("isUndefined(123123)")->boolValue(), false);
@@ -145,7 +193,7 @@ class ParserTests extends RoxTestCase
 
     public function testNowEvaluation()
     {
-        $parser = new Parser();
+        $parser = new Parser(Mockery::mock(UserspaceUnhandledErrorInvokerInterface::class));
 
         $this->assertSame($parser->evaluateExpression("gte(now(), now())")->boolValue(), true);
         $this->assertSame($parser->evaluateExpression("gte(now(), 2458.123)")->boolValue(), true);
@@ -154,7 +202,7 @@ class ParserTests extends RoxTestCase
 
     public function testRegularExpressionEvaluation()
     {
-        $parser = new Parser();
+        $parser = new Parser(Mockery::mock(UserspaceUnhandledErrorInvokerInterface::class));
 
         $this->assertSame($parser->evaluateExpression("match(\"111\", \"222\", \"\")")->boolValue(), false);
         $this->assertSame($parser->evaluateExpression("match(\".*\", \"222\", \"\")")->boolValue(), false);
@@ -176,7 +224,7 @@ class ParserTests extends RoxTestCase
 
     public function testIfThenExpressionEvaluationString()
     {
-        $parser = new Parser();
+        $parser = new Parser(Mockery::mock(UserspaceUnhandledErrorInvokerInterface::class));
 
         $this->assertSame("AB", $parser->evaluateExpression("ifThen(and(true, or(true, true)), \"AB\", \"CD\")")->stringValue());
         $this->assertSame("CD", $parser->evaluateExpression("ifThen(and(false, or(true, true)), \"AB\", \"CD\")")->stringValue());
@@ -190,7 +238,7 @@ class ParserTests extends RoxTestCase
 
     public function testIfThenExpressionEvaluationIntNumber()
     {
-        $parser = new Parser();
+        $parser = new Parser(Mockery::mock(UserspaceUnhandledErrorInvokerInterface::class));
 
         $this->assertSame(1, $parser->evaluateExpression("ifThen(and(true, or(true, true)), 1, 2)")->integerValue());
         $this->assertSame(2, $parser->evaluateExpression("ifThen(and(false, or(true, true)), 1, 2)")->integerValue());
@@ -204,7 +252,7 @@ class ParserTests extends RoxTestCase
 
     public function testIfThenExpressionEvaluationDoubleNumber()
     {
-        $parser = new Parser();
+        $parser = new Parser(Mockery::mock(UserspaceUnhandledErrorInvokerInterface::class));
 
         $this->assertSame(1.1, $parser->evaluateExpression("ifThen(and(true, or(true, true)), 1.1, 2.2)")->doubleValue());
         $this->assertSame(2.2, $parser->evaluateExpression("ifThen(and(false, or(true, true)), 1.1, 2.2)")->doubleValue());
@@ -218,7 +266,7 @@ class ParserTests extends RoxTestCase
 
     public function testIfThenExpressionEvaluationBoolean()
     {
-        $parser = new Parser();
+        $parser = new Parser(Mockery::mock(UserspaceUnhandledErrorInvokerInterface::class));
 
         $this->assertSame(true, $parser->evaluateExpression("ifThen(and(true, or(true, true)), true, false)")->boolValue());
         $this->assertSame(false, $parser->evaluateExpression("ifThen(and(false, or(true, true)), true, false)")->boolValue());
@@ -235,7 +283,7 @@ class ParserTests extends RoxTestCase
 
     public function testInArray()
     {
-        $parser = new Parser();
+        $parser = new Parser(Mockery::mock(UserspaceUnhandledErrorInvokerInterface::class));
         $experimentsExtensions = new ExperimentsExtensions($parser, new TargetGroupRepository(), new FlagRepository(), new ExperimentRepository());
         $roxxPropertiesExtensions = new PropertiesExtensions($parser, new CustomPropertyRepository(), new DynamicProperties());
         $experimentsExtensions->extend();
