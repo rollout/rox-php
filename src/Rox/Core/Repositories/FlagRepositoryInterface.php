@@ -2,12 +2,12 @@
 
 namespace Rox\Core\Repositories;
 
-use Rox\Core\Entities\Variant;
+use Rox\Core\Entities\RoxStringBase;
 
 interface FlagRepositoryInterface
 {
     /**
-     * @param Variant $variant
+     * @param RoxStringBase $variant
      * @param string $name
      * @return void
      */
@@ -15,7 +15,7 @@ interface FlagRepositoryInterface
 
     /**
      * @param string $name
-     * @return Variant|null
+     * @return RoxStringBase|null
      */
     function getFlag($name);
 

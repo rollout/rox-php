@@ -2,12 +2,16 @@
 
 namespace Rox\Core\Roxx;
 
+use Exception;
+use Mockery;
 use Rox\Core\Context\ContextBuilder;
 use Rox\Core\Context\ContextInterface;
 use Rox\Core\CustomProperties\CustomProperty;
 use Rox\Core\CustomProperties\CustomPropertyRepository;
 use Rox\Core\CustomProperties\CustomPropertyType;
 use Rox\Core\CustomProperties\DynamicProperties;
+use Rox\Core\ErrorHandling\ExceptionTrigger;
+use Rox\Core\ErrorHandling\UserspaceUnhandledErrorInvokerInterface;
 use Rox\RoxTestCase;
 
 class PropertiesExtensionsTests extends RoxTestCase
@@ -15,7 +19,7 @@ class PropertiesExtensionsTests extends RoxTestCase
     public function testRoxxPropertiesExtensionsString()
     {
         $customPropertiesRepository = new CustomPropertyRepository();
-        $parser = new Parser();
+        $parser = new Parser(Mockery::mock(UserspaceUnhandledErrorInvokerInterface::class));
         $dynamicProperties = new DynamicProperties();
         $roxxPropertiesExtensions =
             new PropertiesExtensions($parser, $customPropertiesRepository, $dynamicProperties);
@@ -31,7 +35,7 @@ class PropertiesExtensionsTests extends RoxTestCase
     public function testRoxxPropertiesExtensionsInt()
     {
         $customPropertiesRepository = new CustomPropertyRepository();
-        $parser = new Parser();
+        $parser = new Parser(Mockery::mock(UserspaceUnhandledErrorInvokerInterface::class));
         $dynamicProperties = new DynamicProperties();
         $roxxPropertiesExtensions =
             new PropertiesExtensions($parser, $customPropertiesRepository, $dynamicProperties);
@@ -47,7 +51,7 @@ class PropertiesExtensionsTests extends RoxTestCase
     public function testRoxxPropertiesExtensionsDouble()
     {
         $customPropertiesRepository = new CustomPropertyRepository();
-        $parser = new Parser();
+        $parser = new Parser(Mockery::mock(UserspaceUnhandledErrorInvokerInterface::class));
         $dynamicProperties = new DynamicProperties();
         $roxxPropertiesExtensions =
             new PropertiesExtensions($parser, $customPropertiesRepository, $dynamicProperties);
@@ -64,7 +68,7 @@ class PropertiesExtensionsTests extends RoxTestCase
     public function testRoxxPropertiesExtensionsWithContextString()
     {
         $customPropertiesRepository = new CustomPropertyRepository();
-        $parser = new Parser();
+        $parser = new Parser(Mockery::mock(UserspaceUnhandledErrorInvokerInterface::class));
         $dynamicProperties = new DynamicProperties();
         $roxxPropertiesExtensions =
             new PropertiesExtensions($parser, $customPropertiesRepository, $dynamicProperties);
@@ -83,7 +87,7 @@ class PropertiesExtensionsTests extends RoxTestCase
     public function testRoxxPropertiesExtensionsWithContextInt()
     {
         $customPropertiesRepository = new CustomPropertyRepository();
-        $parser = new Parser();
+        $parser = new Parser(Mockery::mock(UserspaceUnhandledErrorInvokerInterface::class));
         $dynamicProperties = new DynamicProperties();
         $roxxPropertiesExtensions =
             new PropertiesExtensions($parser, $customPropertiesRepository, $dynamicProperties);
@@ -102,7 +106,7 @@ class PropertiesExtensionsTests extends RoxTestCase
     public function testRoxxPropertiesExtensionsWithContextIntWithString()
     {
         $customPropertiesRepository = new CustomPropertyRepository();
-        $parser = new Parser();
+        $parser = new Parser(Mockery::mock(UserspaceUnhandledErrorInvokerInterface::class));
         $dynamicProperties = new DynamicProperties();
         $roxxPropertiesExtensions =
             new PropertiesExtensions($parser, $customPropertiesRepository, $dynamicProperties);
@@ -121,7 +125,7 @@ class PropertiesExtensionsTests extends RoxTestCase
     public function testRoxxPropertiesExtensionsWithContextIntNotEqual()
     {
         $customPropertiesRepository = new CustomPropertyRepository();
-        $parser = new Parser();
+        $parser = new Parser(Mockery::mock(UserspaceUnhandledErrorInvokerInterface::class));
         $dynamicProperties = new DynamicProperties();
         $roxxPropertiesExtensions =
             new PropertiesExtensions($parser, $customPropertiesRepository, $dynamicProperties);
@@ -140,7 +144,7 @@ class PropertiesExtensionsTests extends RoxTestCase
     public function testUnknownProperty()
     {
         $customPropertiesRepository = new CustomPropertyRepository();
-        $parser = new Parser();
+        $parser = new Parser(Mockery::mock(UserspaceUnhandledErrorInvokerInterface::class));
         $dynamicProperties = new DynamicProperties();
         $roxxPropertiesExtensions =
             new PropertiesExtensions($parser, $customPropertiesRepository, $dynamicProperties);
@@ -156,7 +160,7 @@ class PropertiesExtensionsTests extends RoxTestCase
     public function testNullProperty()
     {
         $customPropertiesRepository = new CustomPropertyRepository();
-        $parser = new Parser();
+        $parser = new Parser(Mockery::mock(UserspaceUnhandledErrorInvokerInterface::class));
         $dynamicProperties = new DynamicProperties();
         $roxxPropertiesExtensions =
             new PropertiesExtensions($parser, $customPropertiesRepository, $dynamicProperties);
@@ -174,7 +178,7 @@ class PropertiesExtensionsTests extends RoxTestCase
     public function testDefaultDynamicRule()
     {
         $customPropertiesRepository = new CustomPropertyRepository();
-        $parser = new Parser();
+        $parser = new Parser(Mockery::mock(UserspaceUnhandledErrorInvokerInterface::class));
         $dynamicProperties = new DynamicProperties();
         $roxxPropertiesExtensions =
             new PropertiesExtensions($parser, $customPropertiesRepository, $dynamicProperties);
@@ -188,7 +192,7 @@ class PropertiesExtensionsTests extends RoxTestCase
     public function testCustomDynamicRule()
     {
         $customPropertiesRepository = new CustomPropertyRepository();
-        $parser = new Parser();
+        $parser = new Parser(Mockery::mock(UserspaceUnhandledErrorInvokerInterface::class));
         $dynamicProperties = new DynamicProperties();
         $roxxPropertiesExtensions =
             new PropertiesExtensions($parser, $customPropertiesRepository, $dynamicProperties);
@@ -206,7 +210,7 @@ class PropertiesExtensionsTests extends RoxTestCase
     public function testDynamicRuleReturnsNull()
     {
         $customPropertiesRepository = new CustomPropertyRepository();
-        $parser = new Parser();
+        $parser = new Parser(Mockery::mock(UserspaceUnhandledErrorInvokerInterface::class));
         $dynamicProperties = new DynamicProperties();
         $roxxPropertiesExtensions =
             new PropertiesExtensions($parser, $customPropertiesRepository, $dynamicProperties);
@@ -220,7 +224,7 @@ class PropertiesExtensionsTests extends RoxTestCase
     public function testDynamicRuleReturnsSupportedType()
     {
         $customPropertiesRepository = new CustomPropertyRepository();
-        $parser = new Parser();
+        $parser = new Parser(Mockery::mock(UserspaceUnhandledErrorInvokerInterface::class));
         $dynamicProperties = new DynamicProperties();
         $roxxPropertiesExtensions =
             new PropertiesExtensions($parser, $customPropertiesRepository, $dynamicProperties);
@@ -243,7 +247,7 @@ class PropertiesExtensionsTests extends RoxTestCase
     public function testDynamicRuleReturnUnsupportedType()
     {
         $customPropertiesRepository = new CustomPropertyRepository();
-        $parser = new Parser();
+        $parser = new Parser(Mockery::mock(UserspaceUnhandledErrorInvokerInterface::class));
         $dynamicProperties = new DynamicProperties();
         $roxxPropertiesExtensions =
             new PropertiesExtensions($parser, $customPropertiesRepository, $dynamicProperties);
@@ -252,5 +256,108 @@ class PropertiesExtensionsTests extends RoxTestCase
 
         $context = (new ContextBuilder())->build(["testKeyRule", []]);
         $this->assertEquals($parser->evaluateExpression("eq(undefined, property(\"testKeyRule\"))", $context)->boolValue(), true);
+    }
+
+    public function testDynamicRulesInvokeUserUnhandledErrorInvokerOnCustomPropertyException()
+    {
+        $unhandledErrorInvokeCalled = false;
+        $ex = new Exception("user exception");
+        $userUnhandledErrorInvoker = Mockery::mock(UserspaceUnhandledErrorInvokerInterface::class)
+            ->shouldReceive('invoke')
+            ->andReturnUsing(function ($sender, $trigger, $exception) use (&$unhandledErrorInvokeCalled, $ex) {
+                $this->assertSame(ExceptionTrigger::CustomPropertyGenerator, $trigger);
+                $this->assertSame($ex, $exception);
+                $unhandledErrorInvokeCalled = true;
+            })
+            ->byDefault()
+            ->getMock();
+
+        $customPropertiesRepository = new CustomPropertyRepository();
+        $parser = new Parser($userUnhandledErrorInvoker);
+        $dynamicProperties = new DynamicProperties();
+        $dynamicProperties->setDynamicPropertiesRule(function () {
+            return null;
+        });
+
+        $roxxPropertiesExtensions =
+            new PropertiesExtensions($parser, $customPropertiesRepository, $dynamicProperties);
+
+        $customPropertiesRepository->addCustomProperty(new CustomProperty("testKeyRule",
+            CustomPropertyType::getInt(),
+            function () use ($ex) {
+                throw $ex;
+            }));
+
+        $roxxPropertiesExtensions->extend();
+
+        $context = (new ContextBuilder())->build(["testKey" => 5]);
+        $this->assertFalse($parser->evaluateExpression("eq(5, property(\"testKeyRule\"))", $context)->boolValue());
+        $this->assertTrue($unhandledErrorInvokeCalled);
+    }
+
+    public function testDynamicRulesInvokeUserUnhandledErrorInvokerOnDynamicRuleException()
+    {
+        $unhandledErrorInvokeCalled = false;
+        $ex = new Exception("user exception");
+
+        $userUnhandledErrorInvoker = Mockery::mock(UserspaceUnhandledErrorInvokerInterface::class)
+            ->shouldReceive('invoke')
+            ->andReturnUsing(function ($sender, $trigger, $exception) use (&$unhandledErrorInvokeCalled, $ex) {
+                $this->assertSame(ExceptionTrigger::DynamicPropertiesRule, $trigger);
+                $this->assertSame($ex, $exception);
+                $unhandledErrorInvokeCalled = true;
+            })
+            ->byDefault()
+            ->getMock();
+
+        $dynamicRule = function () use ($ex) {
+            throw $ex;
+        };
+
+        $customPropertiesRepository = new CustomPropertyRepository();
+        $parser = new Parser($userUnhandledErrorInvoker);
+        $dynamicProperties = new DynamicProperties();
+        $dynamicProperties->setDynamicPropertiesRule($dynamicRule);
+
+        $roxxPropertiesExtensions =
+            new PropertiesExtensions($parser, $customPropertiesRepository, $dynamicProperties);
+
+        $roxxPropertiesExtensions->extend();
+
+        $context = (new ContextBuilder())->build(["testKeyRule", []]);
+        $this->assertFalse($parser->evaluateExpression("eq(undefined, property(\"testKeyRule\"))", $context)->boolValue());
+        $this->assertTrue($unhandledErrorInvokeCalled);
+    }
+
+    public function testDynamicRulesDoesntInvokeUserUnhandledErrorInvokerOnDefaultDynamicRuleException()
+    {
+        $unhandledErrorInvokeCalled = false;
+        $userUnhandledErrorInvoker = Mockery::mock(UserspaceUnhandledErrorInvokerInterface::class)
+            ->shouldReceive('invoke')
+            ->andReturnUsing(function () use (&$unhandledErrorInvokeCalled) {
+                $unhandledErrorInvokeCalled = true;
+            })
+            ->byDefault()
+            ->getMock();
+        
+        $customPropertiesRepository = new CustomPropertyRepository();
+        $parser = new Parser($userUnhandledErrorInvoker);
+        $dynamicProperties = new DynamicProperties();
+
+        $roxxPropertiesExtensions =
+            new PropertiesExtensions($parser, $customPropertiesRepository, $dynamicProperties);
+
+        $roxxPropertiesExtensions->extend();
+
+        $mockedContext = Mockery::mock(ContextInterface::class)
+            ->shouldReceive('get')
+            ->andReturnUsing(function () {
+                throw new Exception("our exception");
+            })
+            ->byDefault()
+            ->getMock();
+
+        $this->assertFalse($parser->evaluateExpression("eq(undefined, property(\"testKeyRule\"))", $mockedContext)->boolValue());
+        $this->assertFalse($unhandledErrorInvokeCalled);
     }
 }

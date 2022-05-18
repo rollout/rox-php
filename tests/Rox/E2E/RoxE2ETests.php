@@ -22,7 +22,7 @@ class RoxE2ETests extends RoxTestCase
      */
     private static $_staticLoggerFactory;
 
-    public static function setUpBeforeClass()
+    public static function setUpBeforeClass(): void
     {
         $_ENV[Environment::ENV_VAR_NAME] = Environment::QA;
 
@@ -31,12 +31,12 @@ class RoxE2ETests extends RoxTestCase
 
         $options = new RoxOptions((new RoxOptionsBuilder())
             ->setConfigurationFetchedHandler(function (ConfigurationFetchedArgs $args) {
-                if ($args != null && $args->getFetcherStatus() == FetcherStatus::AppliedFromNetwork) {
+                if ($args->getFetcherStatus() == FetcherStatus::AppliedFromNetwork) {
                     TestVars::$configurationFetchedCount++;
                 }
             })
             ->setImpressionHandler(function (ImpressionArgs $args) {
-                if ($args != null && $args->getReportingValue() != null) {
+                if ($args->getReportingValue() != null) {
                     if ($args->getReportingValue()->getName() == "flagForImpression") {
                         TestVars::$isImpressionRaised = true;
                     }
@@ -47,13 +47,18 @@ class RoxE2ETests extends RoxTestCase
             ->setCacheStorage(new VolatileRuntimeStorage())
             ->setLogCacheHitsAndMisses(true));
 
-        Rox::register("", Container::getInstance());
+        Rox::register(Container::getInstance());
         TestCustomPropsCreator::createCustomProps();
 
         Rox::setup("5df8d5e802e23378643705bf", $options);
     }
 
-    protected function setUp()
+    public static function tearDownAfterClass(): void
+    {
+        Rox::shutdown();
+    }
+
+    protected function setUp(): void
     {
         parent::setUp();
 
@@ -84,7 +89,7 @@ class RoxE2ETests extends RoxTestCase
     public function testRegisterAfterSetup()
     {
         $this->assertTrue(ContainerTwo::getInstance()->flag2->isEnabled());
-        $this->assertEquals("red", ContainerTwo::getInstance()->variant2->getValue()); 
+        $this->assertEquals("red", ContainerTwo::getInstance()->variant2->getValue());
         Rox::register("afterSetup", ContainerTwo::getInstance());
         $this->assertFalse(ContainerTwo::getInstance()->flag2->isEnabled());
         $this->assertEquals("green", ContainerTwo::getInstance()->variant2->getValue());
@@ -133,6 +138,19 @@ class RoxE2ETests extends RoxTestCase
         $this->assertEquals(Container::getInstance()->variantWithContext->getValue($someNegativeContext), "red");
     }
 
+    public function testVariantWithGlobalContext()
+    {
+        $somePositiveContext = (new ContextBuilder())->build([
+            "isDuckAndCover" => true
+        ]);
+
+        $this->assertEquals(Container::getInstance()->variantWithContext->getValue(), "red");
+        Rox::setContext($somePositiveContext);
+        $this->assertEquals(Container::getInstance()->variantWithContext->getValue(), "blue");
+        Rox::setContext(null);
+        $this->assertEquals(Container::getInstance()->variantWithContext->getValue(), "red");
+    }
+
     public function testTargetGroupsAllAnyNone()
     {
         TestVars::$targetGroup1 = TestVars::$targetGroup2 = true;
@@ -167,9 +185,7 @@ class RoxE2ETests extends RoxTestCase
         $this->assertEquals("flagForImpressionWithExperimentAndContext", TestVars::$impressionReturnedArgs->getReportingValue()->getName());
 
         $this->assertNotNull(TestVars::$impressionReturnedArgs);
-        $this->assertNotNull(TestVars::$impressionReturnedArgs->getExperiment());
-        $this->assertEquals("5df8d8b930fcc301c34ad331", TestVars::$impressionReturnedArgs->getExperiment()->getIdentifier());
-        $this->assertEquals("flag for impression with experiment and context", TestVars::$impressionReturnedArgs->getExperiment()->getName());
+        $this->assertTrue(TestVars::$impressionReturnedArgs->getReportingValue()->isTargeting());
 
         $this->assertEquals("val", TestVars::$impressionReturnedArgs->getContext()->get("var"));
     }

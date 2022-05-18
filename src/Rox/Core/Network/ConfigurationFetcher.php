@@ -59,7 +59,15 @@ class ConfigurationFetcher extends ConfigurationFetcherBase
     {
         return $this->_request->sendGet(new RequestData($this->_getCDNUrl($properties), [
             PropertyType::getDistinctId()->getName() =>
-                (string)$properties[PropertyType::getDistinctId()->getName()]
+                (string)$properties[PropertyType::getDistinctId()->getName()],
+            'realPlatform' =>
+                (string)@$properties['platform'],
+            'sdkVersion' =>
+                (string)@$properties['lib_version'],
+            'platformVersion' =>
+                php_sapi_name(),
+            'languageVersion' =>
+                PHP_VERSION
         ]));
     }
 

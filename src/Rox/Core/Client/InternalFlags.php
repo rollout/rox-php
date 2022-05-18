@@ -2,7 +2,7 @@
 
 namespace Rox\Core\Client;
 
-use Rox\Core\Entities\Flag;
+use Rox\Core\Entities\BoolFlagValueConverter;
 use Rox\Core\Repositories\ExperimentRepositoryInterface;
 use Rox\Core\Roxx\ParserInterface;
 
@@ -41,8 +41,10 @@ class InternalFlags implements InternalFlagsInterface
         if ($internalExperiment == null) {
             return false;
         }
-        $value = $this->_parser->evaluateExpression($internalExperiment->getCondition(), null)->stringValue();
-        return $value === Flag::FLAG_TRUE_VALUE;
+        $value = $this->_parser
+            ->evaluateExpression($internalExperiment->getCondition(), null)
+            ->stringValue();
+        return $value === BoolFlagValueConverter::FLAG_TRUE_VALUE;
     }
 
     /**
@@ -55,7 +57,8 @@ class InternalFlags implements InternalFlagsInterface
         if ($internalExperiment == null) {
             return null;
         }
-        $value = $this->_parser->evaluateExpression($internalExperiment->getCondition(), null)->integerValue();
-        return $value;
+        return $this->_parser
+            ->evaluateExpression($internalExperiment->getCondition(), null)
+            ->integerValue();
     }
 }

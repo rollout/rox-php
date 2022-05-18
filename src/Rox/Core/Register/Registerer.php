@@ -6,9 +6,10 @@ use InvalidArgumentException;
 use Psr\Log\LoggerInterface;
 use ReflectionClass;
 use ReflectionException;
-use Rox\Core\Entities\Variant;
+use Rox\Core\Entities\RoxStringBase;
 use Rox\Core\Logging\LoggerFactory;
 use Rox\Core\Repositories\FlagRepositoryInterface;
+use RuntimeException;
 
 class Registerer
 {
@@ -67,10 +68,12 @@ class Registerer
             $this->_log->error("Failed to obtain properties of class ${type}", [
                 'exception' => $e
             ]);
+            throw new RuntimeException(
+                "Failed to obtain properties of class ${type}. See inner exception for details.", 0, $e);
         }
 
         foreach ($properties as $name => $value) {
-            if ($value instanceof Variant) {
+            if ($value instanceof RoxStringBase) {
                 if ($ns) {
                     $name = "${ns}.${name}";
                 }

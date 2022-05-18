@@ -2,8 +2,11 @@
 
 namespace Rox\Core\Roxx;
 
+use Exception;
 use Rox\Core\Context\ContextInterface;
 use Rox\Core\CustomProperties\DynamicPropertiesInterface;
+use Rox\Core\ErrorHandling\ExceptionTrigger;
+use Rox\Core\ErrorHandling\UserspaceHandlerException;
 use Rox\Core\Repositories\CustomPropertyRepositoryInterface;
 
 class PropertiesExtensions
@@ -30,9 +33,9 @@ class PropertiesExtensions
      * @param DynamicPropertiesInterface $dynamicProperties
      */
     public function __construct(
-        ParserInterface $parser,
+        ParserInterface                   $parser,
         CustomPropertyRepositoryInterface $propertiesRepository,
-        DynamicPropertiesInterface $dynamicProperties)
+        DynamicPropertiesInterface        $dynamicProperties)
     {
         $this->_parser = $parser;
         $this->_propertiesRepository = $propertiesRepository;
@@ -49,7 +52,17 @@ class PropertiesExtensions
                 if ($property == null) {
                     $dynamicPropertiesRule = $this->_dynamicProperties->getDynamicPropertiesRule();
                     if ($dynamicPropertiesRule != null) {
-                        $value = $dynamicPropertiesRule($propName, $context);
+                        if ($this->_dynamicProperties->isDefault()) {
+                            // this is our implementation, if there's an exception, shouldn't throw to user error handler
+                            $value = $dynamicPropertiesRule($propName, $context);
+                        } else {
+                            try {
+                                $value = $dynamicPropertiesRule($propName, $context);
+                            } catch (Exception $ex) {
+                                // throwing exception, so the whole evaluation will exit, and default will be applied
+                                throw new UserspaceHandlerException($dynamicPropertiesRule, ExceptionTrigger::DynamicPropertiesRule, $ex);
+                            }
+                        }
                         if ($value != null) {
                             if (is_string($value) || is_bool($value)) {
                                 $stack->push($value);
@@ -65,7 +78,12 @@ class PropertiesExtensions
                 }
 
                 $propValue = $property->getValue();
-                $value = $propValue($context);
+                try {
+                    $value = $propValue($context);
+                } catch (Exception $ex) {
+                    throw new UserspaceHandlerException($propValue,
+                        ExceptionTrigger::CustomPropertyGenerator, $ex);
+                }
                 if ($value !== null) {
                     $stack->push($value);
                     return;
