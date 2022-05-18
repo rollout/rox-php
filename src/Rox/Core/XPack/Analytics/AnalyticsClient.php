@@ -110,24 +110,13 @@ class AnalyticsClient implements ClientInterface
     {
         $batch = $this->_createBatch($messages);
         $url = Environment::getAnalyticsPath() . "/impression/" . $this->_deviceProperties->getRolloutKey();
-        $backoff = 100;     // Set initial waiting time to 100ms
-        while ($backoff < $this->_maximum_backoff_duration) {
-            $response = $this->_httpClient->postJson($url, $batch);
-            $statusCode = $response->getStatusCode();
-            if (200 == $statusCode) {
-                return true;
-            }
-            $this->_log->error("Failed to post data to ${url}: HTTP response code ${statusCode} ({$response->getContent()->readAsString()})");
-            if (($statusCode >= 500 && $statusCode <= 600) || 429 == $statusCode) {
-                // If status code is greater than 500 and less than 600, it indicates server error
-                // Error code 429 indicates rate limited.
-                // Retry uploading in these cases.
-                usleep($backoff * 1000);
-                $backoff *= 2;
-            } elseif ($statusCode >= 400) {
-                return false;
-            }
+        $response = $this->_httpClient->postJson($url, $batch);
+        $statusCode = $response->getStatusCode();
+        if (200 == $statusCode) {
+            return true;
         }
+        $this->_log->error("Failed to post data to ${url}: HTTP response code ${statusCode} ({$response->getContent()->readAsString()})");
+
         return false;
     }
 
