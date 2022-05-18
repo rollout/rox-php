@@ -4,11 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-<<<<<<< HEAD
-    "content-hash": "251e60f1ec45f76f7ad61db7aebe7235",
-=======
     "content-hash": "0c59af4d7c436188b4e3f06e94dd5593",
->>>>>>> 3837ec7d90e8bc15bae1499e7c4f8f54deb4bfff
     "packages": [
         {
             "name": "brick/math",
@@ -487,18 +483,6 @@
         },
         {
             "name": "monolog/monolog",
-<<<<<<< HEAD
-            "version": "1.26.1",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/Seldaek/monolog.git",
-                "reference": "c6b00f05152ae2c9b04a448f99c7590beb6042f5"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/Seldaek/monolog/zipball/c6b00f05152ae2c9b04a448f99c7590beb6042f5",
-                "reference": "c6b00f05152ae2c9b04a448f99c7590beb6042f5",
-=======
             "version": "2.3.4",
             "source": {
                 "type": "git",
@@ -509,7 +493,6 @@
                 "type": "zip",
                 "url": "https://api.github.com/repos/Seldaek/monolog/zipball/437e7a1c50044b92773b361af77620efb76fff59",
                 "reference": "437e7a1c50044b92773b361af77620efb76fff59",
->>>>>>> 3837ec7d90e8bc15bae1499e7c4f8f54deb4bfff
                 "shasum": ""
             },
             "require": {
@@ -583,11 +566,7 @@
             ],
             "support": {
                 "issues": "https://github.com/Seldaek/monolog/issues",
-<<<<<<< HEAD
-                "source": "https://github.com/Seldaek/monolog/tree/1.26.1"
-=======
                 "source": "https://github.com/Seldaek/monolog/tree/2.3.4"
->>>>>>> 3837ec7d90e8bc15bae1499e7c4f8f54deb4bfff
             },
             "funding": [
                 {
@@ -599,22 +578,6 @@
                     "type": "tidelift"
                 }
             ],
-<<<<<<< HEAD
-            "time": "2021-05-28T08:32:12+00:00"
-        },
-        {
-            "name": "paragonie/random_compat",
-            "version": "v2.0.20",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/paragonie/random_compat.git",
-                "reference": "0f1f60250fccffeaf5dda91eea1c018aed1adc2a"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/paragonie/random_compat/zipball/0f1f60250fccffeaf5dda91eea1c018aed1adc2a",
-                "reference": "0f1f60250fccffeaf5dda91eea1c018aed1adc2a",
-=======
             "time": "2021-09-15T11:27:21+00:00"
         },
         {
@@ -629,7 +592,6 @@
                 "type": "zip",
                 "url": "https://api.github.com/repos/php-fig/http-client/zipball/2dfb5f6c5eff0e91e20e913f8c5452ed95b86621",
                 "reference": "2dfb5f6c5eff0e91e20e913f8c5452ed95b86621",
->>>>>>> 3837ec7d90e8bc15bae1499e7c4f8f54deb4bfff
                 "shasum": ""
             },
             "require": {
@@ -668,11 +630,7 @@
             "support": {
                 "source": "https://github.com/php-fig/http-client/tree/master"
             },
-<<<<<<< HEAD
-            "time": "2021-04-17T09:33:01+00:00"
-=======
             "time": "2020-06-29T06:28:15+00:00"
->>>>>>> 3837ec7d90e8bc15bae1499e7c4f8f54deb4bfff
         },
         {
             "name": "psr/http-message",
@@ -1492,19 +1450,6 @@
             "time": "2020-11-13T09:40:50+00:00"
         },
         {
-<<<<<<< HEAD
-            "name": "mockery/mockery",
-            "version": "1.3.4",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/mockery/mockery.git",
-                "reference": "31467aeb3ca3188158613322d66df81cedd86626"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/mockery/mockery/zipball/31467aeb3ca3188158613322d66df81cedd86626",
-                "reference": "31467aeb3ca3188158613322d66df81cedd86626",
-=======
             "name": "nikic/php-parser",
             "version": "v4.13.0",
             "source": {
@@ -1516,7 +1461,6 @@
                 "type": "zip",
                 "url": "https://api.github.com/repos/nikic/PHP-Parser/zipball/50953a2691a922aa1769461637869a0a2faa3f53",
                 "reference": "50953a2691a922aa1769461637869a0a2faa3f53",
->>>>>>> 3837ec7d90e8bc15bae1499e7c4f8f54deb4bfff
                 "shasum": ""
             },
             "require": {
@@ -1556,17 +1500,10 @@
                 "php"
             ],
             "support": {
-<<<<<<< HEAD
-                "issues": "https://github.com/mockery/mockery/issues",
-                "source": "https://github.com/mockery/mockery/tree/1.3.4"
-            },
-            "time": "2021-02-24T09:51:00+00:00"
-=======
                 "issues": "https://github.com/nikic/PHP-Parser/issues",
                 "source": "https://github.com/nikic/PHP-Parser/tree/v4.13.0"
             },
             "time": "2021-09-20T12:20:58+00:00"
->>>>>>> 3837ec7d90e8bc15bae1499e7c4f8f54deb4bfff
         },
         {
             "name": "phar-io/manifest",
@@ -3346,21 +3283,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/webmozarts/assert.git",
-<<<<<<< HEAD
-                "reference": "bafc69caeb4d49c39fd0779086c03a3738cbb389"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/webmozarts/assert/zipball/bafc69caeb4d49c39fd0779086c03a3738cbb389",
-                "reference": "bafc69caeb4d49c39fd0779086c03a3738cbb389",
-=======
                 "reference": "6964c76c7804814a842473e0c8fd15bab0f18e25"
             },
             "dist": {
                 "type": "zip",
                 "url": "https://api.github.com/repos/webmozarts/assert/zipball/6964c76c7804814a842473e0c8fd15bab0f18e25",
                 "reference": "6964c76c7804814a842473e0c8fd15bab0f18e25",
->>>>>>> 3837ec7d90e8bc15bae1499e7c4f8f54deb4bfff
                 "shasum": ""
             },
             "require": {
@@ -3403,11 +3331,7 @@
             ],
             "support": {
                 "issues": "https://github.com/webmozarts/assert/issues",
-<<<<<<< HEAD
-                "source": "https://github.com/webmozarts/assert/tree/1.9.1"
-=======
                 "source": "https://github.com/webmozarts/assert/tree/1.10.0"
->>>>>>> 3837ec7d90e8bc15bae1499e7c4f8f54deb4bfff
             },
             "time": "2021-03-09T10:59:23+00:00"
         }
