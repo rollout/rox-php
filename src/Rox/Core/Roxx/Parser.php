@@ -6,8 +6,10 @@ use Exception;
 use Psr\Log\LoggerInterface;
 use Rox\Core\Context\ContextBuilder;
 use Rox\Core\Context\ContextInterface;
+use Rox\Core\ErrorHandling\UserspaceHandlerException;
+use Rox\Core\ErrorHandling\UserspaceUnhandledErrorInvokerInterface;
 use Rox\Core\Logging\LoggerFactory;
-use Rox\Core\Utils\DotNetCompat;
+use Rox\Core\Utils\NumericUtils;
 use Rox\Core\Utils\TimeUtils;
 
 class Parser implements ParserInterface
@@ -23,11 +25,22 @@ class Parser implements ParserInterface
     private $_operatorsMap = [];
 
     /**
-     * Parser constructor.
-     * @throws Exception
+     * @var UserspaceUnhandledErrorInvokerInterface $_userUnhandledErrorInvoker
      */
-    public function __construct()
+    private $_userUnhandledErrorInvoker;
+
+    /**
+     * @var ContextInterface $_globalContext
+     */
+    private $_globalContext;
+
+    /**
+     * Parser constructor.
+     * @param UserspaceUnhandledErrorInvokerInterface|null $userUnhandledErrorInvoker
+     */
+    public function __construct($userUnhandledErrorInvoker)
     {
+        $this->_userUnhandledErrorInvoker = $userUnhandledErrorInvoker;
         $this->_log = LoggerFactory::getInstance()->createLogger(self::class);
         $this->_setBasicOperators();
     }
@@ -105,6 +118,22 @@ class Parser implements ParserInterface
             $stack->push($op1 !== $op2);
         });
 
+        $this->addOperator("numne", function (ParserInterface $parser, StackInterface $stack, ContextInterface $context) {
+            $op1 = $stack->pop();
+            $op2 = $stack->pop();
+
+            $decimal1 = 0;
+            $decimal2 = 0;
+            $result = false;
+
+            if (NumericUtils::parseNumber($op1, $decimal1) &&
+                NumericUtils::parseNumber($op2, $decimal2)) {
+                $result = !NumericUtils::numbersEqual($decimal1, $decimal2);
+            }
+
+            $stack->push($result);
+        });
+
         $this->addOperator("eq", function (ParserInterface $parser, StackInterface $stack, ContextInterface $context) {
             $op1 = $stack->pop();
             $op2 = $stack->pop();
@@ -117,15 +146,28 @@ class Parser implements ParserInterface
                 $op2 = false;
             }
 
-            if (DotNetCompat::isNumericStrict($op1)) {
-                $op1 = (float)$op1; // cast int to float for comparison
-            }
-
-            if (DotNetCompat::isNumericStrict($op2)) {
-                $op2 = (float)$op2; // cast int to float for comparison
+            if (NumericUtils::isNumericStrict($op1) && NumericUtils::isNumericStrict($op2)) {
+                $stack->push(NumericUtils::numbersEqual($op1, $op2));
+                return;
             }
 
             $stack->push($op1 === $op2);
+        });
+
+        $this->addOperator("numeq", function (ParserInterface $parser, StackInterface $stack, ContextInterface $context) {
+            $op1 = $stack->pop();
+            $op2 = $stack->pop();
+
+            $decimal1 = 0;
+            $decimal2 = 0;
+            $result = false;
+
+            if (NumericUtils::parseNumber($op1, $decimal1) &&
+                NumericUtils::parseNumber($op2, $decimal2)) {
+                $result = NumericUtils::numbersEqual($decimal1, $decimal2);
+            }
+
+            $stack->push($result);
         });
 
         $this->addOperator("not",
@@ -195,9 +237,10 @@ class Parser implements ParserInterface
     /**
      * @param string $expression
      * @param ContextInterface $context
+     * @param EvaluationContext $evaluationContext
      * @return EvaluationResult
      */
-    public function evaluateExpression($expression, $context = null)
+    public function evaluateExpression($expression, $context = null, $evaluationContext = null)
     {
         if ($context == null) {
             $context = (new ContextBuilder())->build(); // Don't pass nulls anywhere, it's a bad practice.
@@ -218,14 +261,27 @@ class Parser implements ParserInterface
                 } else if ($node->getType() == Node::TYPE_RATOR) {
                     $key = (string)$node->getValue();
                     if (array_key_exists($key, $this->_operatorsMap)) {
-                        $this->_operatorsMap[$key]($this, $stack, $context);
+                        $this->_operatorsMap[$key]($this, $stack, $context, $evaluationContext);
                     }
                 } else {
-                    return new EvaluationResult($result);
+                    return new EvaluationResult($result, $context);
                 }
             }
 
             $result = $stack->pop();
+
+        } catch (UserspaceHandlerException $ex) {
+
+            $this->_log->warning("Roxx Exception: Failed evaluate expression, user unhandled expression {$ex->getMessage()}", [
+                'exception' => $ex
+            ]);
+
+            if ($this->_userUnhandledErrorInvoker) {
+                $this->_userUnhandledErrorInvoker->invoke(
+                    $ex->getExceptionSource(),
+                    $ex->getExceptionTrigger(),
+                    $ex->getException());
+            }
 
         } catch (Exception $exception) {
 
@@ -234,6 +290,16 @@ class Parser implements ParserInterface
             ]);
         }
 
-        return new EvaluationResult($result);
+        return new EvaluationResult($result, $context);
+    }
+
+    function setGlobalContext($context)
+    {
+        $this->_globalContext = $context;
+    }
+
+    function getGlobalContext()
+    {
+        return $this->_globalContext;
     }
 }

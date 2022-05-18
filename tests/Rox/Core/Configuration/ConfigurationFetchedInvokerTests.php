@@ -1,23 +1,24 @@
 <?php
 
-namespace Rox\Core\XPack\Configuration;
+namespace Rox\Core\Configuration;
 
-use Rox\Core\Configuration\ConfigurationFetchedArgs;
-use Rox\Core\Configuration\ConfigurationFetchedInvoker;
-use Rox\Core\Configuration\FetcherError;
-use Rox\Core\Configuration\FetcherStatus;
-use Rox\Core\Core;
+use Exception;
+use Mockery;
+use Rox\Core\ErrorHandling\ExceptionTrigger;
+use Rox\Core\ErrorHandling\UserspaceUnhandledErrorInvokerInterface;
 use Rox\Core\Utils\TimeUtils;
 use Rox\RoxTestCase;
 
-class XConfigurationFetchedInvokerTests extends RoxTestCase
+class ConfigurationFetchedInvokerTests extends RoxTestCase
 {
     public function testConfigurationInvokerWithNoSubscriberNoException()
     {
-        $configurationFetchedInvoker = new XConfigurationFetchedInvoker(\Mockery::mock(Core::class));
+        $configurationFetchedInvoker = new ConfigurationFetchedInvoker(
+            Mockery::mock(UserspaceUnhandledErrorInvokerInterface::class));
         $configurationFetchedInvoker->invokeWithError(FetcherError::Unknown);
 
-        $configurationFetchedInvoker2 = new XConfigurationFetchedInvoker(\Mockery::mock(Core::class));
+        $configurationFetchedInvoker2 = new ConfigurationFetchedInvoker(
+            Mockery::mock(UserspaceUnhandledErrorInvokerInterface::class));
         $configurationFetchedInvoker2->invoke(FetcherStatus::AppliedFromEmbedded,
             TimeUtils::currentTimeMillis(), true);
 
@@ -55,7 +56,8 @@ class XConfigurationFetchedInvokerTests extends RoxTestCase
         $this->expectNoErrors();
 
         $isConfigurationHandlerInvokerRaised = [false];
-        $configurationFetchedInvoker = new ConfigurationFetchedInvoker();
+        $configurationFetchedInvoker = new ConfigurationFetchedInvoker(
+            Mockery::mock(UserspaceUnhandledErrorInvokerInterface::class));
 
         $configurationFetchedInvoker->register(function (ConfigurationFetchedArgs $e)
         use ($configurationFetchedInvoker, &$isConfigurationHandlerInvokerRaised) {
@@ -79,7 +81,8 @@ class XConfigurationFetchedInvokerTests extends RoxTestCase
         $this->expectNoErrors();
 
         $isConfigurationHandlerInvokerRaised = [false];
-        $configurationFetchedInvoker = new XConfigurationFetchedInvoker(\Mockery::mock(Core::class));
+        $configurationFetchedInvoker = new ConfigurationFetchedInvoker(
+            Mockery::mock(UserspaceUnhandledErrorInvokerInterface::class));
 
         $configurationFetchedInvoker->register(function (ConfigurationFetchedArgs $e)
         use ($configurationFetchedInvoker, &$isConfigurationHandlerInvokerRaised) {
@@ -100,7 +103,8 @@ class XConfigurationFetchedInvokerTests extends RoxTestCase
     public function testConfigurationInvokerInvokeOK()
     {
         $isConfigurationHandlerInvokerRaised = [false];
-        $configurationFetchedInvoker = new XConfigurationFetchedInvoker(\Mockery::mock(Core::class));
+        $configurationFetchedInvoker = new ConfigurationFetchedInvoker(
+            Mockery::mock(UserspaceUnhandledErrorInvokerInterface::class));
 
         $now = TimeUtils::currentTimeMillis();
         $status = FetcherStatus::AppliedFromNetwork;
@@ -120,5 +124,37 @@ class XConfigurationFetchedInvokerTests extends RoxTestCase
         $configurationFetchedInvoker->invoke($status, $now, $hasChanges);
 
         $this->assertTrue($isConfigurationHandlerInvokerRaised[0]);
+    }
+
+    public function testConfigurationInvokerRaisedUserUnhandledError()
+    {
+        $invokedCalled = false;
+        $userUnhandledErrorInvoker = Mockery::mock(UserspaceUnhandledErrorInvokerInterface::class)
+            ->shouldReceive('invoke')
+            ->andReturnUsing(function ($sender, $trigger, $ex) use (&$invokedCalled) {
+                $this->assertSame(ExceptionTrigger::ConfigurationFetchedHandler, $trigger);
+                $invokedCalled = true;
+            })
+            ->byDefault()
+            ->getMock();
+
+        $ex = new Exception("user error");
+
+        $now = time();
+        $status = FetcherStatus::AppliedFromNetwork;
+        $hasChanges = true;
+
+        $configurationFetchedHandled = function (ConfigurationFetchedArgs $e) use ($status, $now, $ex) {
+            $this->assertSame($status, $e->getFetcherStatus());
+            $this->assertSame($now, $e->getCreationDate());
+            $this->assertTrue($e->isHasChanges());
+            $this->assertSame(FetcherError::NoError, $e->getErrorDetails());
+            throw $ex;
+        };
+
+        $configurationFetchedInvoker = new ConfigurationFetchedInvoker($userUnhandledErrorInvoker);
+        $configurationFetchedInvoker->register($configurationFetchedHandled);
+        $configurationFetchedInvoker->invoke($status, $now, $hasChanges);
+        $this->assertTrue($invokedCalled);
     }
 }

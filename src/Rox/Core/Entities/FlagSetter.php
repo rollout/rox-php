@@ -42,7 +42,7 @@ class FlagSetter
         FlagRepositoryInterface $flagRepository,
         ParserInterface $parser,
         ExperimentRepositoryInterface $experimentRepository,
-        $impressionInvoker = null)
+        ImpressionInvokerInterface $impressionInvoker = null)
     {
         $this->_flagRepository = $flagRepository;
         $this->_parser = $parser;
@@ -68,14 +68,14 @@ class FlagSetter
             }
         }
 
-        foreach (array_values($this->_flagRepository->getAllFlags()) as /*Variant*/ $variant) {
+        foreach (array_values($this->_flagRepository->getAllFlags()) as /*RoxStringBase*/ $variant) {
             if (!in_array($variant->getName(), $flagsWithCondition)) {
                 $this->_setFlagData($variant);
             }
         }
     }
 
-    private function _setFlagData(Variant $variant, ExperimentModel $experiment = null)
+    private function _setFlagData(RoxStringBase $variant, ExperimentModel $experiment = null)
     {
         $variant->setForEvaluation($this->_parser, $experiment, $this->_impressionInvoker);
     }

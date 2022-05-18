@@ -2,19 +2,30 @@
 
 namespace Rox\Core\Roxx;
 
-use Rox\Core\Entities\Flag;
+use Rox\Core\Entities\BoolFlagValueConverter;
 
 class EvaluationResult
 {
     private $_value;
+    private $_usedContext;
 
     /**
      * EvaluationResult constructor.
      * @param mixed $value
+     * @param mixed $context
      */
-    public function __construct($value)
+    public function __construct($value, $context = null)
     {
         $this->_value = $value;
+        $this->_usedContext = $context;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getUsedContext()
+    {
+        return $this->_usedContext;
     }
 
     /**
@@ -62,11 +73,17 @@ class EvaluationResult
     public function stringValue()
     {
         if (is_string($this->_value)) {
-            return (string)$this->_value;
+            return $this->_value;
+        }
+
+        if (is_numeric($this->_value)) {
+            return strval($this->_value);
         }
 
         if (is_bool($this->_value)) {
-            return $this->_value ? Flag::FLAG_TRUE_VALUE : Flag::FLAG_FALSE_VALUE;
+            return $this->_value
+                ? BoolFlagValueConverter::FLAG_TRUE_VALUE
+                : BoolFlagValueConverter::FLAG_FALSE_VALUE;
         }
 
         return null;

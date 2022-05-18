@@ -3,7 +3,7 @@
 namespace Rox\Core\Roxx;
 
 use Rox\Core\Context\ContextInterface;
-use Rox\Core\Entities\Flag;
+use Rox\Core\Entities\BoolFlagValueConverter;
 use Rox\Core\Repositories\ExperimentRepositoryInterface;
 use Rox\Core\Repositories\FlagRepositoryInterface;
 use Rox\Core\Repositories\TargetGroupRepositoryInterface;
@@ -78,13 +78,13 @@ class ExperimentsExtensions
             $stack->push($isInPercentage);
         });
 
-        $this->_parser->addOperator("flagValue", function (ParserInterface $parser, StackInterface $stack, ContextInterface $context) {
+        $this->_parser->addOperator("flagValue", function (ParserInterface $parser, StackInterface $stack, ContextInterface $context, EvaluationContext $evaluationContext = null) {
             $featureFlagIdentifier = (string)$stack->pop();
 
-            $result = Flag::FLAG_FALSE_VALUE;
+            $result = BoolFlagValueConverter::FLAG_FALSE_VALUE;
             $variant = $this->_flagsRepository->getFlag($featureFlagIdentifier);
             if ($variant != null) {
-                $result = $variant->getValue($context);
+                $result = $variant->getStringValue($context, null, $evaluationContext);
             } else {
                 $flagsExperiment = $this->_experimentRepository->getExperimentByFlag($featureFlagIdentifier);
                 if ($flagsExperiment != null && $flagsExperiment->getCondition()) {
