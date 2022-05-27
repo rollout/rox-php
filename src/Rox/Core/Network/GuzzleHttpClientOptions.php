@@ -32,6 +32,11 @@ class GuzzleHttpClientOptions
     private $_userAgent;
 
     /**
+     * @var int
+     */
+    private $_timeout = 0;
+
+    /**
      * GuzzleHttpClientOptions constructor.
      */
     public function __construct()
@@ -130,6 +135,24 @@ class GuzzleHttpClientOptions
     public function setUserAgent($userAgent)
     {
         $this->_userAgent = $userAgent;
+        return $this;
+    }
+
+    /**
+     * @return int
+     */
+    public function getTimeout()
+    {
+        return $this->_timeout;
+    }
+
+    /**
+     * @param int $timeout
+     * @return GuzzleHttpClientOptions
+     */
+    public function setTimeout($timeout)
+    {
+        $this->_timeout = $timeout;
         return $this;
     }
 }

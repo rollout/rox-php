@@ -34,6 +34,11 @@ class GuzzleHttpClient implements HttpClientInterface
     private $_log;
 
     /**
+     * @var int
+     */
+    private $_timeout = 0;
+
+    /**
      * GuzzleHttpClient constructor.
      * @param GuzzleHttpClientOptions|null $options
      */
@@ -56,7 +61,7 @@ class GuzzleHttpClient implements HttpClientInterface
                 ];
             }
         }
-
+        $this->_timeout = $options->getTimeout();
         $this->_client = new Client($config);
         $this->_log = LoggerFactory::getInstance()->createLogger(self::class);
     }
@@ -78,7 +83,9 @@ class GuzzleHttpClient implements HttpClientInterface
                 // Don't use Kevinrob/GuzzleCache lib constants here to make it optional in composer.json
                 $request = $request->withHeader('X-Kevinrob-GuzzleCache-ReValidation', true);
             }
-            $response = $this->_client->send($request);
+            $response = $this->_client->send($request, [
+                RequestOptions::TIMEOUT => $this->_timeout,
+            ]);
             if (!$noCache && $this->_logCacheHitsAndMisses) {
                 $cacheState = $response->getHeader("X-Kevinrob-Cache");
                 if (is_array($cacheState) && !empty($cacheState)) {
@@ -117,7 +124,8 @@ class GuzzleHttpClient implements HttpClientInterface
     {
         try {
             return new Psr7ResponseWrapper($this->_client->post(new Uri($uri), [
-                RequestOptions::JSON => $data
+                RequestOptions::JSON => $data,
+                RequestOptions::TIMEOUT => $this->_timeout,
             ]));
         } catch (GuzzleException $e) {
             $this->_log->error("Failed to send data to ${uri}: {$e->getMessage()}", [
