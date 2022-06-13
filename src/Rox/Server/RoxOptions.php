@@ -53,6 +53,11 @@ final class RoxOptions implements RoxOptionsInterface
     private $_configFetchIntervalInSeconds;
 
     /**
+     * @var int
+     */
+    private $_timeout = 0;
+
+    /**
      * RoxOptions constructor.
      * @param RoxOptionsBuilder $roxOptionsBuilder
      */
@@ -75,6 +80,7 @@ final class RoxOptions implements RoxOptionsInterface
         $this->_cacheStorage = $roxOptionsBuilder->getCacheStorage();
         $this->_logCacheHitsAndMisses = $roxOptionsBuilder->isLogCacheHitsAndMisses();
         $this->_configFetchIntervalInSeconds = $roxOptionsBuilder->getConfigFetchIntervalInSeconds();
+        $this->_timeout = $roxOptionsBuilder->getTimeout();
     }
 
     /**
@@ -147,5 +153,13 @@ final class RoxOptions implements RoxOptionsInterface
     function getConfigFetchIntervalInSeconds()
     {
         return $this->_configFetchIntervalInSeconds;
+    }
+
+    /**
+     * @return int
+     */
+    public function getTimeout()
+    {
+        return $this->_timeout;
     }
 }
