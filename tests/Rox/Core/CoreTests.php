@@ -71,6 +71,10 @@ class CoreTests extends RoxTestCase
             ->shouldReceive('getDistinctId')
             ->andReturnNull()
             ->byDefault()
+            ->getMock()
+            ->shouldReceive('getTimeout')
+            ->andReturnNull()
+            ->byDefault()
             ->getMock();
     }
 
