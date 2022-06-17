@@ -52,6 +52,11 @@ final class RoxOptionsBuilder
     private $_configFetchIntervalInSeconds;
 
     /**
+     * @var int
+     */
+    private $_timeout = 0;
+
+    /**
      * @return string
      */
     public function getDevModeKey()
@@ -210,6 +215,24 @@ final class RoxOptionsBuilder
     public function setConfigFetchIntervalInSeconds($configFetchIntervalInSeconds)
     {
         $this->_configFetchIntervalInSeconds = $configFetchIntervalInSeconds;
+        return $this;
+    }
+
+    /**
+     * @return int
+     */
+    public function getTimeout()
+    {
+        return $this->_timeout;
+    }
+
+    /**
+     * @param int $timeout
+     * @return RoxOptionsBuilder
+     */
+    public function setTimeout($timeout)
+    {
+        $this->_timeout = $timeout;
         return $this;
     }
 }

@@ -375,6 +375,9 @@ final class Core
     private function _createHttpClientFactory($options, $cacheTtl)
     {
         $httpClientOptions = new GuzzleHttpClientOptions();
+        if ($options != null) {
+            $httpClientOptions->setTimeout($options->getTimeout());
+        }
         $cacheStorage = $options
             ? $options->getCacheStorage()
             : null;
