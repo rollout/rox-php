@@ -23,7 +23,7 @@ class Environment
      */
     public static function getCdnPath()
     {
-        $env = isset($_ENV[self::ENV_VAR_NAME]) ? $_ENV[self::ENV_VAR_NAME] : null;
+        $env = self::getEnvMode();
         if ($env == self::QA) {
             return 'https://qa-conf.rollout.io';
         } else if ($env == self::LOCAL) {
@@ -37,7 +37,7 @@ class Environment
      */
     public static function getApiPath()
     {
-        $env = isset($_ENV[self::ENV_VAR_NAME]) ? $_ENV[self::ENV_VAR_NAME] : null;
+        $env = self::getEnvMode();
         if ($env == self::QA) {
             return 'https://qax.rollout.io/device/get_configuration';
         } else if ($env == self::LOCAL) {
@@ -51,7 +51,7 @@ class Environment
      */
     public static function getStateCdnPath()
     {
-        $env = isset($_ENV[self::ENV_VAR_NAME]) ? $_ENV[self::ENV_VAR_NAME] : null;
+        $env = self::getEnvMode();
         if ($env == self::QA) {
             return 'https://qa-statestore.rollout.io';
         } else if ($env == self::LOCAL) {
@@ -65,7 +65,7 @@ class Environment
      */
     public static function getStateApiPath()
     {
-        $env = isset($_ENV[self::ENV_VAR_NAME]) ? $_ENV[self::ENV_VAR_NAME] : null;
+        $env = self::getEnvMode();
         if ($env == self::QA) {
             return 'https://qax.rollout.io/device/update_state_store';
         } else if ($env == self::LOCAL) {
@@ -80,7 +80,7 @@ class Environment
      */
     public static function getAnalyticsPath()
     {
-        $env = isset($_ENV[self::ENV_VAR_NAME]) ? $_ENV[self::ENV_VAR_NAME] : null;
+        $env = self::getEnvMode();
         if ($env == self::QA) {
             return 'https://qaanalytic.rollout.io';
         } else if ($env == self::LOCAL) {
@@ -94,12 +94,22 @@ class Environment
      */
     public static function getNotificationsPath()
     {
-        $env = isset($_ENV[self::ENV_VAR_NAME]) ? $_ENV[self::ENV_VAR_NAME] : null;
+        $env = self::getEnvMode();
         if ($env == self::QA) {
             return 'https://qax-push.rollout.io/sse';
         } else if ($env == self::LOCAL) {
             return 'http://127.0.0.1:8887/sse';
         }
         return 'https://push.rollout.io/sse';
+    }
+
+    /**
+     * Reads the environment mode from system environment
+     *
+     * @return null|string
+     */
+    public static function getEnvMode(): ?string
+    {
+        return ((string) getenv(self::ENV_VAR_NAME)) ?: null;
     }
 }
