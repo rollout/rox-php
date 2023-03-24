@@ -11,11 +11,13 @@ use Rox\Core\Configuration\ConfigurationFetchedInvoker;
 use Rox\Core\ErrorHandling\UserspaceUnhandledErrorInvokerInterface;
 use Rox\Core\Reporting\ErrorReporterInterface;
 use Rox\RoxTestCase;
+use Rox\Core\Consts\Environment;
 
-class ConfigurationFetcherRoxyTests extends RoxTestCase
+class ConfigurationFetcherOneSourceTests extends RoxTestCase
 {
     private $_dp;
     private $_bu;
+    private $_environment;
 
     protected function setUp(): void
     {
@@ -33,6 +35,7 @@ class ConfigurationFetcherRoxyTests extends RoxTestCase
             ->getMock();
 
         $this->_bu = Mockery::mock(BUIDInterface::class);
+        $this->_environment = new Environment();
     }
 
     public function testWillReturnDataWhenSuccessful()
@@ -50,11 +53,34 @@ class ConfigurationFetcherRoxyTests extends RoxTestCase
             ->andReturn(new TestHttpResponse(200, "{\"a\": \"harti\"}"))
             ->getMock();
 
-        $confFetcher = new ConfigurationFetcherRoxy($request, $this->_dp, $this->_bu, $confFetchInvoker, "http://harta.com", $errorReporter);
+        $confFetcher = new ConfigurationFetcherOneSource($request, $this->_bu, $this->_dp, $confFetchInvoker, $errorReporter, $this->_environment, ConfigurationSource::Roxy);
         $result = $confFetcher->fetch();
 
         $this->assertEquals($result->getParsedData()["a"], "harti");
         $this->assertEquals(ConfigurationSource::Roxy, $result->getSource());
+        $this->assertEquals(0, $numberOfTimersCalled[0]);
+    }
+
+    public function testWillReturnDataWhenSuccessfulAPISource()
+    {
+        $confFetchInvoker = new ConfigurationFetchedInvoker(Mockery::mock(UserspaceUnhandledErrorInvokerInterface::class));
+        $errorReporter = Mockery::mock(ErrorReporterInterface::class);
+
+        $numberOfTimersCalled = [0];
+        $confFetchInvoker->register(function (ConfigurationFetchedArgs $e) use (&$numberOfTimersCalled) {
+            $numberOfTimersCalled[0]++;
+        });
+
+        $request = Mockery::mock(HttpClientInterface::class)
+            ->shouldReceive('sendGet')
+            ->andReturn(new TestHttpResponse(200, "{\"a\": \"harti\"}"))
+            ->getMock();
+
+        $confFetcher = new ConfigurationFetcherOneSource($request, $this->_bu, $this->_dp, $confFetchInvoker, $errorReporter, $this->_environment, ConfigurationSource::API);
+        $result = $confFetcher->fetch();
+
+        $this->assertEquals($result->getParsedData()["a"], "harti");
+        $this->assertEquals(ConfigurationSource::API, $result->getSource());
         $this->assertEquals(0, $numberOfTimersCalled[0]);
     }
 
@@ -73,7 +99,7 @@ class ConfigurationFetcherRoxyTests extends RoxTestCase
             ->andThrow(Exception::class)
             ->getMock();
 
-        $confFetcher = new ConfigurationFetcherRoxy($request, $this->_dp, $this->_bu, $confFetchInvoker, "http://harta.com", $errorReporter);
+        $confFetcher = new ConfigurationFetcherOneSource($request, $this->_bu, $this->_dp, $confFetchInvoker, $errorReporter, $this->_environment);
         $result = $confFetcher->fetch();
 
         $this->assertEquals($result, null);
@@ -98,7 +124,7 @@ class ConfigurationFetcherRoxyTests extends RoxTestCase
             ->andReturn(new TestHttpResponse(HttpResponseInterface::STATUS_NOT_FOUND))
             ->getMock();
 
-        $confFetcher = new ConfigurationFetcherRoxy($request, $this->_dp, $this->_bu, $confFetchInvoker, "http://harta.com", $errorReporter);
+        $confFetcher = new ConfigurationFetcherOneSource($request, $this->_bu, $this->_dp, $confFetchInvoker, $errorReporter, $this->_environment);
         $result = $confFetcher->fetch();
 
         $this->assertEquals($result, null);

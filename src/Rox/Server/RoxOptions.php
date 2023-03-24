@@ -58,6 +58,11 @@ final class RoxOptions implements RoxOptionsInterface
     private $_timeout = 0;
 
     /**
+     * @var NetworkConfigurationsOptions
+     */
+    private $_networkConfigurationsOptions;
+
+    /**
      * RoxOptions constructor.
      * @param RoxOptionsBuilder $roxOptionsBuilder
      */
@@ -81,6 +86,7 @@ final class RoxOptions implements RoxOptionsInterface
         $this->_logCacheHitsAndMisses = $roxOptionsBuilder->isLogCacheHitsAndMisses();
         $this->_configFetchIntervalInSeconds = $roxOptionsBuilder->getConfigFetchIntervalInSeconds();
         $this->_timeout = $roxOptionsBuilder->getTimeout();
+        $this->_networkConfigurationsOptions = $roxOptionsBuilder->getNetworkConfigurationsOptions();
     }
 
     /**
@@ -161,5 +167,13 @@ final class RoxOptions implements RoxOptionsInterface
     public function getTimeout()
     {
         return $this->_timeout;
+    }
+
+    /**
+     * @return NetworkConfigurationsOptions
+     */
+    public function getNetworkConfigurationsOptions()
+    {
+        return $this->_networkConfigurationsOptions;
     }
 }

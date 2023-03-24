@@ -14,8 +14,6 @@ use Rox\Core\Reporting\ErrorReporterInterface;
 
 class XErrorReporter implements ErrorReporterInterface
 {
-    const BUGSNAG_NOTIFY_URL = "https://notify.bugsnag.com";
-
     /**
      * @var DevicePropertiesInterface $_deviceProperties
      */
@@ -37,20 +35,28 @@ class XErrorReporter implements ErrorReporterInterface
     private $_log;
 
     /**
+     * @var Environment $_environment
+     */
+    private $_environment;
+
+    /**
      * XErrorReporter constructor.
      * @param HttpClientInterface $request
      * @param DevicePropertiesInterface $deviceProperties
      * @param BUIDInterface $buid
+     * @param Environment $environment
      */
     public function __construct(
         HttpClientInterface $request,
         DevicePropertiesInterface $deviceProperties,
-        BUIDInterface $buid)
+        BUIDInterface $buid,
+        Environment $environment)
     {
         $this->_log = LoggerFactory::getInstance()->createLogger(self::class);
         $this->_deviceProperties = $deviceProperties;
         $this->_buid = $buid;
         $this->_request = $request;
+        $this->_environment = $environment;
     }
 
     /**
@@ -58,7 +64,7 @@ class XErrorReporter implements ErrorReporterInterface
      */
     function report($message, Exception $ex)
     {
-        if ($this->_deviceProperties->getRolloutEnvironment() === Environment::LOCAL) {
+        if ($this->_environment->errorReporterPath() == null) {
             return;
         }
 
@@ -86,7 +92,7 @@ class XErrorReporter implements ErrorReporterInterface
         $this->_log->debug("Sending bugsnag error report...");
 
         try {
-            $this->_request->postJson(self::BUGSNAG_NOTIFY_URL, $payload);
+            $this->_request->postJson($this->_environment->errorReporterPath(), $payload);
             $this->_log->debug("Bugsnag error report was sent");
         } catch (Exception $e) {
             $this->_log->error("Failed to send bugsnag error ", [
@@ -235,7 +241,7 @@ class XErrorReporter implements ErrorReporterInterface
     private function _addApp(array &$ev)
     {
         $app = [
-            "releaseStage" => (string)$this->_deviceProperties->getRolloutEnvironment(),
+            "releaseStage" => $this->_environment->name(),
             "version" => $this->_deviceProperties->getLibVersion()
         ];
         $ev["app"] = $app;

@@ -4,16 +4,70 @@ namespace Rox\Core\Consts;
 
 class Environment
 {
-    const INSTANCE_ID_ENV_VAR_NAME = 'ROLLOUT_INSTANCE_ID';
-    const ENV_VAR_NAME = 'ROLLOUT_MODE';
+    private $_getConfigCDNPath;
+    private $_getConfigAPIPath;
+    private $_sendStateCDNPath;
+    private $_sendStateAPIPath;
+    private $_analyticsPath;
+    private $_errorReporterPath;
+    private $_name;
+
     const PRODUCTION = 'PRODUCTION';
-    const QA = 'QA';
-    const LOCAL = 'LOCAL';
+    const CUSTOM = 'CUSTOM';
+
+    public function __construct($options = null)
+    {
+        if ($options != null && $options->getNetworkConfigurationsOptions() != null) {
+            $networkConfig = $options->getNetworkConfigurationsOptions();
+            $this->_getConfigCDNPath = $this->chopLastestSlash($networkConfig->getConfigCloudEndpoint());
+            $this->_getConfigAPIPath = $this->chopLastestSlash($networkConfig->getConfigApiEndpoint());
+            $this->_sendStateCDNPath = $this->chopLastestSlash($networkConfig->sendStateCloudEndpoint());
+            $this->_sendStateAPIPath = $this->chopLastestSlash($networkConfig->sendStateApiEndpoint());
+            $this->_analyticsPath = $this->chopLastestSlash($networkConfig->analyticsEndpoint());
+            $this->_errorReporterPath = $this->chopLastestSlash($networkConfig->errorReporterEndpoint());
+            $this->_name = self::CUSTOM;
+            return;
+        }
+
+        if ($options != null && $options->getRoxyURL() != null) {
+            $this->_getConfigCDNPath = null;
+            $this->_getConfigAPIPath = $this->chopLastestSlash($options->getRoxyURL()) . '/' . $this->getRoxyInternalPath();
+            $this->_sendStateCDNPath = null;
+            $this->_sendStateAPIPath = null;
+            $this->_analyticsPath = null;
+            $this->_errorReporterPath = null;
+            $this->_name = self::CUSTOM;
+            return;
+        }
+
+        $this->_getConfigCDNPath = 'https://conf.rollout.io';
+        $this->_getConfigAPIPath = 'https://x-api.rollout.io/device/get_configuration';
+        $this->_sendStateCDNPath = 'https://statestore.rollout.io';
+        $this->_sendStateAPIPath = 'https://x-api.rollout.io/device/update_state_store';
+        $this->_analyticsPath = 'https://analytic.rollout.io';
+        $this->_errorReporterPath = 'https://notify.bugsnag.com';
+        $this->_name = self::PRODUCTION;
+    }
+    
+    /**
+     * @return string
+     */
+    private function chopLastestSlash($url)
+    {
+        if ($url != null)
+        {
+            if (substr($url, -1) == '/')
+            {
+                return substr($url, 0, -1);
+            }
+        }
+        return $url;
+    }
 
     /**
      * @return string
      */
-    public static function getRoxyInternalPath()
+    public function getRoxyInternalPath()
     {
         return 'device/request_configuration';
     }
@@ -21,85 +75,56 @@ class Environment
     /**
      * @return string
      */
-    public static function getCdnPath()
+    public function getConfigCDNPath()
     {
-        $env = isset($_ENV[self::ENV_VAR_NAME]) ? $_ENV[self::ENV_VAR_NAME] : null;
-        if ($env == self::QA) {
-            return 'https://qa-conf.rollout.io';
-        } else if ($env == self::LOCAL) {
-            return 'https://development-conf.rollout.io';
-        }
-        return 'https://conf.rollout.io';
+        return $this->_getConfigCDNPath;
     }
 
     /**
      * @return string
      */
-    public static function getApiPath()
+    public function getConfigAPIPath()
     {
-        $env = isset($_ENV[self::ENV_VAR_NAME]) ? $_ENV[self::ENV_VAR_NAME] : null;
-        if ($env == self::QA) {
-            return 'https://qax.rollout.io/device/get_configuration';
-        } else if ($env == self::LOCAL) {
-            return 'http://127.0.0.1:8557/device/get_configuration';
-        }
-        return 'https://x-api.rollout.io/device/get_configuration';
+        return $this->_getConfigAPIPath;
     }
 
     /**
      * @return string
      */
-    public static function getStateCdnPath()
+    public function sendStateCDNPath()
     {
-        $env = isset($_ENV[self::ENV_VAR_NAME]) ? $_ENV[self::ENV_VAR_NAME] : null;
-        if ($env == self::QA) {
-            return 'https://qa-statestore.rollout.io';
-        } else if ($env == self::LOCAL) {
-            return 'https://development-statestore.rollout.io';
-        }
-        return 'https://statestore.rollout.io';
+        return $this->_sendStateCDNPath;
     }
 
     /**
      * @return string
      */
-    public static function getStateApiPath()
+    public function sendStateAPIPath()
     {
-        $env = isset($_ENV[self::ENV_VAR_NAME]) ? $_ENV[self::ENV_VAR_NAME] : null;
-        if ($env == self::QA) {
-            return 'https://qax.rollout.io/device/update_state_store';
-        } else if ($env == self::LOCAL) {
-            return 'http://127.0.0.1:8557/device/update_state_store';
-        }
-
-        return 'https://x-api.rollout.io/device/update_state_store';
+        return $this->_sendStateAPIPath;
     }
 
     /**
      * @return string
      */
-    public static function getAnalyticsPath()
+    public function analyticsPath()
     {
-        $env = isset($_ENV[self::ENV_VAR_NAME]) ? $_ENV[self::ENV_VAR_NAME] : null;
-        if ($env == self::QA) {
-            return 'https://qaanalytic.rollout.io';
-        } else if ($env == self::LOCAL) {
-            return 'http://127.0.0.1:8787';
-        }
-        return 'https://analytic.rollout.io';
+        return $this->_analyticsPath;
     }
 
     /**
      * @return string
      */
-    public static function getNotificationsPath()
+    public function errorReporterPath()
     {
-        $env = isset($_ENV[self::ENV_VAR_NAME]) ? $_ENV[self::ENV_VAR_NAME] : null;
-        if ($env == self::QA) {
-            return 'https://qax-push.rollout.io/sse';
-        } else if ($env == self::LOCAL) {
-            return 'http://127.0.0.1:8887/sse';
-        }
-        return 'https://push.rollout.io/sse';
+        return $this->_errorReporterPath;
+    }
+
+    /**
+     * @return string
+     */
+    public function name()
+    {
+        return $this->_name;
     }
 }

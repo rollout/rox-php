@@ -59,11 +59,13 @@ class AnalyticsClient implements ClientInterface
     public function __construct(
         DevicePropertiesInterface $deviceProperties,
         InternalFlagsInterface $internalFlags,
-        HttpClientInterface $httpClient)
+        HttpClientInterface $httpClient,
+        Environment $environment)
     {
         $this->_deviceProperties = $deviceProperties;
         $this->_httpClient = $httpClient;
         $this->_log = LoggerFactory::getInstance()->createLogger(self::class);
+        $this->_environment = $environment;
         $maxQueueSize = $internalFlags->getIntValue("rox.internal.analytics.max_queue_size");
         if ($maxQueueSize > 0) {
             $this->_max_queue_size = $maxQueueSize;
@@ -109,7 +111,7 @@ class AnalyticsClient implements ClientInterface
     private function _flushBatch(array $messages)
     {
         $batch = $this->_createBatch($messages);
-        $url = Environment::getAnalyticsPath() . "/impression/" . $this->_deviceProperties->getRolloutKey();
+        $url = $this->_environment->analyticsPath() . "/impression/" . $this->_deviceProperties->getRolloutKey();
         $response = $this->_httpClient->postJson($url, $batch);
         $statusCode = $response->getStatusCode();
         if (200 == $statusCode) {

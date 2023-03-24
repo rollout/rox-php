@@ -7,7 +7,6 @@ final class ConfigurationSource
     const CDN = 1;
     const API = 2;
     const Roxy = 3;
-    const URL = 4;
 
     /**
      * @param int $source
@@ -22,8 +21,6 @@ final class ConfigurationSource
                 return 'API';
             case self::Roxy:
                 return 'Roxy';
-            case self::URL:
-                return 'URL';
             default:
                 return (string)$source;
         }

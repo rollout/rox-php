@@ -10,6 +10,7 @@ use Rox\Core\Configuration\ConfigurationFetchedInvokerInterface;
 use Rox\Core\Configuration\FetcherError;
 use Rox\Core\Logging\LoggerFactory;
 use Rox\Core\Reporting\ErrorReporterInterface;
+use Rox\Core\Consts\Environment;
 
 abstract class ConfigurationFetcherBase implements ConfigurationFetcherInterface
 {
@@ -43,19 +44,27 @@ abstract class ConfigurationFetcherBase implements ConfigurationFetcherInterface
     protected $_errorReporter;
 
     /**
+     * @var Environment $_environment
+     */
+    protected $_environment;
+
+    /**
      * ConfigurationFetcherBase constructor.
      * @param HttpClientInterface $request
      * @param BUIDInterface $buid
      * @param DevicePropertiesInterface $deviceProperties
      * @param ConfigurationFetchedInvokerInterface $configurationFetchedInvoker
      * @param ErrorReporterInterface $errorReporter
+     * @param Environment $environment
      */
     public function __construct(
         HttpClientInterface $request,
         BUIDInterface $buid,
         DevicePropertiesInterface $deviceProperties,
         ConfigurationFetchedInvokerInterface $configurationFetchedInvoker,
-        ErrorReporterInterface $errorReporter)
+        ErrorReporterInterface $errorReporter,
+        Environment $environment
+        )
     {
         $this->_log = LoggerFactory::getInstance()->createLogger(self::class);
         $this->_request = $request;
@@ -63,6 +72,7 @@ abstract class ConfigurationFetcherBase implements ConfigurationFetcherInterface
         $this->_deviceProperties = $deviceProperties;
         $this->_configurationFetchedInvoker = $configurationFetchedInvoker;
         $this->_errorReporter = $errorReporter;
+        $this->_environment = $environment;
     }
 
     /**

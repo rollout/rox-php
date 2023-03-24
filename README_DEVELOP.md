@@ -23,7 +23,6 @@ composer test
 
 Demo uses the following environment variables defined in the system:
 
- - `ROLLOUT_MODE` - can be `LOCAL`, `QA` (default), or `PROD`
  - `ROLLOUT_API_KEY`
  - `ROLLOUT_DEV_MOD_KEY`
  

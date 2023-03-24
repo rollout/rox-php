@@ -57,6 +57,11 @@ final class RoxOptionsBuilder
     private $_timeout = 0;
 
     /**
+     * @var NetworkConfigurationsOptions
+     */
+    private $_networkConfigurationsOptions;
+
+    /**
      * @return string
      */
     public function getDevModeKey()
@@ -235,4 +240,23 @@ final class RoxOptionsBuilder
         $this->_timeout = $timeout;
         return $this;
     }
+
+    /**
+     * @return NetworkConfigurationsOptions
+     */
+    public function getNetworkConfigurationsOptions()
+    {
+        return $this->_networkConfigurationsOptions;
+    }
+
+    /**
+     * @param NetworkConfigurationsOptions
+     * @return RoxOptionsBuilder
+     */
+    public function setNetworkConfigurationsOptions($networkConfigurationsOptions)
+    {
+        $this->_networkConfigurationsOptions = $networkConfigurationsOptions;
+        return $this;
+    }
+
 }

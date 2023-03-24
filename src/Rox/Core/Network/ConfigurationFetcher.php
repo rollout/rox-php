@@ -3,7 +3,6 @@
 namespace Rox\Core\Network;
 
 use Exception;
-use Rox\Core\Consts\Environment;
 use Rox\Core\Consts\PropertyType;
 
 class ConfigurationFetcher extends ConfigurationFetcherBase
@@ -23,7 +22,7 @@ class ConfigurationFetcher extends ConfigurationFetcherBase
      */
     private function _getCDNUrl(array $properties)
     {
-        return Environment::getCdnPath() . '/' . $properties[PropertyType::getCacheMissRelativeUrl()->getName()];
+        return $this->_environment->getConfigCDNPath() . '/' . $properties[PropertyType::getCacheMissRelativeUrl()->getName()];
     }
 
     /**
@@ -32,7 +31,7 @@ class ConfigurationFetcher extends ConfigurationFetcherBase
      */
     private function _getAPIUrl(array $properties)
     {
-        return Environment::getApiPath() . '/' . $properties[PropertyType::getCacheMissRelativeUrl()->getName()];
+        return $this->_environment->getConfigAPIPath() . '/' . $properties[PropertyType::getCacheMissRelativeUrl()->getName()];
     }
 
     /**

@@ -60,17 +60,24 @@ class StateSender
     private $_stateSent = false;
 
     /**
+     * @var Environment $_environment
+     */
+    private $_environment;
+
+    /**
      * StateSender constructor.
      * @param HttpClientInterface $request
      * @param DevicePropertiesInterface $deviceProperties
      * @param FlagRepositoryInterface $flagRepository
      * @param CustomPropertyRepositoryInterface $customPropertyRepository
+     * @param Environment $environment
      */
     public function __construct(
         HttpClientInterface               $request,
         DevicePropertiesInterface         $deviceProperties,
         FlagRepositoryInterface           $flagRepository,
-        CustomPropertyRepositoryInterface $customPropertyRepository)
+        CustomPropertyRepositoryInterface $customPropertyRepository,
+        Environment                       $environment)
     {
         $this->_relevantAPICallParams = [
             PropertyType::getPlatform(),
@@ -95,6 +102,7 @@ class StateSender
         $this->_deviceProperties = $deviceProperties;
         $this->_flagRepository = $flagRepository;
         $this->_customPropertyRepository = $customPropertyRepository;
+        $this->_environment = $environment;
     }
 
     /**
@@ -154,7 +162,7 @@ class StateSender
      */
     private function _getCDNUrl(array $properties)
     {
-        return Environment::getStateCdnPath() . '/' . $this->_getPath($properties);
+        return $this->_environment->sendStateCDNPath() . '/' . $this->_getPath($properties);
     }
 
     /**
@@ -163,7 +171,7 @@ class StateSender
      */
     private function _getAPIUrl(array $properties)
     {
-        return Environment::getStateApiPath() . '/' . $this->_getPath($properties);
+        return $this->_environment->sendStateAPIPath() . '/' . $this->_getPath($properties);
     }
 
     /**
@@ -229,34 +237,8 @@ class StateSender
         $source = ConfigurationSource::CDN;
 
         try {
-            $fetchResult = $this->_sendStateToCDN($properties);
-
-            if ($fetchResult->isSuccessfulStatusCode()) {
-                $responseAsString = $fetchResult->getContent()->readAsString();
-                $responseJSON = json_decode($responseAsString, true);
-
-                if (!is_array($responseJSON)) {
-                    $this->_log->error(
-                        sprintf("Failed to send state. The returned response is not a valid JSON: %s, Source: %s",
-                            $responseAsString,
-                            ConfigurationSource::toString($source)));
-                } else if (array_key_exists("result", $responseJSON)) {
-                    $responseResultValue = $responseJSON["result"];
-                    if ((int)$responseResultValue == 404) {
-                        $shouldRetry = true;
-                    }
-                }
-
-                if (!$shouldRetry) {
-                    // success from cdn
-                    return;
-                }
-            }
-
-            if ($shouldRetry ||
-                $fetchResult->getStatusCode() == HttpResponseInterface::STATUS_FORBIDDEN ||
-                $fetchResult->getStatusCode() == HttpResponseInterface::STATUS_NOT_FOUND) {
-                $this->_logSendStateError($source, $fetchResult, ConfigurationSource::API);
+            if ($this->_environment->sendStateCDNPath() == null) 
+            {
                 $source = ConfigurationSource::API;
 
                 $fetchResult = $this->_sendStateToAPI($properties);
@@ -265,8 +247,47 @@ class StateSender
                     return;
                 }
             }
+            else
+            {
+                $fetchResult = $this->_sendStateToCDN($properties);
 
+                if ($fetchResult->isSuccessfulStatusCode()) {
+                    $responseAsString = $fetchResult->getContent()->readAsString();
+                    $responseJSON = json_decode($responseAsString, true);
+
+                    if (!is_array($responseJSON)) {
+                        $this->_log->error(
+                            sprintf("Failed to send state. The returned response is not a valid JSON: %s, Source: %s",
+                                $responseAsString,
+                                ConfigurationSource::toString($source)));
+                    } else if (array_key_exists("result", $responseJSON)) {
+                        $responseResultValue = $responseJSON["result"];
+                        if ((int)$responseResultValue == 404) {
+                            $shouldRetry = true;
+                        }
+                    }
+
+                    if (!$shouldRetry) {
+                        // success from cdn
+                        return;
+                    }
+                }
+
+                if ($shouldRetry ||
+                    $fetchResult->getStatusCode() == HttpResponseInterface::STATUS_FORBIDDEN ||
+                    $fetchResult->getStatusCode() == HttpResponseInterface::STATUS_NOT_FOUND) {
+                    $this->_logSendStateError($source, $fetchResult, ConfigurationSource::API);
+                    $source = ConfigurationSource::API;
+
+                    $fetchResult = $this->_sendStateToAPI($properties);
+                    if ($fetchResult->isSuccessfulStatusCode()) {
+                        // success for api
+                        return;
+                    }
+                }
+            }
             $this->_logSendStateError($source, $fetchResult);
+
         } catch (Exception $ex) {
             $this->_logSendStateException($source, $ex);
         }
