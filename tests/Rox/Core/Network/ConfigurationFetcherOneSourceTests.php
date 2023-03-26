@@ -34,7 +34,12 @@ class ConfigurationFetcherOneSourceTests extends RoxTestCase
             ->byDefault()
             ->getMock();
 
-        $this->_bu = Mockery::mock(BUIDInterface::class);
+        $this->_bu = Mockery::mock(BUIDInterface::class)
+            ->shouldReceive('getQueryStringParts')
+            ->andReturn(["buid" => "buid"])
+            ->byDefault()
+            ->getMock();
+            
         $this->_environment = new Environment();
     }
 
@@ -49,7 +54,7 @@ class ConfigurationFetcherOneSourceTests extends RoxTestCase
         });
 
         $request = Mockery::mock(HttpClientInterface::class)
-            ->shouldReceive('sendGet')
+            ->shouldReceive('sendPost')
             ->andReturn(new TestHttpResponse(200, "{\"a\": \"harti\"}"))
             ->getMock();
 
@@ -72,7 +77,7 @@ class ConfigurationFetcherOneSourceTests extends RoxTestCase
         });
 
         $request = Mockery::mock(HttpClientInterface::class)
-            ->shouldReceive('sendGet')
+            ->shouldReceive('sendPost')
             ->andReturn(new TestHttpResponse(200, "{\"a\": \"harti\"}"))
             ->getMock();
 
@@ -95,7 +100,7 @@ class ConfigurationFetcherOneSourceTests extends RoxTestCase
         });
 
         $request = Mockery::mock(HttpClientInterface::class)
-            ->shouldReceive('sendGet')
+            ->shouldReceive('sendPost')
             ->andThrow(Exception::class)
             ->getMock();
 
@@ -120,7 +125,7 @@ class ConfigurationFetcherOneSourceTests extends RoxTestCase
         });
 
         $request = Mockery::mock(HttpClientInterface::class)
-            ->shouldReceive('sendGet')
+            ->shouldReceive('sendPost')
             ->andReturn(new TestHttpResponse(HttpResponseInterface::STATUS_NOT_FOUND))
             ->getMock();
 
