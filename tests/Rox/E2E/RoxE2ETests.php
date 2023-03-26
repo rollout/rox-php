@@ -24,7 +24,7 @@ class RoxE2ETests extends RoxTestCase
 
     public static function setUpBeforeClass(): void
     {
-        $_ENV[Environment::ENV_VAR_NAME] = Environment::QA;
+        putenv(Environment::ENV_VAR_NAME."=".$Environment::QA);
 
         self::$_staticLoggerFactory = new TestLoggerFactory();
         LoggerFactory::setup(self::$_staticLoggerFactory);
