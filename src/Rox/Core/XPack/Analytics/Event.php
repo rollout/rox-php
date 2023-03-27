@@ -36,7 +36,7 @@ class Event implements JsonSerializable
     {
         $this->_type = 'IMPRESSION';
         $time = TimeUtils::currentTimeMillis();
-        $ms = isset($_ENV['rox.analytics.ms']) ? $_ENV['rox.analytics.ms'] : null;
+        $ms = getenv('rox.analytics.ms') ?: null ;
         if ($ms) {
             $time = floatval($ms);
         }

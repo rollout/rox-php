@@ -74,9 +74,7 @@ class DeviceProperties implements DevicePropertiesInterface
      */
     function getRolloutEnvironment()
     {
-        $env = isset($_ENV[Environment::ENV_VAR_NAME])
-            ? $_ENV[Environment::ENV_VAR_NAME]
-            : null;
+        $env = Environment::getEnvMode();
         if ($env != Environment::QA && $env != Environment::LOCAL) {
             return Environment::PRODUCTION;
         }
