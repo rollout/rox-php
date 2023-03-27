@@ -29,13 +29,9 @@ class Container
     }
 }
 
-$apiKey = isset($_ENV['ROLLOUT_API_KEY'])
-    ? $_ENV['ROLLOUT_API_KEY']
-    : DEFAULT_API_KEY;
+$apiKey = getenv('ROLLOUT_API_KEY') ?: DEFAULT_API_KEY;
 
-$devModeKey = isset($_ENV['ROLLOUT_DEV_MODE_KEY'])
-    ? $_ENV['ROLLOUT_DEV_MODE_KEY']
-    : DEFAULT_DEV_MODE_KEY;
+$devModeKey = getenv('ROLLOUT_DEV_MODE_KEY') ?: DEFAULT_DEV_MODE_KEY;
 
 $roxOptionsBuilder = (new RoxOptionsBuilder())
     ->setDevModeKey($devModeKey)

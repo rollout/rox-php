@@ -23,9 +23,8 @@ class ServerProperties extends DeviceProperties
         RoxOptionsInterface $roxOptions)
     {
         parent::__construct($sdkSettings, $roxOptions);
-        $this->_distinctId = isset($_ENV[self::INSTANCE_ID_ENV_VAR_NAME])
-            ? $_ENV[self::INSTANCE_ID_ENV_VAR_NAME]
-            : md5(join('.', [
+        $this->_distinctId = getenv(self::INSTANCE_ID_ENV_VAR_NAME)
+            ?: md5(join('.', [
                 getmyuid(),
                 getmygid(),
                 get_current_user(),
