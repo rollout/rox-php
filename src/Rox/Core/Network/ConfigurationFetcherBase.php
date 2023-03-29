@@ -10,13 +10,15 @@ use Rox\Core\Configuration\ConfigurationFetchedInvokerInterface;
 use Rox\Core\Configuration\FetcherError;
 use Rox\Core\Logging\LoggerFactory;
 use Rox\Core\Reporting\ErrorReporterInterface;
+use Rox\Core\Consts\Environment;
+use Rox\Core\Consts\PropertyType;
 
 abstract class ConfigurationFetcherBase implements ConfigurationFetcherInterface
 {
     /**
      * @var LoggerInterface
      */
-    private $_log;
+    protected $_log;
 
     /**
      * @var HttpClientInterface $_request
@@ -43,19 +45,27 @@ abstract class ConfigurationFetcherBase implements ConfigurationFetcherInterface
     protected $_errorReporter;
 
     /**
+     * @var Environment $_environment
+     */
+    protected $_environment;
+
+    /**
      * ConfigurationFetcherBase constructor.
      * @param HttpClientInterface $request
      * @param BUIDInterface $buid
      * @param DevicePropertiesInterface $deviceProperties
      * @param ConfigurationFetchedInvokerInterface $configurationFetchedInvoker
      * @param ErrorReporterInterface $errorReporter
+     * @param Environment $environment
      */
     public function __construct(
         HttpClientInterface $request,
         BUIDInterface $buid,
         DevicePropertiesInterface $deviceProperties,
         ConfigurationFetchedInvokerInterface $configurationFetchedInvoker,
-        ErrorReporterInterface $errorReporter)
+        ErrorReporterInterface $errorReporter,
+        Environment $environment
+        )
     {
         $this->_log = LoggerFactory::getInstance()->createLogger(self::class);
         $this->_request = $request;
@@ -63,6 +73,7 @@ abstract class ConfigurationFetcherBase implements ConfigurationFetcherInterface
         $this->_deviceProperties = $deviceProperties;
         $this->_configurationFetchedInvoker = $configurationFetchedInvoker;
         $this->_errorReporter = $errorReporter;
+        $this->_environment = $environment;
     }
 
     /**
@@ -89,6 +100,52 @@ abstract class ConfigurationFetcherBase implements ConfigurationFetcherInterface
         }
 
         return new ConfigurationFetchResult($decoded, $source);
+    }
+
+    /**
+     * @param array $properties
+     * @return string
+     */
+    private function _getAPIUrl(array $properties)
+    {
+        return $this->_environment->getConfigAPIPath() . '/' . $properties[PropertyType::getCacheMissRelativeUrl()->getName()];
+    }
+
+    /**
+     * @param array $properties
+     * @return HttpResponseInterface
+     */
+    protected function _fetchFromAPI(array $properties)
+    {
+        $url = $this->_getAPIUrl($properties);
+
+        $apiRequest = new RequestData($url, $properties);
+        return $this->_request->sendPost($apiRequest);
+    }
+
+    /**
+     * @param array $properties
+     * @return string
+     */
+    protected function _getPath(array $properties)
+    {
+        return $properties[PropertyType::getAppKey()->getName()] . '/' . $properties[PropertyType::getBuid()->getName()];
+    }
+
+    /**
+     * @return array
+     */
+    protected function _preparePropsFromDeviceProps()
+    {
+        $queryParams = $this->_deviceProperties->getAllProperties();
+        $queryStringParts = $this->_buid->getQueryStringParts();
+        foreach (array_keys($queryStringParts) as $key) {
+            if (!array_key_exists($key, $queryParams)) {
+                $queryParams[$key] = $queryStringParts[$key];
+            }
+        }
+        $queryParams[PropertyType::getCacheMissRelativeUrl()->getName()] = $this->_getPath($queryParams);
+        return $queryParams;
     }
 
     /**

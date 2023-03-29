@@ -38,8 +38,9 @@ use Rox\Core\Logging\LoggerFactory;
 use Rox\Core\Network\CdnCacheStrategy;
 use Rox\Core\Network\CdnRequestMatcher;
 use Rox\Core\Network\ConfigurationFetcher;
+use Rox\Core\Network\ConfigurationSource;
 use Rox\Core\Network\ConfigurationFetcherInterface;
-use Rox\Core\Network\ConfigurationFetcherRoxy;
+use Rox\Core\Network\ConfigurationFetcherOneSource;
 use Rox\Core\Network\ConfigurationFetchResult;
 use Rox\Core\Network\GuzzleHttpClientFactory;
 use Rox\Core\Network\GuzzleHttpClientOptions;
@@ -63,8 +64,10 @@ use Rox\Core\XPack\Analytics\AnalyticsClient;
 use Rox\Core\XPack\Client\XBUID;
 use Rox\Core\XPack\Network\StateSender;
 use Rox\Core\XPack\Reporting\XErrorReporter;
+use Rox\Core\Reporting\ErrorReporter;
 use Rox\Core\XPack\Security\XAPIKeyVerifier;
 use Rox\Core\XPack\Security\XSignatureVerifier;
+use Rox\Core\Consts\Environment;
 
 final class Core
 {
@@ -177,6 +180,11 @@ final class Core
     private $_log;
 
     /**
+     * @var Environment $_environment
+     */
+    private $_environment;
+
+    /**
      * Core constructor.
      */
     public function __construct()
@@ -209,7 +217,7 @@ final class Core
     public function setup(
         SdkSettingsInterface      $sdkSettings,
         DevicePropertiesInterface $deviceProperties,
-                                  $roxOptions)
+        RoxOptionsInterface       $roxOptions = null)
     {
         $roxyUrl = ($roxOptions != null) ? $roxOptions->getRoxyURL() : null;
         if ($roxyUrl == null) {
@@ -222,6 +230,7 @@ final class Core
             }
         }
 
+        $this->_environment = new Environment($roxOptions);
         $this->_sdkSettings = $sdkSettings;
 
         $this->_deviceProperties = $deviceProperties;
@@ -239,25 +248,49 @@ final class Core
         $signature = null;
         $apiKeyVerifier = null;
 
-        $this->_errorReporter = new XErrorReporter($httpClientFactory->createHttpClient(), $deviceProperties, $buid);
+        if ($this->_environment->errorReporterPath() == null)
+        {
+            $this->_errorReporter = new ErrorReporter();
+        }
+        else
+        {
+            $this->_errorReporter = new XErrorReporter($httpClientFactory->createHttpClient(), $deviceProperties, $buid, $this->_environment);
+        }
         $this->_configurationFetchedInvoker = new ConfigurationFetchedInvoker($this->_userUnhandledErrorInvoker);
 
-        if ($roxyUrl != null) {
-            $this->_configurationFetcher = new ConfigurationFetcherRoxy($httpClient, $deviceProperties, $buid, $this->_configurationFetchedInvoker, $roxyUrl, $this->_errorReporter);
+        if ($roxyUrl != null) 
+        {
+            $this->_configurationFetcher = new ConfigurationFetcherOneSource($httpClient, $buid, $deviceProperties, $this->_configurationFetchedInvoker, $this->_errorReporter, $this->_environment, ConfigurationSource::Roxy);
             $this->_impressionInvoker = new ImpressionInvoker($this->_userUnhandledErrorInvoker);
             $signature = new SignatureVerifier();
             $apiKeyVerifier = new APIKeyVerifier();
-        } else {
+        }
+        else 
+        {
             $stateSenderHttpClient = $this->_createHttpClientFactory($roxOptions, self::STATE_STORE_CACHE_TTL_SECONDS)
                 ->createHttpClient();
-            $this->_stateSender = new StateSender($stateSenderHttpClient, $deviceProperties, $this->_flagRepository, $this->_customPropertyRepository);
-            $this->_configurationFetcher = new ConfigurationFetcher($httpClient, $buid, $deviceProperties, $this->_configurationFetchedInvoker, $this->_errorReporter);
-            $analyticsClient = new AnalyticsClient($this->_deviceProperties, $this->_internalFlags, $httpClientFactory->createHttpClient());
-            $this->_impressionInvoker = new XImpressionInvoker(
-                $this->_internalFlags,
-                $this->_userUnhandledErrorInvoker,
-                $this->_customPropertyRepository,
-                $analyticsClient);
+            if ($this->_environment->sendStateAPIPath() != null)
+            {
+                $this->_stateSender = new StateSender($stateSenderHttpClient, $deviceProperties, $this->_flagRepository, $this->_customPropertyRepository, $this->_environment);
+            }
+            if ($this->_environment->getConfigCDNPath() == null)
+            {
+                $this->_configurationFetcher = new ConfigurationFetcherOneSource($httpClient, $buid, $deviceProperties, $this->_configurationFetchedInvoker, $this->_errorReporter, $this->_environment, ConfigurationSource::API);
+            } 
+            else
+            {
+                $this->_configurationFetcher = new ConfigurationFetcher($httpClient, $buid, $deviceProperties, $this->_configurationFetchedInvoker, $this->_errorReporter, $this->_environment);
+            }
+            
+            if ($this->_environment->analyticsPath() != null)
+            {
+                $analyticsClient = new AnalyticsClient($this->_deviceProperties, $this->_internalFlags, $httpClientFactory->createHttpClient(), $this->_environment);
+                $this->_impressionInvoker = new XImpressionInvoker(
+                    $this->_internalFlags,
+                    $this->_userUnhandledErrorInvoker,
+                    $this->_customPropertyRepository,
+                    $analyticsClient);
+            }
             $signature = new XSignatureVerifier();
             $apiKeyVerifier = new XAPIKeyVerifier($sdkSettings);
         }
@@ -394,7 +427,7 @@ final class Core
             );
         }
         $strategy = new DelegatingCacheStrategy(new NullCacheStrategy());
-        $strategy->registerRequestMatcher(new CdnRequestMatcher(), new CdnCacheStrategy(
+        $strategy->registerRequestMatcher(new CdnRequestMatcher($this->_environment), new CdnCacheStrategy(
             $cacheStorage,
             max($cacheTtl ?: self::MIN_CACHE_TTL_SECONDS, self::MIN_CACHE_TTL_SECONDS)
         ));

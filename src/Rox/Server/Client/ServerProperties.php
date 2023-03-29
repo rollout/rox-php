@@ -13,7 +13,7 @@ class ServerProperties extends DeviceProperties
      * @var string $_distinctId
      */
     private $_distinctId;
-
+    const INSTANCE_ID_ENV_VAR_NAME = 'ROLLOUT_INSTANCE_ID';
     /**
      * @param SdkSettingsInterface $sdkSettings
      * @param RoxOptionsInterface $roxOptions
@@ -23,7 +23,7 @@ class ServerProperties extends DeviceProperties
         RoxOptionsInterface $roxOptions)
     {
         parent::__construct($sdkSettings, $roxOptions);
-        $this->_distinctId = getenv(Environment::INSTANCE_ID_ENV_VAR_NAME)
+        $this->_distinctId = getenv(self::INSTANCE_ID_ENV_VAR_NAME)
             ?: md5(join('.', [
                 getmyuid(),
                 getmygid(),

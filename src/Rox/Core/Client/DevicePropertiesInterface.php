@@ -12,11 +12,6 @@ interface DevicePropertiesInterface
     /**
      * @return string
      */
-    function getRolloutEnvironment();
-
-    /**
-     * @return string
-     */
     function getLibVersion();
 
     /**

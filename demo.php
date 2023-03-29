@@ -34,7 +34,15 @@ $apiKey = getenv('ROLLOUT_API_KEY') ?: DEFAULT_API_KEY;
 $devModeKey = getenv('ROLLOUT_DEV_MODE_KEY') ?: DEFAULT_DEV_MODE_KEY;
 
 $roxOptionsBuilder = (new RoxOptionsBuilder())
-    ->setDevModeKey($devModeKey);
+    ->setDevModeKey($devModeKey)
+    ->setNetworkConfigurationsOptions(new NetworkConfigurationsOptions(
+        'https://api.test.rollout.io/device/get_configuration',
+        'https://rox-conf.test.rollout.io',
+        'https://api.test.rollout.io/device/update_state_store',
+        'https://rox-state.test.rollout.io',
+        'https://analytic.test.rollout.io',
+        'https://notify.bugsnag.com'
+    ));
 
 echo '<pre>';
 

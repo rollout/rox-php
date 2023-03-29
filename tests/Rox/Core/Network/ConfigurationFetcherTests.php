@@ -12,6 +12,7 @@ use Rox\Core\Consts\PropertyType;
 use Rox\Core\ErrorHandling\UserspaceUnhandledErrorInvokerInterface;
 use Rox\Core\Reporting\ErrorReporterInterface;
 use Rox\RoxTestCase;
+use Rox\Core\Consts\Environment;
 
 class ConfigurationFetcherTests extends RoxTestCase
 {
@@ -30,9 +31,16 @@ class ConfigurationFetcherTests extends RoxTestCase
      */
     private $_errorReporter;
 
+    /**
+     * @var Environment
+     */
+    private $_environment;
+
     protected function setUp(): void
     {
         parent::setUp();
+
+        $this->_environment = new Environment();
 
         $this->_dp = Mockery::mock(DevicePropertiesInterface::class)
             ->shouldReceive('getAllProperties')
@@ -78,7 +86,7 @@ class ConfigurationFetcherTests extends RoxTestCase
             })
             ->getMock();
 
-        $confFetcher = new ConfigurationFetcher($request, $this->_bu, $this->_dp, $confFetchInvoker, $this->_errorReporter);
+        $confFetcher = new ConfigurationFetcher($request, $this->_bu, $this->_dp, $confFetchInvoker, $this->_errorReporter, $this->_environment);
         $result = $confFetcher->fetch();
 
         $this->assertEquals($reqData[0]->getUrl(), "https://conf.rollout.io/123/buid");
@@ -114,7 +122,7 @@ class ConfigurationFetcherTests extends RoxTestCase
             ->andReturn(new TestHttpResponse(200, "{\"a: harto\"}"))
             ->getMock();
 
-        $confFetcher = new ConfigurationFetcher($request, $this->_bu, $this->_dp, $confFetchInvoker, $this->_errorReporter);
+        $confFetcher = new ConfigurationFetcher($request, $this->_bu, $this->_dp, $confFetchInvoker, $this->_errorReporter, $this->_environment);
         $result = $confFetcher->fetch();
 
         $this->assertNull($result);
@@ -139,7 +147,7 @@ class ConfigurationFetcherTests extends RoxTestCase
             ->never()
             ->getMock();
 
-        $confFetcher = new ConfigurationFetcher($request, $this->_bu, $this->_dp, $confFetchInvoker, $this->_errorReporter);
+        $confFetcher = new ConfigurationFetcher($request, $this->_bu, $this->_dp, $confFetchInvoker, $this->_errorReporter, $this->_environment);
         $result = $confFetcher->fetch();
 
         $this->assertEquals($result, null);
@@ -167,7 +175,7 @@ class ConfigurationFetcherTests extends RoxTestCase
             ->never()
             ->getMock();
 
-        $confFetcher = new ConfigurationFetcher($request, $this->_bu, $this->_dp, $confFetchInvoker, $this->_errorReporter);
+        $confFetcher = new ConfigurationFetcher($request, $this->_bu, $this->_dp, $confFetchInvoker, $this->_errorReporter, $this->_environment);
         $result = $confFetcher->fetch();
 
         $this->assertNull($result);
@@ -197,7 +205,7 @@ class ConfigurationFetcherTests extends RoxTestCase
             ->once()
             ->getMock();
 
-        $confFetcher = new ConfigurationFetcher($request, $this->_bu, $this->_dp, $confFetchInvoker, $this->_errorReporter);
+        $confFetcher = new ConfigurationFetcher($request, $this->_bu, $this->_dp, $confFetchInvoker, $this->_errorReporter, $this->_environment);
         $result = $confFetcher->fetch();
 
         $this->assertNull($result);
@@ -226,7 +234,7 @@ class ConfigurationFetcherTests extends RoxTestCase
             })
             ->getMock();
 
-        $confFetcher = new ConfigurationFetcher($request, $this->_bu, $this->_dp, $confFetchInvoker, $this->_errorReporter);
+        $confFetcher = new ConfigurationFetcher($request, $this->_bu, $this->_dp, $confFetchInvoker, $this->_errorReporter, $this->_environment);
         $result = $confFetcher->fetch();
 
         $this->assertEquals($reqData[0]->getUrl(), "https://x-api.rollout.io/device/get_configuration/123/buid");
@@ -271,7 +279,7 @@ class ConfigurationFetcherTests extends RoxTestCase
             ->never()
             ->getMock();
 
-        $confFetcher = new ConfigurationFetcher($request, $this->_bu, $this->_dp, $confFetchInvoker, $this->_errorReporter);
+        $confFetcher = new ConfigurationFetcher($request, $this->_bu, $this->_dp, $confFetchInvoker, $this->_errorReporter, $this->_environment);
         $result = $confFetcher->fetch();
 
         $this->assertEquals("200", $result->getParsedData()["result"]);
@@ -298,7 +306,7 @@ class ConfigurationFetcherTests extends RoxTestCase
             ->once()
             ->getMock();
 
-        $confFetcher = new ConfigurationFetcher($request, $this->_bu, $this->_dp, $confFetchInvoker, $this->_errorReporter);
+        $confFetcher = new ConfigurationFetcher($request, $this->_bu, $this->_dp, $confFetchInvoker, $this->_errorReporter, $this->_environment);
         $result = $confFetcher->fetch();
 
         $this->assertEquals("harto", $result->getParsedData()["a"]);
@@ -325,7 +333,7 @@ class ConfigurationFetcherTests extends RoxTestCase
             ->once()
             ->getMock();
 
-        $confFetcher = new ConfigurationFetcher($request, $this->_bu, $this->_dp, $confFetchInvoker, $this->_errorReporter);
+        $confFetcher = new ConfigurationFetcher($request, $this->_bu, $this->_dp, $confFetchInvoker, $this->_errorReporter, $this->_environment);
         $result = $confFetcher->fetch();
 
         $this->assertNull($result);

@@ -50,4 +50,9 @@ interface RoxOptionsInterface
      * @return int|null
      */
     function getConfigFetchIntervalInSeconds();
+
+    /**
+     * @return NetworkConfigurationsOptions|null
+     */
+    function getNetworkConfigurationsOptions();
 }

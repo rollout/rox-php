@@ -3,7 +3,6 @@
 namespace Rox\Core\Network;
 
 use Exception;
-use Rox\Core\Consts\Environment;
 use Rox\Core\Consts\PropertyType;
 
 class ConfigurationFetcher extends ConfigurationFetcherBase
@@ -12,43 +11,9 @@ class ConfigurationFetcher extends ConfigurationFetcherBase
      * @param array $properties
      * @return string
      */
-    private function _getPath(array $properties)
-    {
-        return $properties[PropertyType::getAppKey()->getName()] . '/' . $properties[PropertyType::getBuid()->getName()];
-    }
-
-    /**
-     * @param array $properties
-     * @return string
-     */
     private function _getCDNUrl(array $properties)
     {
-        return Environment::getCdnPath() . '/' . $properties[PropertyType::getCacheMissRelativeUrl()->getName()];
-    }
-
-    /**
-     * @param array $properties
-     * @return string
-     */
-    private function _getAPIUrl(array $properties)
-    {
-        return Environment::getApiPath() . '/' . $properties[PropertyType::getCacheMissRelativeUrl()->getName()];
-    }
-
-    /**
-     * @return array
-     */
-    private function _preparePropsFromDeviceProps()
-    {
-        $queryParams = $this->_deviceProperties->getAllProperties();
-        $queryStringParts = $this->_buid->getQueryStringParts();
-        foreach (array_keys($queryStringParts) as $key) {
-            if (!array_key_exists($key, $queryParams)) {
-                $queryParams[$key] = $queryStringParts[$key];
-            }
-        }
-        $queryParams[PropertyType::getCacheMissRelativeUrl()->getName()] = $this->_getPath($queryParams);
-        return $queryParams;
+        return $this->_environment->getConfigCDNPath() . '/' . $properties[PropertyType::getCacheMissRelativeUrl()->getName()];
     }
 
     /**
@@ -69,18 +34,6 @@ class ConfigurationFetcher extends ConfigurationFetcherBase
             'languageVersion' =>
                 PHP_VERSION
         ]));
-    }
-
-    /**
-     * @param array $properties
-     * @return HttpResponseInterface
-     */
-    private function _fetchFromAPI(array $properties)
-    {
-        $url = $this->_getAPIUrl($properties);
-
-        $apiRequest = new RequestData($url, $properties);
-        return $this->_request->sendPost($apiRequest);
     }
 
     /**

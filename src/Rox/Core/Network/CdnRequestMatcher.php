@@ -8,13 +8,20 @@ use Rox\Core\Consts\Environment;
 
 class CdnRequestMatcher implements RequestMatcherInterface
 {
+    private $_environment;
+
+    public function __construct($environment)
+    {
+        $this->_environment = $environment;
+    }
+
     /**
      * @inheritDoc
      */
     public function matches(RequestInterface $request)
     {
         $uri = (string)$request->getUri();
-        return false !== strpos($uri, Environment::getCdnPath()) ||
-            false !== strpos($uri, Environment::getStateCdnPath());
+        return false !== strpos($uri, $this->_environment->getConfigCDNPath()) ||
+            false !== strpos($uri, $this->_environment->sendStateCDNPath());
     }
 }

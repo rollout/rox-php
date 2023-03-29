@@ -68,19 +68,6 @@ class DeviceProperties implements DevicePropertiesInterface
         ];
     }
 
-
-    /**
-     * @return string
-     */
-    function getRolloutEnvironment()
-    {
-        $env = Environment::getEnvMode();
-        if ($env != Environment::QA && $env != Environment::LOCAL) {
-            return Environment::PRODUCTION;
-        }
-        return $env;
-    }
-
     /**
      * @return string
      */

@@ -19,6 +19,10 @@ use Rox\Core\Repositories\FlagRepositoryInterface;
 use Rox\Core\Utils\DotNetCompat;
 use Rox\RoxTestCase;
 use Rox\Server\Flags\RoxFlag;
+use Rox\Core\Consts\Environment;
+use Rox\Server\RoxOptions;
+use Rox\Server\NetworkConfigurationsOptions;
+use Rox\Server\RoxOptionsBuilder;
 
 class StateSenderTests extends RoxTestCase
 {
@@ -48,6 +52,11 @@ class StateSenderTests extends RoxTestCase
     private $_log;
 
     /**
+     * @var Environment $_environment
+     */
+    private $_environment;
+
+    /**
      * @return array
      */
     private function _createNewDeviceProp()
@@ -64,6 +73,7 @@ class StateSenderTests extends RoxTestCase
     {
         parent::setUp();
 
+        $this->_environment = new Environment();
         $this->_log = LoggerFactory::getInstance()->createLogger(self::class);;
 
         $this->_dp = \Mockery::mock(DevicePropertiesInterface::class)
@@ -97,7 +107,7 @@ class StateSenderTests extends RoxTestCase
 
         $this->_flagRepo->addFlag(new RoxFlag(), "flag1");
 
-        $stateSender = new StateSender($request, $this->_dp, $this->_flagRepo, $this->_cpRepo);
+        $stateSender = new StateSender($request, $this->_dp, $this->_flagRepo, $this->_cpRepo, $this->_environment);
         $stateSender->send();
 
         $this->assertEquals("/{$this->_appKey}/09FBB5C9B28B300E8FF14BE4EBB5A829", parse_url($reqData[0]->getUrl())['path']);
@@ -119,7 +129,7 @@ class StateSenderTests extends RoxTestCase
 
         $this->_flagRepo->addFlag(new RoxFlag(), "flag1");
 
-        $stateSender = new StateSender($request, $this->_dp, $this->_flagRepo, $this->_cpRepo);
+        $stateSender = new StateSender($request, $this->_dp, $this->_flagRepo, $this->_cpRepo, $this->_environment);
         $stateSender->send();
 
         $this->assertEquals(parse_url($reqData[0]->getUrl())['path'], "/{$this->_appKey}/09FBB5C9B28B300E8FF14BE4EBB5A829");
@@ -144,7 +154,7 @@ class StateSenderTests extends RoxTestCase
             ->getMock();
 
         $this->_flagRepo->addFlag(new RoxFlag(), "flag1");
-        $stateSender = new StateSender($request, $this->_dp, $this->_flagRepo, $this->_cpRepo);
+        $stateSender = new StateSender($request, $this->_dp, $this->_flagRepo, $this->_cpRepo, $this->_environment);
         $stateSender->send();
 
         $this->_validateNoErrors();
@@ -153,7 +163,7 @@ class StateSenderTests extends RoxTestCase
 
         $this->_flagRepo->addFlag(new RoxFlag(), "flag2");
 
-        $stateSender = new StateSender($request, $this->_dp, $this->_flagRepo, $this->_cpRepo);
+        $stateSender = new StateSender($request, $this->_dp, $this->_flagRepo, $this->_cpRepo, $this->_environment);
         $stateSender->send();
         $this->assertEquals(parse_url($reqData[0]->getUrl())['path'], "/{$this->_appKey}/70748DE9C7F33257E8D2E6B6D7F13C21");
     }
@@ -171,7 +181,7 @@ class StateSenderTests extends RoxTestCase
             ->getMock();
 
         $this->_cpRepo->addCustomProperty(new CustomProperty("cp1", CustomPropertyType::getString(), "true"));
-        $stateSender = new StateSender($request, $this->_dp, $this->_flagRepo, $this->_cpRepo);
+        $stateSender = new StateSender($request, $this->_dp, $this->_flagRepo, $this->_cpRepo, $this->_environment);
         $stateSender->send();
 
         $this->_validateNoErrors();
@@ -179,7 +189,7 @@ class StateSenderTests extends RoxTestCase
         $this->assertEquals(parse_url($reqData[0]->getUrl())['path'], "/{$this->_appKey}/81E3F0A97C49E64CA5E47558F2DFC028");
 
         $this->_cpRepo->addCustomProperty(new CustomProperty("cp2", CustomPropertyType::getDouble(), 20));
-        $stateSender = new StateSender($request, $this->_dp, $this->_flagRepo, $this->_cpRepo);
+        $stateSender = new StateSender($request, $this->_dp, $this->_flagRepo, $this->_cpRepo, $this->_environment);
         $stateSender->send();
         $this->assertEquals(parse_url($reqData[0]->getUrl())['path'], "/{$this->_appKey}/A5D9A87DB72A5A8DA0E571408E81A0A9");
     }
@@ -199,20 +209,20 @@ class StateSenderTests extends RoxTestCase
         $this->_flagRepo->addFlag(new RoxFlag(), "flag1");
         $this->_flagRepo->addFlag(new RoxFlag(), "flag2");
 
-        $stateSender = new StateSender($request, $this->_dp, $this->_flagRepo, $this->_cpRepo);
+        $stateSender = new StateSender($request, $this->_dp, $this->_flagRepo, $this->_cpRepo, $this->_environment);
         $stateSender->send();
         $this->_validateNoErrors();
 
         $this->assertEquals(parse_url($reqData[0]->getUrl())['path'], "/{$this->_appKey}/70748DE9C7F33257E8D2E6B6D7F13C21");
 
-        $stateSender = new StateSender($request, $this->_dp, $this->_flagRepo, $this->_cpRepo);
+        $stateSender = new StateSender($request, $this->_dp, $this->_flagRepo, $this->_cpRepo, $this->_environment);
         $stateSender->send();
         $fr2 = new FlagRepository();
-        $stateSender2 = new StateSender($request, $this->_dp, $fr2, $this->_cpRepo);
+        $stateSender2 = new StateSender($request, $this->_dp, $fr2, $this->_cpRepo, $this->_environment);
         $fr2->addFlag(new RoxFlag(), "flag2");
         $fr2->addFlag(new RoxFlag(), "flag1");
 
-        $stateSender = new StateSender($request, $this->_dp, $this->_flagRepo, $this->_cpRepo);
+        $stateSender = new StateSender($request, $this->_dp, $this->_flagRepo, $this->_cpRepo, $this->_environment);
         $stateSender2->send();
         $this->_validateNoErrors();
 
@@ -234,16 +244,16 @@ class StateSenderTests extends RoxTestCase
         $this->_cpRepo->addCustomProperty(new CustomProperty("cp1", CustomPropertyType::getString(), "1111"));
         $this->_cpRepo->addCustomProperty(new CustomProperty("cp2", CustomPropertyType::getString(), "2222"));;
 
-        $stateSender = new StateSender($request, $this->_dp, $this->_flagRepo, $this->_cpRepo);
+        $stateSender = new StateSender($request, $this->_dp, $this->_flagRepo, $this->_cpRepo, $this->_environment);
         $stateSender->send();
         $this->_validateNoErrors();
 
         $this->assertEquals(parse_url($reqData[0]->getUrl())['path'], "/{$this->_appKey}/F8B8EC489E8F944187BA8343537B14BA");
 
-        $stateSender = new StateSender($request, $this->_dp, $this->_flagRepo, $this->_cpRepo);
+        $stateSender = new StateSender($request, $this->_dp, $this->_flagRepo, $this->_cpRepo, $this->_environment);
         $stateSender->send();
         $cpr2 = new CustomPropertyRepository();
-        $stateSender2 = new StateSender($request, $this->_dp, $this->_flagRepo, $cpr2);
+        $stateSender2 = new StateSender($request, $this->_dp, $this->_flagRepo, $cpr2, $this->_environment);
         $cpr2->addCustomProperty(new CustomProperty("cp2", CustomPropertyType::getString(), "2222"));;
         $cpr2->addCustomProperty(new CustomProperty("cp1", CustomPropertyType::getString(), "1111"));
 
@@ -252,7 +262,6 @@ class StateSenderTests extends RoxTestCase
 
         $this->assertEquals(parse_url($reqData[0]->getUrl())['path'], "/{$this->_appKey}/F8B8EC489E8F944187BA8343537B14BA");
     }
-
 
     public function testWillReturnNullWhenCDNFailsWithException()
     {
@@ -271,7 +280,7 @@ class StateSenderTests extends RoxTestCase
 
         $this->_flagRepo->addFlag(new RoxFlag(), "flag");
 
-        $stateSender = new StateSender($request, $this->_dp, $this->_flagRepo, $this->_cpRepo);
+        $stateSender = new StateSender($request, $this->_dp, $this->_flagRepo, $this->_cpRepo, $this->_environment);
         $stateSender->send();
 
         $this->assertEquals(1, count($this->_log->records));
@@ -297,7 +306,7 @@ class StateSenderTests extends RoxTestCase
 
         $this->_flagRepo->addFlag(new RoxFlag(), "flag");
 
-        $stateSender = new StateSender($request, $this->_dp, $this->_flagRepo, $this->_cpRepo);
+        $stateSender = new StateSender($request, $this->_dp, $this->_flagRepo, $this->_cpRepo, $this->_environment);
         $stateSender->send();
 
         $this->assertEquals(1, count($this->_log->records));
@@ -321,7 +330,7 @@ class StateSenderTests extends RoxTestCase
 
         $this->_flagRepo->addFlag(new RoxFlag(), "flag");
 
-        $stateSender = new StateSender($request, $this->_dp, $this->_flagRepo, $this->_cpRepo);
+        $stateSender = new StateSender($request, $this->_dp, $this->_flagRepo, $this->_cpRepo, $this->_environment);
         $stateSender->send();
 
         $this->assertEquals(1, count($this->_log->records));
@@ -352,7 +361,7 @@ class StateSenderTests extends RoxTestCase
         $this->_flagRepo->addFlag(new RoxFlag(), "flag");
         $this->_cpRepo->addCustomProperty(new CustomProperty("id", CustomPropertyType::getString(), "1111"));
 
-        $stateSender = new StateSender($request, $this->_dp, $this->_flagRepo, $this->_cpRepo);
+        $stateSender = new StateSender($request, $this->_dp, $this->_flagRepo, $this->_cpRepo, $this->_environment);
         $stateSender->send();
 
         $this->assertEquals(parse_url($reqAPIData[0]->getUrl())['path'], "/device/update_state_store/{$this->_appKey}/3A8C38DAE0553488B96AA0EB5508C4CC");
@@ -361,6 +370,138 @@ class StateSenderTests extends RoxTestCase
         $this->assertEquals(2, count($this->_log->records));
         $this->assertTrue($this->_log->hasDebugThatContains("Failed to send state"));
         $this->assertTrue($this->_log->hasErrorThatContains("Failed to send state"));
+    }
+
+    public function testWillReturnCallOnlyApiSuccessfully()
+    {
+        $reqCDNData = [null];
+        $reqAPIData = [null];
+        $reqCDNRequestNumber = 0;
+        $reqAPIRequestNumber = 0;
+
+        $request = \Mockery::mock(HttpClientInterface::class)
+            ->shouldReceive('sendGet')
+            ->andReturnUsing(function ($req) use (&$reqCDNData, &$reqCDNRequestNumber) {
+                $reqCDNData[$reqCDNRequestNumber] = $req;
+                $reqCDNRequestNumber++;
+                return new TestHttpResponse(200, "{\"result\": \"200\"}");
+            })
+            ->never()
+            ->getMock()
+            ->shouldReceive('sendPost')
+            ->andReturnUsing(function ($req) use (&$reqAPIData, &$reqAPIRequestNumber) {
+                $reqAPIData[$reqAPIRequestNumber] = $req;
+                $reqAPIRequestNumber++;
+                return new TestHttpResponse(200, "{\"result\": \"200\"}");
+            })
+            ->once()
+            ->getMock();
+
+        $this->_flagRepo->addFlag(new RoxFlag(), "flag");
+        $this->_cpRepo->addCustomProperty(new CustomProperty("id", CustomPropertyType::getString(), "1111"));
+        $optionBuilder = new RoxOptionsBuilder();
+        $optionBuilder->setNetworkConfigurationsOptions(
+            new NetworkConfigurationsOptions(null, null, 'https://x-api.rollout.io/device/update_state_store', null, null)
+        );
+        $envNoCdn = new Environment(new RoxOptions($optionBuilder));
+
+        $stateSender = new StateSender($request, $this->_dp, $this->_flagRepo, $this->_cpRepo, $envNoCdn);
+        $stateSender->send();
+
+        $this->assertEquals(parse_url($reqAPIData[0]->getUrl())['path'], "/device/update_state_store/{$this->_appKey}/3A8C38DAE0553488B96AA0EB5508C4CC");
+        $this->_validateNoErrors();
+        $this->assertEquals(0, $reqCDNRequestNumber);
+        $this->assertEquals(1, $reqAPIRequestNumber);
+    }
+
+    public function testWillReturnNullCallOnlyApiFailed404()
+    {
+        $reqCDNData = [null];
+        $reqAPIData = [null];
+        $reqCDNRequestNumber = 0;
+        $reqAPIRequestNumber = 0;
+
+        $request = \Mockery::mock(HttpClientInterface::class)
+            ->shouldReceive('sendGet')
+            ->andReturnUsing(function ($req) use (&$reqCDNData, &$reqCDNRequestNumber) {
+                $reqCDNData[$reqCDNRequestNumber] = $req;
+                $reqCDNRequestNumber++;
+                return new TestHttpResponse(200, "{\"result\": \"200\"}");
+            })
+            ->never()
+            ->getMock()
+            ->shouldReceive('sendPost')
+            ->andReturnUsing(function ($req) use (&$reqAPIData, &$reqAPIRequestNumber) {
+                $reqAPIData[$reqAPIRequestNumber] = $req;
+                $reqAPIRequestNumber++;
+                return new TestHttpResponse(404);
+            })
+            ->once()
+            ->getMock();
+
+        $this->_flagRepo->addFlag(new RoxFlag(), "flag");
+        $this->_cpRepo->addCustomProperty(new CustomProperty("id", CustomPropertyType::getString(), "1111"));
+        $optionBuilder = new RoxOptionsBuilder();
+        $optionBuilder->setNetworkConfigurationsOptions(
+            new NetworkConfigurationsOptions(null, null, 'https://x-api.rollout.io/device/update_state_store', null, null)
+        );
+        $envNoCdn = new Environment(new RoxOptions($optionBuilder));
+
+        $stateSender = new StateSender($request, $this->_dp, $this->_flagRepo, $this->_cpRepo, $envNoCdn);
+        $stateSender->send();
+
+        $this->assertEquals(parse_url($reqAPIData[0]->getUrl())['path'], "/device/update_state_store/{$this->_appKey}/3A8C38DAE0553488B96AA0EB5508C4CC");
+
+        $this->assertEquals(1, count($this->_log->records));
+        $this->assertTrue($this->_log->hasDebugThatContains("Failed to send state to API"));
+
+        $this->assertEquals(0, $reqCDNRequestNumber);
+        $this->assertEquals(1, $reqAPIRequestNumber);
+    }
+    
+    public function testWillReturnNullCallOnlyApiFailedException()
+    {
+        $reqCDNData = [null];
+        $reqAPIData = [null];
+        $reqCDNRequestNumber = 0;
+        $reqAPIRequestNumber = 0;
+
+        $request = \Mockery::mock(HttpClientInterface::class)
+            ->shouldReceive('sendGet')
+            ->andReturnUsing(function ($req) use (&$reqCDNData, &$reqCDNRequestNumber) {
+                $reqCDNData[$reqCDNRequestNumber] = $req;
+                $reqCDNRequestNumber++;
+                return new TestHttpResponse(200, "{\"result\": \"200\"}");
+            })
+            ->never()
+            ->getMock()
+            ->shouldReceive('sendPost')
+            ->andReturnUsing(function ($req) use (&$reqAPIData, &$reqAPIRequestNumber) {
+                $reqAPIData[$reqAPIRequestNumber] = $req;
+                $reqAPIRequestNumber++;
+                throw new Exception("not found");;
+            })
+            ->once()
+            ->getMock();
+
+        $this->_flagRepo->addFlag(new RoxFlag(), "flag");
+        $this->_cpRepo->addCustomProperty(new CustomProperty("id", CustomPropertyType::getString(), "1111"));
+        $optionBuilder = new RoxOptionsBuilder();
+        $optionBuilder->setNetworkConfigurationsOptions(
+            new NetworkConfigurationsOptions(null, null, 'https://x-api.rollout.io/device/update_state_store', null, null)
+        );
+        $envNoCdn = new Environment(new RoxOptions($optionBuilder));
+
+        $stateSender = new StateSender($request, $this->_dp, $this->_flagRepo, $this->_cpRepo, $envNoCdn);
+        $stateSender->send();
+
+        $this->assertEquals(parse_url($reqAPIData[0]->getUrl())['path'], "/device/update_state_store/{$this->_appKey}/3A8C38DAE0553488B96AA0EB5508C4CC");
+
+        $this->assertEquals(1, count($this->_log->records));
+        $this->assertTrue($this->_log->hasErrorThatContains("Failed to send state. Source: API"));
+
+        $this->assertEquals(0, $reqCDNRequestNumber);
+        $this->assertEquals(1, $reqAPIRequestNumber);
     }
 
     public function testWillReturnAPIDataWhenCDNSucceedWithResult404APIOK()
@@ -386,7 +527,7 @@ class StateSenderTests extends RoxTestCase
 
         $this->_flagRepo->addFlag(new RoxFlag(), "flag");
         $this->_cpRepo->addCustomProperty(new CustomProperty("id", CustomPropertyType::getString(), "1111"));
-        $stateSender = new StateSender($request, $this->_dp, $this->_flagRepo, $this->_cpRepo);
+        $stateSender = new StateSender($request, $this->_dp, $this->_flagRepo, $this->_cpRepo, $this->_environment);
         $stateSender->send();
 
         $this->assertEquals(parse_url($reqAPIData[0]->getUrl())['path'], "/device/update_state_store/{$this->_appKey}/3A8C38DAE0553488B96AA0EB5508C4CC");
@@ -420,7 +561,7 @@ class StateSenderTests extends RoxTestCase
         $this->_flagRepo->addFlag(new RoxFlag(), "flag");
         $this->_cpRepo->addCustomProperty(new CustomProperty("id", CustomPropertyType::getString(), "1111"));
 
-        $stateSender = new StateSender($request, $this->_dp, $this->_flagRepo, $this->_cpRepo);
+        $stateSender = new StateSender($request, $this->_dp, $this->_flagRepo, $this->_cpRepo, $this->_environment);
         $stateSender->send();
 
         $this->assertEquals(parse_url($reqAPIData[0]->getUrl())['path'], "/device/update_state_store/{$this->_appKey}/3A8C38DAE0553488B96AA0EB5508C4CC");
@@ -462,7 +603,7 @@ class StateSenderTests extends RoxTestCase
 
         $this->_flagRepo->addFlag(new RoxFlag(), "flag");
 
-        $stateSender = new StateSender($request, $this->_dp, $this->_flagRepo, $this->_cpRepo);
+        $stateSender = new StateSender($request, $this->_dp, $this->_flagRepo, $this->_cpRepo, $this->_environment);
         $stateSender->send();
 
         $this->assertEquals(2, count($this->_log->records));

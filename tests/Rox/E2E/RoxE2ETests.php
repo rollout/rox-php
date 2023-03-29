@@ -14,9 +14,12 @@ use Rox\RoxTestCase;
 use Rox\Server\Rox;
 use Rox\Server\RoxOptions;
 use Rox\Server\RoxOptionsBuilder;
+use Rox\Server\NetworkConfigurationsOptions;
 
 class RoxE2ETests extends RoxTestCase
 {
+    const SEND_STATE_CDN_PATH = 'https://rox-state.test.rollout.io';
+    const GET_CONFIG_CDN_PATH = 'https://rox-conf.test.rollout.io';
     /**
      * @var TestLoggerFactory $_staticLoggerFactory
      */
@@ -24,8 +27,6 @@ class RoxE2ETests extends RoxTestCase
 
     public static function setUpBeforeClass(): void
     {
-        putenv(Environment::ENV_VAR_NAME . "=" . Environment::QA);
-
         self::$_staticLoggerFactory = new TestLoggerFactory();
         LoggerFactory::setup(self::$_staticLoggerFactory);
 
@@ -43,14 +44,22 @@ class RoxE2ETests extends RoxTestCase
                 }
                 TestVars::$impressionReturnedArgs = $args;
             })
-            ->setDevModeKey("ba9bf259159cfd1af16feb19")
+            ->setDevModeKey("2373e426606c3ff9be9bff45")
             ->setCacheStorage(new VolatileRuntimeStorage())
+            ->setNetworkConfigurationsOptions(new NetworkConfigurationsOptions(
+                'https://api.test.rollout.io/device/get_configuration',
+                self::GET_CONFIG_CDN_PATH,
+                'https://api.test.rollout.io/device/update_state_store',
+                self::SEND_STATE_CDN_PATH,
+                'https://analytic.test.rollout.io',
+                'https://notify.bugsnag.com'
+            ))
             ->setLogCacheHitsAndMisses(true));
 
         Rox::register(Container::getInstance());
         TestCustomPropsCreator::createCustomProps();
 
-        Rox::setup("5df8d5e802e23378643705bf", $options);
+        Rox::setup("641ce80edd8d93835b77b6f1", $options);
     }
 
     public static function tearDownAfterClass(): void
@@ -217,7 +226,7 @@ class RoxE2ETests extends RoxTestCase
         Rox::fetch();
 
         $this->assertTrue(self::$_staticLoggerFactory->getLogger()->hasDebugThatPasses(function ($record) {
-            return strpos($record['message'], Environment::getCdnPath()) !== false &&
+            return strpos($record['message'], self::GET_CONFIG_CDN_PATH) !== false &&
                 strpos($record['message'], 'HIT') !== false;
         }));
     }
@@ -227,7 +236,7 @@ class RoxE2ETests extends RoxTestCase
         Rox::fetch();
 
         $this->assertTrue(self::$_staticLoggerFactory->getLogger()->hasDebugThatPasses(function ($record) {
-            return strpos($record['message'], Environment::getStateCdnPath()) !== false &&
+            return strpos($record['message'], self::SEND_STATE_CDN_PATH) !== false &&
                 (strpos($record['message'], 'HIT') !== false ||
                     strpos($record['message'], 'MISS') !== false);
         }));
