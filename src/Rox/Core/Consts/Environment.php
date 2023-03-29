@@ -19,19 +19,19 @@ class Environment
     {
         if ($options != null && $options->getNetworkConfigurationsOptions() != null) {
             $networkConfig = $options->getNetworkConfigurationsOptions();
-            $this->_getConfigCDNPath = $this->chopLastestSlash($networkConfig->getConfigCloudEndpoint());
-            $this->_getConfigAPIPath = $this->chopLastestSlash($networkConfig->getConfigApiEndpoint());
-            $this->_sendStateCDNPath = $this->chopLastestSlash($networkConfig->sendStateCloudEndpoint());
-            $this->_sendStateAPIPath = $this->chopLastestSlash($networkConfig->sendStateApiEndpoint());
-            $this->_analyticsPath = $this->chopLastestSlash($networkConfig->analyticsEndpoint());
-            $this->_errorReporterPath = $this->chopLastestSlash($networkConfig->errorReporterEndpoint());
+            $this->_getConfigCDNPath = $this->chopLastSlash($networkConfig->getConfigCloudEndpoint());
+            $this->_getConfigAPIPath = $this->chopLastSlash($networkConfig->getConfigApiEndpoint());
+            $this->_sendStateCDNPath = $this->chopLastSlash($networkConfig->sendStateCloudEndpoint());
+            $this->_sendStateAPIPath = $this->chopLastSlash($networkConfig->sendStateApiEndpoint());
+            $this->_analyticsPath = $this->chopLastSlash($networkConfig->analyticsEndpoint());
+            $this->_errorReporterPath = $this->chopLastSlash($networkConfig->errorReporterEndpoint());
             $this->_name = self::CUSTOM;
             return;
         }
 
         if ($options != null && $options->getRoxyURL() != null) {
             $this->_getConfigCDNPath = null;
-            $this->_getConfigAPIPath = $this->chopLastestSlash($options->getRoxyURL()) . '/' . $this->getRoxyInternalPath();
+            $this->_getConfigAPIPath = $this->chopLastSlash($options->getRoxyURL()) . '/' . $this->getRoxyInternalPath();
             $this->_sendStateCDNPath = null;
             $this->_sendStateAPIPath = null;
             $this->_analyticsPath = null;
@@ -52,7 +52,7 @@ class Environment
     /**
      * @return string
      */
-    private function chopLastestSlash($url)
+    private function chopLastSlash($url)
     {
         if ($url != null)
         {
