@@ -221,11 +221,12 @@ final class Core
     {
         $roxyUrl = ($roxOptions != null) ? $roxOptions->getRoxyURL() : null;
         if ($roxyUrl == null) {
-            $validApiKeyPattern = "/^[a-f\\d]{24}$/i";
+            $mongoApiKeyPattern = "/^[a-f\\d]{24}$/i";
+            $uuidApiKeyPattern = "/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i";
             if (!$sdkSettings->getApiKey()) {
                 throw new InvalidArgumentException("Invalid rollout apikey - must be specified");
             }
-            if (!preg_match($validApiKeyPattern, $sdkSettings->getApiKey())) {
+            if (!preg_match($mongoApiKeyPattern, $sdkSettings->getApiKey()) && !preg_match($uuidApiKeyPattern, $sdkSettings->getApiKey())) {
                 throw new InvalidArgumentException("Illegal rollout apikey");
             }
         }
