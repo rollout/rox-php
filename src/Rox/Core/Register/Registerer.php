@@ -65,17 +65,17 @@ class Registerer
             }
         } catch (ReflectionException $e) {
             $type = get_class($container);
-            $this->_log->error("Failed to obtain properties of class ${type}", [
+            $this->_log->error("Failed to obtain properties of class {$type}", [
                 'exception' => $e
             ]);
             throw new RuntimeException(
-                "Failed to obtain properties of class ${type}. See inner exception for details.", 0, $e);
+                "Failed to obtain properties of class {$type}. See inner exception for details.", 0, $e);
         }
 
         foreach ($properties as $name => $value) {
             if ($value instanceof RoxStringBase) {
                 if ($ns) {
-                    $name = "${ns}.${name}";
+                    $name = "{$ns}.{$name}";
                 }
                 $this->_flagRepository->addFlag($value, $name);
             }

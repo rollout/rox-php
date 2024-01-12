@@ -7,6 +7,6 @@ class DeviceProperty extends CustomProperty
     public function getName()
     {
         $name = parent::getName();
-        return "rox.${name}";
+        return "rox.{$name}";
     }
 }

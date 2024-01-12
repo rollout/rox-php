@@ -128,7 +128,7 @@ class GuzzleHttpClient implements HttpClientInterface
                 RequestOptions::TIMEOUT => $this->_timeout,
             ]));
         } catch (GuzzleException $e) {
-            $this->_log->error("Failed to send data to ${uri}: {$e->getMessage()}", [
+            $this->_log->error("Failed to send data to {$uri}: {$e->getMessage()}", [
                 'exception' => $e
             ]);
             return new HttpErrorResponse($e->getCode(), $e->getMessage());
@@ -142,7 +142,7 @@ class GuzzleHttpClient implements HttpClientInterface
      */
     private function _handleError($uri, GuzzleException $e)
     {
-        $this->_log->error("Failed to send data to ${uri}: {$e->getMessage()}", [
+        $this->_log->error("Failed to send data to {$uri}: {$e->getMessage()}", [
             'exception' => $e
         ]);
         return new HttpErrorResponse($e->getCode(), $e->getMessage());
