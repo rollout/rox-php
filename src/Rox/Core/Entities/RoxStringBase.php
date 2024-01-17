@@ -90,7 +90,7 @@ abstract class RoxStringBase
     {
         $converter = $this->getConverter();
         if (!$converter->isValid($value)) {
-            throw new InvalidArgumentException("Invalid value type: ${value}");
+            throw new InvalidArgumentException("Invalid value type: {$value}");
         }
         return $converter->convertToString($value);
     }
@@ -107,7 +107,7 @@ abstract class RoxStringBase
             return !$converter->isValid($value);
         })) {
             $invalidValue = array_shift($invalidVariations);
-            throw new InvalidArgumentException("Invalid variation type: ${invalidValue}");
+            throw new InvalidArgumentException("Invalid variation type: {$invalidValue}");
         }
         return array_map(function ($v) use ($converter) {
             return $converter->convertToString($v);

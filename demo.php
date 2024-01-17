@@ -70,7 +70,7 @@ if (!isset($_GET['nolog'])) {
         'demo.log'
     ]);
 
-    echo "Logging to ${logFile}\n";
+    echo "Logging to {$logFile}\n";
 
     LoggerFactory::setup((new MonologLoggerFactory())
         ->setDefaultHandlers([

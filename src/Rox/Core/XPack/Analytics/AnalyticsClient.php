@@ -117,7 +117,7 @@ class AnalyticsClient implements ClientInterface
         if (200 == $statusCode) {
             return true;
         }
-        $this->_log->error("Failed to post data to ${url}: HTTP response code ${statusCode} ({$response->getContent()->readAsString()})");
+        $this->_log->error("Failed to post data to {$url}: HTTP response code {$statusCode} ({$response->getContent()->readAsString()})");
 
         return false;
     }

@@ -285,7 +285,7 @@ class Parser implements ParserInterface
 
         } catch (Exception $exception) {
 
-            $this->_log->warning("Roxx Exception: Failed evaluate expression ${expression}", [
+            $this->_log->warning("Roxx Exception: Failed evaluate expression {$expression}", [
                 'exception' => $exception
             ]);
         }

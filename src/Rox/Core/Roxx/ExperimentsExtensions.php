@@ -54,7 +54,7 @@ class ExperimentsExtensions
         $this->_parser->addOperator("mergeSeed", function (ParserInterface $parser, StackInterface $stack, ContextInterface $context) {
             $seed1 = (string)$stack->pop();
             $seed2 = (string)$stack->pop();
-            $stack->push("${seed1}.${seed2}");
+            $stack->push("{$seed1}.{$seed2}");
         });
 
         $this->_parser->addOperator("isInPercentage", function (ParserInterface $parser, StackInterface $stack, ContextInterface $context) {

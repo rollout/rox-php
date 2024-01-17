@@ -58,11 +58,11 @@ class RegularExpressionExtensions
                     }
 
                     if ($flag == 'n') {
-                        $this->_log->warning("Regexp flag ${flag} is not supported.");
+                        $this->_log->warning("Regexp flag {$flag} is not supported.");
                     }
                 }
 
-                $stack->push(preg_match("/${pattern}/${filteredFlags}", $str) === 1);
+                $stack->push(preg_match("/{$pattern}/{$filteredFlags}", $str) === 1);
             });
     }
 }
