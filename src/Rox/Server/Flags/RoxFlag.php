@@ -18,8 +18,11 @@ class RoxFlag extends RoxStringBase implements BooleanFlagInterface
     {
         parent::__construct(
             $this->checkValueType($defaultValue),
-            [BoolFlagValueConverter::FLAG_FALSE_VALUE,
-                BoolFlagValueConverter::FLAG_TRUE_VALUE]);
+            [
+                BoolFlagValueConverter::FLAG_FALSE_VALUE,
+                BoolFlagValueConverter::FLAG_TRUE_VALUE
+            ]
+        );
     }
 
     /**
@@ -59,5 +62,13 @@ class RoxFlag extends RoxStringBase implements BooleanFlagInterface
         if (!$this->isEnabled($context)) {
             $action();
         }
+    }
+
+    /**
+     * @return string
+     */
+    public function getExternalType()
+    {
+        return "Boolean";
     }
 }

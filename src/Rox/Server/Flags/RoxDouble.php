@@ -16,7 +16,8 @@ class RoxDouble extends RoxStringBase implements DoubleFlagInterface
     {
         parent::__construct(
             $this->checkValueType($defaultValue),
-            $this->checkVariationsType($variations));
+            $this->checkVariationsType($variations)
+        );
     }
 
     /**
@@ -25,6 +26,14 @@ class RoxDouble extends RoxStringBase implements DoubleFlagInterface
     protected function getConverter()
     {
         return FlagValueConverters::getInstance()->getDouble();
+    }
+
+    /**
+     * @return string
+     */
+    public function getExternalType()
+    {
+        return "Number";
     }
 
     /**

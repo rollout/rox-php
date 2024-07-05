@@ -73,8 +73,10 @@ final class Rox
      */
     public static function setup($apiKey, RoxOptions $roxOptions = null)
     {
-        if (self::$_state !== RoxState::Idle &&
-            self::$_state !== RoxState::Corrupted) {
+        if (
+            self::$_state !== RoxState::Idle &&
+            self::$_state !== RoxState::Corrupted
+        ) {
             self::getLog()->warning("Rox was already initialized, skipping Setup");
             return;
         }
@@ -88,7 +90,12 @@ final class Rox
 
             try {
                 if (!$roxOptions) {
-                    $roxOptions = new RoxOptions(new RoxOptionsBuilder());
+                    $roxOptionsBuilder = new RoxOptionsBuilder();
+                    $uuidApiKeyPattern = "/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i";
+                    if (preg_match($uuidApiKeyPattern, $apiKey)) {
+                        $roxOptionsBuilder->setDisableSignatureVerification(true);
+                    }
+                    $roxOptions = new RoxOptions($roxOptionsBuilder);
                 }
 
                 $sdkSettings = new SdkSettings($apiKey, $roxOptions->getDevModeKey());
@@ -96,18 +103,22 @@ final class Rox
 
                 $props = $serverProperties->getAllProperties();
                 $core = self::getCore();
-                $core->addCustomPropertyIfNotExists(new DeviceProperty(PropertyType::getPlatform()->getName(), CustomPropertyType::getString(), (string)$props[PropertyType::getPlatform()->getName()]));
-                $core->addCustomPropertyIfNotExists(new DeviceProperty(PropertyType::getAppRelease()->getName(), CustomPropertyType::getSemver(), (string)$props[PropertyType::getAppRelease()->getName()]));
+                $core->addCustomPropertyIfNotExists(new DeviceProperty(PropertyType::getPlatform()->getName(), CustomPropertyType::getString(), (string) $props[PropertyType::getPlatform()->getName()]));
+                $core->addCustomPropertyIfNotExists(new DeviceProperty(PropertyType::getAppRelease()->getName(), CustomPropertyType::getSemver(), (string) $props[PropertyType::getAppRelease()->getName()]));
                 $core->addCustomPropertyIfNotExists(new DeviceProperty(PropertyType::getDistinctId()->getName(), CustomPropertyType::getString(), function ($c) {
                     return Uuid::uuid4()->toString();
                 }));
-                $core->addCustomPropertyIfNotExists(new DeviceProperty("internal.realPlatform", CustomPropertyType::getString(), (string)$props[PropertyType::getPlatform()->getName()]));
-                $core->addCustomPropertyIfNotExists(new DeviceProperty("internal.customPlatform", CustomPropertyType::getString(), (string)$props[PropertyType::getPlatform()->getName()]));
+                $core->addCustomPropertyIfNotExists(new DeviceProperty("internal.realPlatform", CustomPropertyType::getString(), (string) $props[PropertyType::getPlatform()->getName()]));
+                $core->addCustomPropertyIfNotExists(new DeviceProperty("internal.customPlatform", CustomPropertyType::getString(), (string) $props[PropertyType::getPlatform()->getName()]));
                 $core->addCustomPropertyIfNotExists(new DeviceProperty("internal.appKey", CustomPropertyType::getString(), $serverProperties->getRolloutKey()));
-                $core->addCustomPropertyIfNotExists(new DeviceProperty("internal." . PropertyType::getLibVersion()->getName(), CustomPropertyType::getSemver(), (string)$props[PropertyType::getLibVersion()->getName()]));
-                $core->addCustomPropertyIfNotExists(new DeviceProperty("internal." . PropertyType::getApiVersion()->getName(), CustomPropertyType::getSemver(), (string)$props[PropertyType::getApiVersion()->getName()]));
+                $core->addCustomPropertyIfNotExists(new DeviceProperty("internal." . PropertyType::getLibVersion()->getName(), CustomPropertyType::getSemver(), (string) $props[PropertyType::getLibVersion()->getName()]));
+                $core->addCustomPropertyIfNotExists(new DeviceProperty("internal." . PropertyType::getApiVersion()->getName(), CustomPropertyType::getSemver(), (string) $props[PropertyType::getApiVersion()->getName()]));
                 $core->addCustomPropertyIfNotExists(new DeviceProperty("internal." . PropertyType::getDistinctId()->getName(), CustomPropertyType::getString(), function ($c) {
                     return Uuid::uuid4()->toString();
+                }));
+                $core->addCustomPropertyIfNotExists(new DeviceProperty("internal." . PropertyType::getDateTime()->getName(), CustomPropertyType::getDateTime(), function ($c) {
+                    $now = new \DateTime("now");
+                    return $now;
                 }));
 
                 $core->setup($sdkSettings, $serverProperties, $roxOptions);
@@ -125,8 +136,10 @@ final class Rox
 
     public static function shutdown()
     {
-        if (self::$_state !== RoxState::Set &&
-            self::$_state !== RoxState::Corrupted) {
+        if (
+            self::$_state !== RoxState::Set &&
+            self::$_state !== RoxState::Corrupted
+        ) {
             self::getLog()->warning("Rox can only be shutdown when it is already Set up, skipping Shutdown");
         } else {
             self::reset();
@@ -150,10 +163,13 @@ final class Rox
         if (func_num_args() == 2) {
             self::getCore()->register(
                 func_get_arg(0), // ns
-                func_get_arg(1)); // container
+                func_get_arg(1)
+            ); // container
         } else {
-            self::getCore()->register("",
-                func_get_arg(0));
+            self::getCore()->register(
+                "",
+                func_get_arg(0)
+            );
         }
 
     }
@@ -259,6 +275,15 @@ final class Rox
     public static function setCustomComputedSemverProperty($name, callable $value)
     {
         self::getCore()->addCustomProperty(new CustomProperty($name, CustomPropertyType::getSemver(), $value));
+    }
+
+    /**
+     * @param string $name
+     * @param callable $value
+     */
+    public static function setCustomDateTimeProperty($name, callable $value)
+    {
+        self::getCore()->addCustomProperty(new CustomProperty($name, CustomPropertyType::getDateTime(), $value));
     }
 
     /**

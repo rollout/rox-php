@@ -103,9 +103,11 @@ abstract class RoxStringBase
     protected function checkVariationsType(array $variations)
     {
         $converter = $this->getConverter();
-        if ($invalidVariations = array_filter($variations, function ($value) use ($converter) {
-            return !$converter->isValid($value);
-        })) {
+        if (
+            $invalidVariations = array_filter($variations, function ($value) use ($converter) {
+                return !$converter->isValid($value);
+            })
+        ) {
             $invalidValue = array_shift($invalidVariations);
             throw new InvalidArgumentException("Invalid variation type: {$invalidValue}");
         }
@@ -118,6 +120,11 @@ abstract class RoxStringBase
      * @return FlagValueConverter
      */
     protected abstract function getConverter();
+
+    /**
+     * @return string
+     */
+    public abstract function getExternalType();
 
     /**
      * @return string
@@ -236,7 +243,10 @@ abstract class RoxStringBase
     {
         return $this->_getFlagValue(
             FlagValueConverters::getInstance()->getString(),
-            $context, $alternativeDefaultValue, $evaluationContext);
+            $context,
+            $alternativeDefaultValue,
+            $evaluationContext
+        );
     }
 
     /**
@@ -249,7 +259,10 @@ abstract class RoxStringBase
     {
         return $this->_getFlagValue(
             FlagValueConverters::getInstance()->getInt(),
-            $context, $alternativeDefaultValue, $evaluationContext);
+            $context,
+            $alternativeDefaultValue,
+            $evaluationContext
+        );
     }
 
     /**
@@ -262,7 +275,10 @@ abstract class RoxStringBase
     {
         return $this->_getFlagValue(
             FlagValueConverters::getInstance()->getDouble(),
-            $context, $alternativeDefaultValue, $evaluationContext);
+            $context,
+            $alternativeDefaultValue,
+            $evaluationContext
+        );
     }
 
     /**
@@ -275,7 +291,10 @@ abstract class RoxStringBase
     {
         return $this->_getFlagValue(
             FlagValueConverters::getInstance()->getBool(),
-            $context, $alternativeDefaultValue, $evaluationContext);
+            $context,
+            $alternativeDefaultValue,
+            $evaluationContext
+        );
     }
 
     /**
@@ -289,13 +308,18 @@ abstract class RoxStringBase
     {
         $evaluation = $this->_getExperimentValue($context, $evaluationContext);
         $experimentStringValue = $evaluation->stringValue();
-        $finalValue = $converter->normalizeValue($experimentStringValue,
-            $alternativeDefaultValue ?: $this->_defaultValue, $this->_log);
+        $finalValue = $converter->normalizeValue(
+            $experimentStringValue,
+            $alternativeDefaultValue ?: $this->_defaultValue,
+            $this->_log
+        );
         if (!$evaluationContext || $evaluationContext->isShouldRaiseImpressionHandler()) {
             if ($this->_impressionInvoker != null) {
                 $this->_impressionInvoker->invoke(
                     new ReportingValue($this->_name, $converter->convertToString($finalValue), !!$this->_experiment),
-                    $this->_experiment, $evaluation->getUsedContext());
+                    $this->_experiment,
+                    $evaluation->getUsedContext()
+                );
             }
         }
         return $finalValue;

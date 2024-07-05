@@ -62,6 +62,12 @@ final class RoxOptionsBuilder
     private $_networkConfigurationsOptions;
 
     /**
+     * @var bool $_disableSignatureVerification
+     */
+    private $_disableSignatureVerification = false;
+
+
+    /**
      * @return string
      */
     public function getDevModeKey()
@@ -256,6 +262,23 @@ final class RoxOptionsBuilder
     public function setNetworkConfigurationsOptions($networkConfigurationsOptions)
     {
         $this->_networkConfigurationsOptions = $networkConfigurationsOptions;
+        return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function getDisableSignatureVerification()
+    {
+        return $this->_disableSignatureVerification;
+    }
+    /**
+     * @param bool $disableSignatureVerification
+     * @return RoxOptionsBuilder
+     * */
+    public function setDisableSignatureVerification($disableSignatureVerification)
+    {
+        $this->_disableSignatureVerification = $disableSignatureVerification;
         return $this;
     }
 

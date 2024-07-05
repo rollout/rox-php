@@ -248,6 +248,17 @@ final class PropertyType
     }
 
     /**
+     * @return PropertyType
+     */
+    public static function getDateTime()
+    {
+        if (self::$datetime_string == null) {
+            self::$datetime_string = new PropertyType(21, 'now');
+        }
+        return self::$datetime_string;
+    }
+
+    /**
      * @var PropertyType $cache_miss_relative_url
      */
     private static $cache_miss_relative_url;
@@ -336,4 +347,9 @@ final class PropertyType
      * @var PropertyType $custom_properties_string
      */
     private static $custom_properties_string;
+
+    /**
+     * @var PropertyType $datetime_string
+     */
+    private static $datetime_string;
 }

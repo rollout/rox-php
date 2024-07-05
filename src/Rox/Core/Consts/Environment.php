@@ -48,16 +48,25 @@ class Environment
         $this->_errorReporterPath = 'https://notify.bugsnag.com';
         $this->_name = self::PRODUCTION;
     }
-    
+
+    public function setToPlatform()
+    {
+        $this->_getConfigCDNPath = 'https://rox-conf.cloudbees.io';
+        $this->_getConfigAPIPath = 'https://api.cloudbees.io/device/get_configuration';
+        $this->_sendStateCDNPath = 'https://rox-state.cloudbees.io';
+        $this->_sendStateAPIPath = 'https://api.cloudbees.io/device/update_state_store';
+        $this->_analyticsPath = 'https://fm-analytics.cloudbees.io';
+        $this->_errorReporterPath = 'https://notify.bugsnag.com';
+        $this->_name = self::PRODUCTION;
+    }
+
     /**
      * @return string
      */
     private function chopLastSlash($url)
     {
-        if ($url != null)
-        {
-            if (substr($url, -1) == '/')
-            {
+        if ($url != null) {
+            if (substr($url, -1) == '/') {
                 return substr($url, 0, -1);
             }
         }

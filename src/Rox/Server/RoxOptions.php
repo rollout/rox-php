@@ -63,6 +63,11 @@ final class RoxOptions implements RoxOptionsInterface
     private $_networkConfigurationsOptions;
 
     /**
+     * @var bool $_disableSignatureVerification
+     */
+    private $_disableSignatureVerification = false;
+
+    /**
      * RoxOptions constructor.
      * @param RoxOptionsBuilder $roxOptionsBuilder
      */
@@ -87,6 +92,7 @@ final class RoxOptions implements RoxOptionsInterface
         $this->_configFetchIntervalInSeconds = $roxOptionsBuilder->getConfigFetchIntervalInSeconds();
         $this->_timeout = $roxOptionsBuilder->getTimeout();
         $this->_networkConfigurationsOptions = $roxOptionsBuilder->getNetworkConfigurationsOptions();
+        $this->_disableSignatureVerification = $roxOptionsBuilder->getDisableSignatureVerification();
     }
 
     /**
@@ -175,5 +181,13 @@ final class RoxOptions implements RoxOptionsInterface
     public function getNetworkConfigurationsOptions()
     {
         return $this->_networkConfigurationsOptions;
+    }
+
+    /**
+     * @return bool
+     */
+    function isSignatureDisabled()
+    {
+        return $this->_disableSignatureVerification;
     }
 }
