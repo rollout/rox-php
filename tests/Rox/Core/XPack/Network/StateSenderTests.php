@@ -74,12 +74,20 @@ class StateSenderTests extends RoxTestCase
         parent::setUp();
 
         $this->_environment = new Environment();
-        $this->_log = LoggerFactory::getInstance()->createLogger(self::class);;
+        $this->_log = LoggerFactory::getInstance()->createLogger(self::class);
+        ;
 
         $this->_dp = \Mockery::mock(DevicePropertiesInterface::class)
             ->shouldReceive('getAllProperties')
             ->andReturnUsing(function () {
                 return $this->_createNewDeviceProp();
+            })
+            ->byDefault()
+            ->getMock();
+
+        $this->_dp->shouldReceive('getRolloutKey')
+            ->andReturnUsing(function () {
+                return $this->_appKey;
             })
             ->byDefault()
             ->getMock();
@@ -242,7 +250,8 @@ class StateSenderTests extends RoxTestCase
             ->getMock();
 
         $this->_cpRepo->addCustomProperty(new CustomProperty("cp1", CustomPropertyType::getString(), "1111"));
-        $this->_cpRepo->addCustomProperty(new CustomProperty("cp2", CustomPropertyType::getString(), "2222"));;
+        $this->_cpRepo->addCustomProperty(new CustomProperty("cp2", CustomPropertyType::getString(), "2222"));
+        ;
 
         $stateSender = new StateSender($request, $this->_dp, $this->_flagRepo, $this->_cpRepo, $this->_environment);
         $stateSender->send();
@@ -254,7 +263,8 @@ class StateSenderTests extends RoxTestCase
         $stateSender->send();
         $cpr2 = new CustomPropertyRepository();
         $stateSender2 = new StateSender($request, $this->_dp, $this->_flagRepo, $cpr2, $this->_environment);
-        $cpr2->addCustomProperty(new CustomProperty("cp2", CustomPropertyType::getString(), "2222"));;
+        $cpr2->addCustomProperty(new CustomProperty("cp2", CustomPropertyType::getString(), "2222"));
+        ;
         $cpr2->addCustomProperty(new CustomProperty("cp1", CustomPropertyType::getString(), "1111"));
 
         $stateSender2->send();
@@ -458,7 +468,7 @@ class StateSenderTests extends RoxTestCase
         $this->assertEquals(0, $reqCDNRequestNumber);
         $this->assertEquals(1, $reqAPIRequestNumber);
     }
-    
+
     public function testWillReturnNullCallOnlyApiFailedException()
     {
         $reqCDNData = [null];
@@ -479,7 +489,8 @@ class StateSenderTests extends RoxTestCase
             ->andReturnUsing(function ($req) use (&$reqAPIData, &$reqAPIRequestNumber) {
                 $reqAPIData[$reqAPIRequestNumber] = $req;
                 $reqAPIRequestNumber++;
-                throw new Exception("not found");;
+                throw new Exception("not found");
+                ;
             })
             ->once()
             ->getMock();
@@ -602,6 +613,7 @@ class StateSenderTests extends RoxTestCase
             ->getMock();
 
         $this->_flagRepo->addFlag(new RoxFlag(), "flag");
+
 
         $stateSender = new StateSender($request, $this->_dp, $this->_flagRepo, $this->_cpRepo, $this->_environment);
         $stateSender->send();

@@ -13,7 +13,7 @@ use Rox\Core\Network\ConfigurationFetchResult;
 use Rox\Core\Reporting\ErrorReporterInterface;
 use Rox\Core\Security\APIKeyVerifierInterface;
 use Rox\Core\Security\SignatureVerifierInterface;
-use Rox\Server\RoxOptions;
+use Rox\Core\Client\RoxOptionsInterface;
 
 class ConfigurationParser
 {
@@ -43,7 +43,7 @@ class ConfigurationParser
     private $_log;
 
     /**
-     * @var RoxOptions|null
+     * @var RoxOptionsInterface|null
      */
     private $_roxOptions;
 
@@ -53,14 +53,14 @@ class ConfigurationParser
      * @param APIKeyVerifierInterface $apiKeyVerifier
      * @param ErrorReporterInterface $errorReporter
      * @param ConfigurationFetchedInvokerInterface $configurationFetchedInvoker
-     * @param RoxOptions $roxOptions
+     * @param RoxOptionsInterface $roxOptions
      */
     public function __construct(
         SignatureVerifierInterface $signatureVerifier,
         APIKeyVerifierInterface $apiKeyVerifier,
         ErrorReporterInterface $errorReporter,
         ConfigurationFetchedInvokerInterface $configurationFetchedInvoker,
-        RoxOptions $roxOptions
+        RoxOptionsInterface $roxOptions = null
     ) {
         $this->_log = LoggerFactory::getInstance()->createLogger(self::class);
         $this->_signatureVerifier = $signatureVerifier;

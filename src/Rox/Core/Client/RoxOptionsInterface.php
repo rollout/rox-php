@@ -55,4 +55,9 @@ interface RoxOptionsInterface
      * @return NetworkConfigurationsOptions|null
      */
     function getNetworkConfigurationsOptions();
+
+    /**
+     * @return bool
+     */
+    function isSignatureDisabled();
 }
