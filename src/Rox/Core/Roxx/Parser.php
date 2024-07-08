@@ -244,12 +244,19 @@ class Parser implements ParserInterface
 
         $this->addOperator("tsToNum", function (ParserInterface $parser, StackInterface $stack, ContextInterface $context) {
             $op1 = $stack->pop();
-            if (true) {
-                $stack->push(TokenType::getUndefined());
+
+            /**
+             * For some reason, get_class, or instanceof, does not check properly the type assertion;
+             * Adding this workaround to make sure that it behaves as an DateTime instance;
+             */
+            if (is_object($op1) && method_exists($op1, "getTimestamp") && is_callable([$op1, "getTimestamp"])) {
+                // getTimestamp return the number of Epoch seconds, no need to divide by 1000
+                $stack->push($op1->getTimestamp());
                 return;
             }
 
-            // Check if $op1 is DateTime, and convert it to a datetime
+            $stack->push(TokenType::getUndefined());
+
         });
 
 

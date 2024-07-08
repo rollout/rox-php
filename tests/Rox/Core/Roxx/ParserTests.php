@@ -3,6 +3,8 @@
 namespace Rox\Core\Roxx;
 
 use Mockery;
+use Rox\Core\CustomProperties\CustomProperty;
+use Rox\Core\CustomProperties\CustomPropertyType;
 use Rox\Core\CustomProperties\CustomPropertyRepository;
 use Rox\Core\CustomProperties\DynamicProperties;
 use Rox\Core\ErrorHandling\UserspaceUnhandledErrorInvokerInterface;
@@ -113,7 +115,9 @@ class ParserTests extends RoxTestCase
 
         $roxxString = "la \\\"la\\\" la";
         $this->assertSame(
-            $parser->evaluateExpression(sprintf("eq(\"%s\", \"la \\\"la\\\" la\")", $roxxString))->boolValue(), true);
+            $parser->evaluateExpression(sprintf("eq(\"%s\", \"la \\\"la\\\" la\")", $roxxString))->boolValue(),
+            true
+        );
     }
 
     public function testComparisonExpressionsEvaluation()
@@ -314,5 +318,45 @@ class ParserTests extends RoxTestCase
 
         $this->assertSame($parser->evaluateExpression("b64d(\"c3RhbQ==\")")->stringValue(), "stam");
         $this->assertSame($parser->evaluateExpression("b64d(\"8Km4vQ==\")")->stringValue(), "𩸽");
+    }
+
+    public function testTsToNum()
+    {
+        $timeNow = new \DateTime("now");
+        $parser = new Parser(Mockery::mock(UserspaceUnhandledErrorInvokerInterface::class));
+        $propertiesRepository = new CustomPropertyRepository();
+        $propertiesRepository->addCustomProperty(new CustomProperty("cp1", CustomPropertyType::getDateTime(), $timeNow));
+
+        $roxxPropertiesExtensions = new PropertiesExtensions($parser, $propertiesRepository, new DynamicProperties());
+        $roxxPropertiesExtensions->extend();
+
+        $this->assertSame($parser->evaluateExpression("tsToNum(property(\"cp1\"))")->integerValue(), $timeNow->getTimestamp());
+        $this->assertTrue($parser->evaluateExpression("gte(tsToNum(property(\"cp1\")),1500000000)")->boolValue());
+        $this->assertTrue($parser->evaluateExpression("lte(tsToNum(property(\"cp1\")),190000000000)")->boolValue());
+
+        $this->assertFalse($parser->evaluateExpression("gte(tsToNum(property(\"cp1\")),190000000000)")->boolValue());
+        $this->assertFalse($parser->evaluateExpression("lte(tsToNum(property(\"cp1\")),1500000000)")->boolValue());
+
+    }
+
+    public function testTsToNumWrongPropertyType()
+    {
+        $parser = new Parser(Mockery::mock(UserspaceUnhandledErrorInvokerInterface::class));
+        $propertiesRepository = new CustomPropertyRepository();
+        $propertiesRepository->addCustomProperty(new CustomProperty("cp1", CustomPropertyType::getDateTime(), "string is wrong type"));
+        $roxxPropertiesExtensions = new PropertiesExtensions($parser, $propertiesRepository, new DynamicProperties());
+        $roxxPropertiesExtensions->extend();
+
+        $this->assertNull($parser->evaluateExpression("tsToNum(property(\"cp1\"))")->integerValue());
+    }
+
+    public function testTsToNumDateTimePropertyTypeNotSet()
+    {
+        $parser = new Parser(Mockery::mock(UserspaceUnhandledErrorInvokerInterface::class));
+        $propertiesRepository = new CustomPropertyRepository();
+        $roxxPropertiesExtensions = new PropertiesExtensions($parser, $propertiesRepository, new DynamicProperties());
+        $roxxPropertiesExtensions->extend();
+
+        $this->assertNull($parser->evaluateExpression("tsToNum(property(\"cp1\"))")->integerValue());
     }
 }
