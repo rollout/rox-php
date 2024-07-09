@@ -14,6 +14,7 @@ use Rox\Core\Network\HttpResponseInterface;
 use Rox\Core\Network\RequestData;
 use Rox\Core\Repositories\CustomPropertyRepositoryInterface;
 use Rox\Core\Repositories\FlagRepositoryInterface;
+use Rox\Core\Utils\ApiKeyHelpers;
 use Rox\Core\Utils\DotNetCompat;
 use Rox\Core\Utils\MD5Generator;
 
@@ -60,6 +61,11 @@ class StateSender
     private $_stateSent = false;
 
     /**
+     * @var bool $_isCBP
+     */
+    private $_isCBP = false;
+
+    /**
      * @var Environment $_environment
      */
     private $_environment;
@@ -103,6 +109,7 @@ class StateSender
         $this->_flagRepository = $flagRepository;
         $this->_customPropertyRepository = $customPropertyRepository;
         $this->_environment = $environment;
+        $this->_isCBP = ApiKeyHelpers::isCBPApiKey($this->_deviceProperties->getRolloutKey());
     }
 
     /**
@@ -141,7 +148,7 @@ class StateSender
                 'options' => $var->getVariations(),
             ];
 
-            if ($this->_isCBP()) {
+            if ($this->_isCBP) {
                 $flag['externalType'] = $var->getExternalType();
             }
 
@@ -162,7 +169,7 @@ class StateSender
         $mapped = array_map(function ($key) use ($allCustomProperties) {
             $value = (string) $allCustomProperties[$key];
 
-            if (!$this->_isCBP() && $allCustomProperties[$key]->getType()->getExternalType() === "DateTime") {
+            if (!$this->_isCBP && $allCustomProperties[$key]->getType()->getExternalType() === "DateTime") {
                 return null;
             }
 
@@ -175,14 +182,6 @@ class StateSender
 
     }
 
-    /**
-     * @return bool
-     */
-    private function _isCBP()
-    {
-        $uuidApiKeyPattern = "/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i";
-        return preg_match($uuidApiKeyPattern, $this->_deviceProperties->getRolloutKey());
-    }
 
     /**
      * @param array $properties

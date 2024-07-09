@@ -12,6 +12,7 @@ use Rox\Core\Repositories\ExperimentRepository;
 use Rox\Core\Repositories\FlagRepository;
 use Rox\Core\Repositories\TargetGroupRepository;
 use Rox\RoxTestCase;
+use DateTime;
 
 /**
  * Class ParserTest
@@ -322,7 +323,7 @@ class ParserTests extends RoxTestCase
 
     public function testTsToNum()
     {
-        $timeNow = new \DateTime("now");
+        $timeNow = new DateTime("now");
         $parser = new Parser(Mockery::mock(UserspaceUnhandledErrorInvokerInterface::class));
         $propertiesRepository = new CustomPropertyRepository();
         $propertiesRepository->addCustomProperty(new CustomProperty("cp1", CustomPropertyType::getDateTime(), $timeNow));

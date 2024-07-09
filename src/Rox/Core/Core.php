@@ -68,6 +68,7 @@ use Rox\Core\Reporting\ErrorReporter;
 use Rox\Core\XPack\Security\XAPIKeyVerifier;
 use Rox\Core\XPack\Security\XSignatureVerifier;
 use Rox\Core\Consts\Environment;
+use Rox\Core\Utils\ApiKeyHelpers;
 
 final class Core
 {
@@ -223,16 +224,20 @@ final class Core
         $this->_environment = new Environment($roxOptions);
 
         if ($roxyUrl == null) {
-            $mongoApiKeyPattern = "/^[a-f\\d]{24}$/i";
-            $uuidApiKeyPattern = "/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i";
             if (!$sdkSettings->getApiKey()) {
                 throw new InvalidArgumentException("Invalid rollout apikey - must be specified");
             }
-            if (!preg_match($mongoApiKeyPattern, $sdkSettings->getApiKey()) && !preg_match($uuidApiKeyPattern, $sdkSettings->getApiKey())) {
+            if (!ApiKeyHelpers::isValidKey($sdkSettings->getApiKey())) {
                 throw new InvalidArgumentException("Illegal rollout apikey");
             }
 
-            if (preg_match($uuidApiKeyPattern, $sdkSettings->getApiKey())) {
+            /*
+             * Checks if either roxOptions is missing, and if not checks if there are no network configs already defined
+             * This is done to avoid override of the given network options
+             */
+            $_isNetworkConfigMissing = $roxOptions == null || ($roxOptions != null && $roxOptions->getNetworkConfigurationsOptions() == null);
+
+            if ($_isNetworkConfigMissing && ApiKeyHelpers::isCBPApiKey($sdkSettings->getApiKey())) {
                 $this->_environment->setToPlatform();
             }
         }

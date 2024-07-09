@@ -250,12 +250,12 @@ final class PropertyType
     /**
      * @return PropertyType
      */
-    public static function getDateTime()
+    public static function getNowString()
     {
-        if (self::$datetime_string == null) {
-            self::$datetime_string = new PropertyType(21, 'now');
+        if (self::$now_string == null) {
+            self::$now_string = new PropertyType(22, 'now');
         }
-        return self::$datetime_string;
+        return self::$now_string;
     }
 
     /**
@@ -349,7 +349,7 @@ final class PropertyType
     private static $custom_properties_string;
 
     /**
-     * @var PropertyType $datetime_string
+     * @var PropertyType $now_string
      */
-    private static $datetime_string;
+    private static $now_string;
 }

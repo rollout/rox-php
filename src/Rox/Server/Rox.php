@@ -17,6 +17,8 @@ use Rox\Core\Logging\LoggerFactory;
 use Rox\Server\Client\ServerProperties;
 use Rox\Server\Flags\ServerEntitiesProvider;
 use RuntimeException;
+use Rox\Core\Utils\ApiKeyHelpers;
+use DateTime;
 
 final class Rox
 {
@@ -91,8 +93,7 @@ final class Rox
             try {
                 if (!$roxOptions) {
                     $roxOptionsBuilder = new RoxOptionsBuilder();
-                    $uuidApiKeyPattern = "/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i";
-                    if (preg_match($uuidApiKeyPattern, $apiKey)) {
+                    if (ApiKeyHelpers::isCBPApiKey($apiKey)) {
                         $roxOptionsBuilder->setDisableSignatureVerification(true);
                     }
                     $roxOptions = new RoxOptions($roxOptionsBuilder);
@@ -116,8 +117,8 @@ final class Rox
                 $core->addCustomPropertyIfNotExists(new DeviceProperty("internal." . PropertyType::getDistinctId()->getName(), CustomPropertyType::getString(), function ($c) {
                     return Uuid::uuid4()->toString();
                 }));
-                $core->addCustomPropertyIfNotExists(new DeviceProperty("internal." . PropertyType::getDateTime()->getName(), CustomPropertyType::getDateTime(), function ($c) {
-                    $now = new \DateTime("now");
+                $core->addCustomPropertyIfNotExists(new DeviceProperty("internal." . PropertyType::getNowString()->getName(), CustomPropertyType::getDateTime(), function ($c) {
+                    $now = new DateTime("now");
                     return $now;
                 }));
 
@@ -163,8 +164,8 @@ final class Rox
         if (func_num_args() == 2) {
             self::getCore()->register(
                 func_get_arg(0), // ns
-                func_get_arg(1)
-            ); // container
+                func_get_arg(1)  // container
+            );
         } else {
             self::getCore()->register(
                 "",

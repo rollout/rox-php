@@ -23,6 +23,8 @@ use Rox\Core\Consts\Environment;
 use Rox\Server\RoxOptions;
 use Rox\Server\NetworkConfigurationsOptions;
 use Rox\Server\RoxOptionsBuilder;
+use Ramsey\Uuid\Uuid;
+use DateTime;
 
 class StateSenderTests extends RoxTestCase
 {
@@ -422,6 +424,59 @@ class StateSenderTests extends RoxTestCase
         $this->_validateNoErrors();
         $this->assertEquals(0, $reqCDNRequestNumber);
         $this->assertEquals(1, $reqAPIRequestNumber);
+    }
+
+    public function testWillReturnCallOnlyCBPApiSuccessfullyIfUUIDKeyGiven()
+    {
+        $reqCDNData = [null];
+        $reqAPIData = [null];
+        $reqCDNRequestNumber = 0;
+        $reqAPIRequestNumber = 0;
+
+        $request = \Mockery::mock(HttpClientInterface::class)
+            ->shouldReceive('sendGet')
+            ->andReturnUsing(function ($req) use (&$reqCDNData, &$reqCDNRequestNumber) {
+                $reqCDNData[$reqCDNRequestNumber] = $req;
+                $reqCDNRequestNumber++;
+                return new TestHttpResponse(200, "{\"result\": \"200\"}");
+            })
+            ->never()
+            ->getMock()
+            ->shouldReceive('sendPost')
+            ->andReturnUsing(function ($req) use (&$reqAPIData, &$reqAPIRequestNumber) {
+                $reqAPIData[$reqAPIRequestNumber] = $req;
+                $reqAPIRequestNumber++;
+                return new TestHttpResponse(200, "{\"result\": \"200\"}");
+            })
+            ->once()
+            ->getMock();
+
+        $this->_dp->shouldReceive('getRolloutKey')
+            ->andReturnUsing(function () {
+                return Uuid::uuid4();
+            })
+            ->byDefault()
+            ->getMock();
+
+        $this->_flagRepo->addFlag(new RoxFlag(), "flag");
+        $this->_cpRepo->addCustomProperty(new CustomProperty("id", CustomPropertyType::getString(), "1111"));
+        $this->_cpRepo->addCustomProperty(new CustomProperty("id", CustomPropertyType::getDateTime(), new DateTime("now")));
+        $optionBuilder = new RoxOptionsBuilder();
+        $optionBuilder->setNetworkConfigurationsOptions(
+            new NetworkConfigurationsOptions(null, null, 'https://api.cloudbees.io/device/update_state_store', null, null)
+        );
+        $envNoCdn = new Environment(new RoxOptions($optionBuilder));
+
+        $stateSender = new StateSender($request, $this->_dp, $this->_flagRepo, $this->_cpRepo, $envNoCdn);
+        $stateSender->send();
+
+        $this->assertEquals(parse_url($reqAPIData[0]->getUrl())['path'], "/device/update_state_store/{$this->_appKey}/EB41037B6A5CC68AA005E5C7A28E9FA6");
+        $this->_validateNoErrors();
+        $this->assertEquals(0, $reqCDNRequestNumber);
+        $this->assertEquals(1, $reqAPIRequestNumber);
+        // This asserts that there is externalType field, which is only for CBP
+        $this->assertEquals("DateTime", $reqAPIData[0]->getQueryParams()['custom_properties'][0]['externalType']);
+        $this->assertEquals("Boolean", $reqAPIData[0]->getQueryParams()['feature_flags'][0]['externalType']);
     }
 
     public function testWillReturnNullCallOnlyApiFailed404()
