@@ -2,6 +2,7 @@
 
 namespace Rox\Core\Roxx;
 
+use DateTimeInterface;
 use Exception;
 use Psr\Log\LoggerInterface;
 use Rox\Core\Context\ContextBuilder;
@@ -246,7 +247,7 @@ class Parser implements ParserInterface
         $this->addOperator("tsToNum", function (ParserInterface $parser, StackInterface $stack, ContextInterface $context) {
             $op1 = (object) $stack->pop();
 
-            if ($op1 instanceof DateTime) {
+            if ($op1 instanceof DateTimeInterface) {
                 // getTimestamp return the number of Epoch seconds, no need to divide by 1000
                 $stack->push($op1->getTimestamp());
                 return;

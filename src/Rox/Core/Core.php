@@ -235,7 +235,7 @@ final class Core
              * Checks if either roxOptions is missing, and if not checks if there are no network configs already defined
              * This is done to avoid override of the given network options
              */
-            $_isNetworkConfigMissing = $roxOptions == null || ($roxOptions != null && $roxOptions->getNetworkConfigurationsOptions() == null);
+            $_isNetworkConfigMissing = $roxOptions == null || $roxOptions->getNetworkConfigurationsOptions() == null;
 
             if ($_isNetworkConfigMissing && ApiKeyHelpers::isCBPApiKey($sdkSettings->getApiKey())) {
                 $this->_environment->setToPlatform();
