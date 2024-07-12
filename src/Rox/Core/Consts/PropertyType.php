@@ -248,6 +248,17 @@ final class PropertyType
     }
 
     /**
+     * @return PropertyType
+     */
+    public static function getNowString()
+    {
+        if (self::$now_string == null) {
+            self::$now_string = new PropertyType(22, 'now');
+        }
+        return self::$now_string;
+    }
+
+    /**
      * @var PropertyType $cache_miss_relative_url
      */
     private static $cache_miss_relative_url;
@@ -336,4 +347,9 @@ final class PropertyType
      * @var PropertyType $custom_properties_string
      */
     private static $custom_properties_string;
+
+    /**
+     * @var PropertyType $now_string
+     */
+    private static $now_string;
 }

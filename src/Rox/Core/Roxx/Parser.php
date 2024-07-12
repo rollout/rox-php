@@ -2,6 +2,7 @@
 
 namespace Rox\Core\Roxx;
 
+use DateTimeInterface;
 use Exception;
 use Psr\Log\LoggerInterface;
 use Rox\Core\Context\ContextBuilder;
@@ -11,6 +12,7 @@ use Rox\Core\ErrorHandling\UserspaceUnhandledErrorInvokerInterface;
 use Rox\Core\Logging\LoggerFactory;
 use Rox\Core\Utils\NumericUtils;
 use Rox\Core\Utils\TimeUtils;
+use DateTime;
 
 class Parser implements ParserInterface
 {
@@ -56,7 +58,8 @@ class Parser implements ParserInterface
 
     private function _setBasicOperators()
     {
-        $this->addOperator("isUndefined",
+        $this->addOperator(
+            "isUndefined",
             function (ParserInterface $parser, StackInterface $stack, ContextInterface $context) {
                 $op1 = $stack->pop();
                 if (!($op1 instanceof TokenType)) {
@@ -64,13 +67,15 @@ class Parser implements ParserInterface
                     return;
                 }
                 $stack->push($op1 == TokenType::getUndefined());
-            });
+            }
+        );
 
         $this->addOperator("now", function (ParserInterface $parser, StackInterface $stack, ContextInterface $context) {
             $stack->push(TimeUtils::currentTimeMillis());
         });
 
-        $this->addOperator("and",
+        $this->addOperator(
+            "and",
             function (ParserInterface $parser, StackInterface $stack, ContextInterface $context) {
 
                 $op1 = $stack->pop();
@@ -84,10 +89,12 @@ class Parser implements ParserInterface
                     $op2 = false;
                 }
 
-                $stack->push((boolean)$op1 && (boolean)$op2);
-            });
+                $stack->push((boolean) $op1 && (boolean) $op2);
+            }
+        );
 
-        $this->addOperator("or",
+        $this->addOperator(
+            "or",
             function (ParserInterface $parser, StackInterface $stack, ContextInterface $context) {
                 $op1 = $stack->pop();
                 $op2 = $stack->pop();
@@ -100,8 +107,9 @@ class Parser implements ParserInterface
                     $op2 = false;
                 }
 
-                $stack->push((boolean)$op1 || (boolean)$op2);
-            });
+                $stack->push((boolean) $op1 || (boolean) $op2);
+            }
+        );
 
         $this->addOperator("ne", function (ParserInterface $parser, StackInterface $stack, ContextInterface $context) {
             $op1 = $stack->pop();
@@ -126,8 +134,10 @@ class Parser implements ParserInterface
             $decimal2 = 0;
             $result = false;
 
-            if (NumericUtils::parseNumber($op1, $decimal1) &&
-                NumericUtils::parseNumber($op2, $decimal2)) {
+            if (
+                NumericUtils::parseNumber($op1, $decimal1) &&
+                NumericUtils::parseNumber($op2, $decimal2)
+            ) {
                 $result = !NumericUtils::numbersEqual($decimal1, $decimal2);
             }
 
@@ -162,25 +172,29 @@ class Parser implements ParserInterface
             $decimal2 = 0;
             $result = false;
 
-            if (NumericUtils::parseNumber($op1, $decimal1) &&
-                NumericUtils::parseNumber($op2, $decimal2)) {
+            if (
+                NumericUtils::parseNumber($op1, $decimal1) &&
+                NumericUtils::parseNumber($op2, $decimal2)
+            ) {
                 $result = NumericUtils::numbersEqual($decimal1, $decimal2);
             }
 
             $stack->push($result);
         });
 
-        $this->addOperator("not",
+        $this->addOperator(
+            "not",
             function (ParserInterface $parser, StackInterface $stack, ContextInterface $context) {
                 $op1 = $stack->pop();
                 if (!is_bool($op1) && $op1 === TokenType::getUndefined()) {
                     $op1 = false;
                 }
-                $stack->push(!(boolean)$op1);
-            });
+                $stack->push(!(boolean) $op1);
+            }
+        );
 
         $this->addOperator("ifThen", function (ParserInterface $parser, StackInterface $stack, ContextInterface $context) {
-            $conditionExpression = (boolean)$stack->pop();
+            $conditionExpression = (boolean) $stack->pop();
             $trueExpression = $stack->pop();
             $falseExpression = $stack->pop();
             $stack->push($conditionExpression ? $trueExpression : $falseExpression);
@@ -230,6 +244,20 @@ class Parser implements ParserInterface
             $stack->push(base64_decode($op1));
         });
 
+        $this->addOperator("tsToNum", function (ParserInterface $parser, StackInterface $stack, ContextInterface $context) {
+            $op1 = (object) $stack->pop();
+
+            if ($op1 instanceof DateTimeInterface) {
+                // getTimestamp return the number of Epoch seconds, no need to divide by 1000
+                $stack->push($op1->getTimestamp());
+                return;
+            }
+
+            $stack->push(TokenType::getUndefined());
+
+        });
+
+
         (new ValueCompareExtensions($this))->extend();
         (new RegularExpressionExtensions($this))->extend();
     }
@@ -259,7 +287,7 @@ class Parser implements ParserInterface
                 if ($node->getType() == Node::TYPE_RAND) {
                     $stack->push($node->getValue());
                 } else if ($node->getType() == Node::TYPE_RATOR) {
-                    $key = (string)$node->getValue();
+                    $key = (string) $node->getValue();
                     if (array_key_exists($key, $this->_operatorsMap)) {
                         $this->_operatorsMap[$key]($this, $stack, $context, $evaluationContext);
                     }
@@ -280,7 +308,8 @@ class Parser implements ParserInterface
                 $this->_userUnhandledErrorInvoker->invoke(
                     $ex->getExceptionSource(),
                     $ex->getExceptionTrigger(),
-                    $ex->getException());
+                    $ex->getException()
+                );
             }
 
         } catch (Exception $exception) {

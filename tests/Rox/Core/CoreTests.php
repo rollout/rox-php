@@ -153,6 +153,7 @@ class CoreTests extends RoxTestCase
 
     public function testWillCheckCoreSetupWhenOptionsWithRoxy()
     {
+        $this->expectNotToPerformAssertions();
         $this->_mockedSdkSettings
             ->shouldReceive('getApiKey')
             ->andReturn('doesn\'t matter')
@@ -171,6 +172,7 @@ class CoreTests extends RoxTestCase
 
     public function testWillCheckCoreSetupWhenNoOptions()
     {
+        $this->expectNotToPerformAssertions();
         $dp = new DeviceProperties($this->_mockedSdkSettings, $this->_mockedOptions);
         $c = new Core();
         $c->setup($this->_mockedSdkSettings, $dp, null);

@@ -11,6 +11,7 @@ use Rox\Core\Reporting\ErrorReporterInterface;
 use Rox\Core\Security\APIKeyVerifierInterface;
 use Rox\Core\Security\SignatureVerifierInterface;
 use Rox\RoxTestCase;
+use Rox\Core\Client\RoxOptionsInterface;
 
 class ConfigurationParserTests extends RoxTestCase
 {
@@ -44,6 +45,11 @@ class ConfigurationParserTests extends RoxTestCase
      */
     private $_cfiEvent;
 
+    /**
+     * @var RoxOptionsInterface $_mockedOptions
+     */
+    private $_mockedOptions;
+
     protected function setUp(): void
     {
         parent::setUp();
@@ -72,11 +78,18 @@ class ConfigurationParserTests extends RoxTestCase
             ->getMock();
 
         $this->_cfi = new ConfigurationFetchedInvoker(
-            Mockery::mock(UserspaceUnhandledErrorInvokerInterface::class));
+            Mockery::mock(UserspaceUnhandledErrorInvokerInterface::class)
+        );
 
         $this->_cfi->register(function (ConfigurationFetchedArgs $e) {
             $this->_cfiEvent = $e;
         });
+
+        $this->_mockedOptions = \Mockery::mock(RoxOptionsInterface::class)
+            ->shouldReceive('isSignatureDisabled')
+            ->andReturn(false)
+            ->byDefault()
+            ->getMock();
     }
 
     public function testWillReturnNullWhenUnexpectedException()
@@ -91,7 +104,7 @@ EOT;
 
         $configFetchResult = new ConfigurationFetchResult(json_decode($json, true), ConfigurationSource::CDN);
 
-        $cp = new ConfigurationParser($this->_sf, $this->_kf, $this->_errRe, $this->_cfi);
+        $cp = new ConfigurationParser($this->_sf, $this->_kf, $this->_errRe, $this->_cfi, $this->_mockedOptions);
         $conf = $cp->parse($configFetchResult, $this->_sdk);
 
         $this->assertNull($conf);
@@ -109,7 +122,7 @@ EOT;
         $this->_sf->shouldReceive('verify')
             ->andReturn(false);
 
-        $cp = new ConfigurationParser($this->_sf, $this->_kf, $this->_errRe, $this->_cfi);
+        $cp = new ConfigurationParser($this->_sf, $this->_kf, $this->_errRe, $this->_cfi, $this->_mockedOptions);
 
         $json = <<<EOT
 {
@@ -141,7 +154,7 @@ EOT;
             ->andReturn(false)
             ->getMock();
 
-        $cp = new ConfigurationParser($this->_sf, $this->_kf, $this->_errRe, $this->_cfi);
+        $cp = new ConfigurationParser($this->_sf, $this->_kf, $this->_errRe, $this->_cfi, $this->_mockedOptions);
         $this->assertNull($cp->parse($configFetchResult, $this->_sdk));
         $this->assertNotNull($this->_cfiEvent);
         $this->assertEquals(FetcherError::MismatchAppKey, $this->_cfiEvent->getErrorDetails());
@@ -159,7 +172,7 @@ EOT;
 
         $configFetchResult = new ConfigurationFetchResult(json_decode($json, true), ConfigurationSource::API);
 
-        $cp = new ConfigurationParser($this->_sf, $this->_kf, $this->_errRe, $this->_cfi);
+        $cp = new ConfigurationParser($this->_sf, $this->_kf, $this->_errRe, $this->_cfi, $this->_mockedOptions);
         $conf = $cp->parse($configFetchResult, $this->_sdk);
 
         $this->assertNotNull($conf);

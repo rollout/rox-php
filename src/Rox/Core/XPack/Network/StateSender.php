@@ -14,6 +14,7 @@ use Rox\Core\Network\HttpResponseInterface;
 use Rox\Core\Network\RequestData;
 use Rox\Core\Repositories\CustomPropertyRepositoryInterface;
 use Rox\Core\Repositories\FlagRepositoryInterface;
+use Rox\Core\Utils\ApiKeyHelpers;
 use Rox\Core\Utils\DotNetCompat;
 use Rox\Core\Utils\MD5Generator;
 
@@ -60,6 +61,11 @@ class StateSender
     private $_stateSent = false;
 
     /**
+     * @var bool $_isCBP
+     */
+    private $_isCBP = false;
+
+    /**
      * @var Environment $_environment
      */
     private $_environment;
@@ -73,12 +79,12 @@ class StateSender
      * @param Environment $environment
      */
     public function __construct(
-        HttpClientInterface               $request,
-        DevicePropertiesInterface         $deviceProperties,
-        FlagRepositoryInterface           $flagRepository,
+        HttpClientInterface $request,
+        DevicePropertiesInterface $deviceProperties,
+        FlagRepositoryInterface $flagRepository,
         CustomPropertyRepositoryInterface $customPropertyRepository,
-        Environment                       $environment)
-    {
+        Environment $environment
+    ) {
         $this->_relevantAPICallParams = [
             PropertyType::getPlatform(),
             PropertyType::getCustomProperties(),
@@ -103,6 +109,7 @@ class StateSender
         $this->_flagRepository = $flagRepository;
         $this->_customPropertyRepository = $customPropertyRepository;
         $this->_environment = $environment;
+        $this->_isCBP = ApiKeyHelpers::isCBPApiKey($this->_deviceProperties->getRolloutKey());
     }
 
     /**
@@ -134,11 +141,20 @@ class StateSender
         return array_map(function ($key) use (&$allFlags) {
             $var = /*RoxStringBase*/
                 $allFlags[$key];
-            return [
+
+            $flag = [
                 'name' => $var->getName(),
                 'defaultValue' => $var->getDefaultValue(),
                 'options' => $var->getVariations(),
             ];
+
+            if ($this->_isCBP) {
+                $flag['externalType'] = $var->getExternalType();
+            }
+
+            return $flag;
+
+
         }, $keys);
     }
 
@@ -150,11 +166,22 @@ class StateSender
         $allCustomProperties = $this->_customPropertyRepository->getAllCustomProperties();
         $keys = array_keys($allCustomProperties);
         sort($keys);
-        return array_map(function ($key) use ($allCustomProperties) {
-            $value = (string)$allCustomProperties[$key];
+        $mapped = array_map(function ($key) use ($allCustomProperties) {
+            $value = (string) $allCustomProperties[$key];
+
+            if (!$this->_isCBP && $allCustomProperties[$key]->getType()->getExternalType() === "DateTime") {
+                return null;
+            }
+
             return json_decode($value, true);
         }, $keys);
+
+        return array_filter($mapped, function ($v) {
+            return $v !== null;
+        });
+
     }
+
 
     /**
      * @param array $properties
@@ -237,8 +264,7 @@ class StateSender
         $source = ConfigurationSource::CDN;
 
         try {
-            if ($this->_environment->sendStateCDNPath() == null) 
-            {
+            if ($this->_environment->sendStateCDNPath() == null) {
                 $source = ConfigurationSource::API;
 
                 $fetchResult = $this->_sendStateToAPI($properties);
@@ -246,9 +272,7 @@ class StateSender
                     // success for api
                     return;
                 }
-            }
-            else
-            {
+            } else {
                 $fetchResult = $this->_sendStateToCDN($properties);
 
                 if ($fetchResult->isSuccessfulStatusCode()) {
@@ -257,12 +281,15 @@ class StateSender
 
                     if (!is_array($responseJSON)) {
                         $this->_log->error(
-                            sprintf("Failed to send state. The returned response is not a valid JSON: %s, Source: %s",
+                            sprintf(
+                                "Failed to send state. The returned response is not a valid JSON: %s, Source: %s",
                                 $responseAsString,
-                                ConfigurationSource::toString($source)));
+                                ConfigurationSource::toString($source)
+                            )
+                        );
                     } else if (array_key_exists("result", $responseJSON)) {
                         $responseResultValue = $responseJSON["result"];
-                        if ((int)$responseResultValue == 404) {
+                        if ((int) $responseResultValue == 404) {
                             $shouldRetry = true;
                         }
                     }
@@ -273,9 +300,11 @@ class StateSender
                     }
                 }
 
-                if ($shouldRetry ||
+                if (
+                    $shouldRetry ||
                     $fetchResult->getStatusCode() == HttpResponseInterface::STATUS_FORBIDDEN ||
-                    $fetchResult->getStatusCode() == HttpResponseInterface::STATUS_NOT_FOUND) {
+                    $fetchResult->getStatusCode() == HttpResponseInterface::STATUS_NOT_FOUND
+                ) {
                     $this->_logSendStateError($source, $fetchResult, ConfigurationSource::API);
                     $source = ConfigurationSource::API;
 
@@ -313,16 +342,23 @@ class StateSender
             $retryMsg = "Trying to send state to " . ConfigurationSource::toString($nextSource) . ". ";
         }
 
-        $this->_log->debug(sprintf("Failed to send state to %s. %shttp result code: %d",
-            ConfigurationSource::toString($source),
-            $retryMsg, $response->getStatusCode()));
+        $this->_log->debug(
+            sprintf(
+                "Failed to send state to %s. %shttp result code: %d",
+                ConfigurationSource::toString($source),
+                $retryMsg,
+                $response->getStatusCode()
+            )
+        );
     }
 
     private function _logSendStateException($source, Exception $ex)
     {
-        $this->_log->error(sprintf("Failed to send state. Source: %s", ConfigurationSource::toString($source)),
+        $this->_log->error(
+            sprintf("Failed to send state. Source: %s", ConfigurationSource::toString($source)),
             [
                 'exception' => $ex
-            ]);
+            ]
+        );
     }
 }

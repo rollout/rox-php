@@ -105,6 +105,17 @@ class CustomPropertyType
     }
 
     /**
+     * @return CustomPropertyType
+     */
+    public static function getDateTime()
+    {
+        if (self::$_dateTime == null) {
+            self::$_dateTime = new CustomPropertyType("time", "DateTime");
+        }
+        return self::$_dateTime;
+    }
+
+    /**
      * @var CustomPropertyType $_string
      */
     private static $_string;
@@ -128,4 +139,9 @@ class CustomPropertyType
      * @var CustomPropertyType $_semver
      */
     private static $_semver;
+
+    /**
+     * @var CustomPropertyType $_dateTime
+     */
+    private static $_dateTime;
 }

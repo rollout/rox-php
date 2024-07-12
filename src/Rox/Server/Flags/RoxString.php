@@ -16,7 +16,8 @@ class RoxString extends RoxStringBase implements StringFlagInterface
     {
         parent::__construct(
             $this->checkValueType($defaultValue),
-            $this->checkVariationsType($variations));
+            $this->checkVariationsType($variations)
+        );
     }
 
     /**
@@ -33,5 +34,13 @@ class RoxString extends RoxStringBase implements StringFlagInterface
     function getValue($context = null)
     {
         return $this->getStringValue($context);
+    }
+
+    /**
+     * @return string
+     */
+    public function getExternalType()
+    {
+        return "String";
     }
 }

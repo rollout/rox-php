@@ -16,7 +16,8 @@ class RoxInt extends RoxStringBase implements IntFlagInterface
     {
         parent::__construct(
             $this->checkValueType($defaultValue),
-            $this->checkVariationsType($variations));
+            $this->checkVariationsType($variations)
+        );
     }
 
     /**
@@ -33,5 +34,13 @@ class RoxInt extends RoxStringBase implements IntFlagInterface
     function getValue($context = null)
     {
         return $this->getIntValue($context);
+    }
+
+    /**
+     * @return string
+     */
+    public function getExternalType()
+    {
+        return "Number";
     }
 }

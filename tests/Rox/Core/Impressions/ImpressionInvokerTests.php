@@ -48,6 +48,8 @@ class ImpressionInvokerTests extends RoxTestCase
 
     public function testWillSetImpressionInvokerEmptyInvokeNotThrowingException()
     {
+        // this line expects no exception will be thrown
+        $this->expectNotToPerformAssertions();
         $internalFlags = Mockery::mock(InternalFlagsInterface::class)
             ->shouldReceive('isEnabled')
             ->andThrow(\Exception::class)
@@ -71,12 +73,7 @@ class ImpressionInvokerTests extends RoxTestCase
         $originalExperiment = new ExperimentModel('id', 'name', 'cond', true, null, ['label1'], 'stam');
 
         $isImpressionRaised = [false];
-        $impressionInvoker->register(function (ImpressionArgs $e) use (
-            $context,
-            $reportingValue,
-            $impressionInvoker,
-            &$isImpressionRaised
-        ) {
+        $impressionInvoker->register(function (ImpressionArgs $e) use ($context, $reportingValue, $impressionInvoker, &$isImpressionRaised) {
 
             $this->assertEquals($e->getReportingValue(), $reportingValue);
             $this->assertEquals($e->getContext(), $context);
