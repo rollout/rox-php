@@ -8,7 +8,7 @@ use Rox\Core\Consts\PropertyType;
 
 class DeviceProperties implements DevicePropertiesInterface
 {
-    const DEFAULT_LIB_VERSION = '5.0.3';
+    const DEFAULT_LIB_VERSION = '6.0.0';
     const DEFAULT_DISTINCT_ID = 'stam'; // FIXME: what?
     const BUILD_NUMBER = "50"; // FIXME: fix the build number
 
@@ -29,8 +29,8 @@ class DeviceProperties implements DevicePropertiesInterface
      */
     public function __construct(
         SdkSettingsInterface $sdkSettings,
-        RoxOptionsInterface $roxOptions)
-    {
+        RoxOptionsInterface $roxOptions
+    ) {
         $this->_sdkSettings = $sdkSettings;
         $this->_roxOptions = $roxOptions;
     }
