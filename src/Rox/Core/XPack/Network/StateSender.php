@@ -169,17 +169,14 @@ class StateSender
         $mapped = array_map(function ($key) use ($allCustomProperties) {
             $value = (string) $allCustomProperties[$key];
 
-            if (!$this->_isCBP && $allCustomProperties[$key]->getType()->getExternalType() === "DateTime") {
-                return null;
-            }
-
             return json_decode($value, true);
         }, $keys);
 
-        return array_filter($mapped, function ($v) {
-            return $v !== null;
+        $mapped = array_filter($mapped, function ($v) {
+            return !(!$this->_isCBP && $v['externalType'] === "DateTime");
         });
 
+        return array_values($mapped);
     }
 
 
