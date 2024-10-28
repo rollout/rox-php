@@ -172,9 +172,11 @@ class StateSender
             return json_decode($value, true);
         }, $keys);
 
-        $mapped = array_filter($mapped, function ($v) {
-            return !(!$this->_isCBP && $v['externalType'] === "DateTime");
-        });
+        if (!$this->_isCBP) {
+            $mapped = array_filter($mapped, function ($v) {
+                return $v['externalType'] !== "DateTime";
+            });
+        }
 
         return array_values($mapped);
     }
