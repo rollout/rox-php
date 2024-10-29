@@ -479,6 +479,62 @@ class StateSenderTests extends RoxTestCase
         $this->assertEquals("Boolean", $reqAPIData[0]->getQueryParams()['feature_flags'][0]['externalType']);
     }
 
+    public function testSkipAddingDateTimePropertyIfNotCBPKeyGiven()
+    {
+        $reqCDNData = [null];
+        $reqAPIData = [null];
+        $reqCDNRequestNumber = 0;
+        $reqAPIRequestNumber = 0;
+
+        $request = \Mockery::mock(HttpClientInterface::class)
+            ->shouldReceive('sendGet')
+            ->andReturnUsing(function ($req) use (&$reqCDNData, &$reqCDNRequestNumber) {
+                $reqCDNData[$reqCDNRequestNumber] = $req;
+                $reqCDNRequestNumber++;
+                return new TestHttpResponse(200, "{\"result\": \"200\"}");
+            })
+            ->never()
+            ->getMock()
+            ->shouldReceive('sendPost')
+            ->andReturnUsing(function ($req) use (&$reqAPIData, &$reqAPIRequestNumber) {
+                $reqAPIData[$reqAPIRequestNumber] = $req;
+                $reqAPIRequestNumber++;
+                return new TestHttpResponse(200, "{\"result\": \"200\"}");
+            })
+            ->once()
+            ->getMock();
+
+        $this->_dp->shouldReceive('getRolloutKey')
+            ->andReturnUsing(function () {
+                return '64c13ab08edf48a008793cac';
+            })
+            ->byDefault()
+            ->getMock();
+
+        $this->_flagRepo->addFlag(new RoxFlag(), "flag");
+        $this->_cpRepo->addCustomProperty(new CustomProperty("id.string", CustomPropertyType::getString(), "1111"));
+        $this->_cpRepo->addCustomProperty(new CustomProperty("id.now", CustomPropertyType::getDateTime(), new DateTime("now")));
+        $optionBuilder = new RoxOptionsBuilder();
+        $optionBuilder->setNetworkConfigurationsOptions(
+            new NetworkConfigurationsOptions(null, null, 'https://api.cloudbees.io/device/update_state_store', null, null)
+        );
+        $envNoCdn = new Environment(new RoxOptions($optionBuilder));
+
+        $stateSender = new StateSender($request, $this->_dp, $this->_flagRepo, $this->_cpRepo, $envNoCdn);
+        $stateSender->send();
+
+        $this->assertEquals(parse_url($reqAPIData[0]->getUrl())['path'], "/device/update_state_store/{$this->_appKey}/CE6ABC2C4A3017819E16086D5D1D9BD1");
+        $this->_validateNoErrors();
+        $this->assertEquals(0, $reqCDNRequestNumber);
+        $this->assertEquals(1, $reqAPIRequestNumber);
+
+        // This asserts that custom properties did not add "DateTime" property, and does not have externalType key for feature flag
+        $this->assertEquals(1, count($reqAPIData[0]->getQueryParams()['custom_properties']));
+        $this->assertEquals("String", $reqAPIData[0]->getQueryParams()['custom_properties'][0]['externalType']);
+        $this->assertEquals("string", $reqAPIData[0]->getQueryParams()['custom_properties'][0]['type']);
+        $this->assertArrayNotHasKey("externalType", $reqAPIData[0]->getQueryParams()['feature_flags'][0]);
+    }
+
     public function testWillReturnNullCallOnlyApiFailed404()
     {
         $reqCDNData = [null];
