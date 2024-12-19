@@ -16,6 +16,8 @@ The following extensions should be enabled in php.ini:
 
 * openssl
 
+**Warning**: If you use `5.0.2` version of `rox-php`, and you are planning to migrate to `5.0.3` or later, you must clear the cache on your deployment environments, as it may cause runtime issues (check [this discussion](https://github.com/Kevinrob/guzzle-cache-middleware/issues/172) for more details).
+
 ## Documentation
 
 Getting started guide, use cases, examples and videos can be found in [Rollout support site](https://support.rollout.io)
