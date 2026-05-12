@@ -93,9 +93,6 @@ final class Rox
             try {
                 if (!$roxOptions) {
                     $roxOptionsBuilder = new RoxOptionsBuilder();
-                    if (ApiKeyHelpers::isCBPApiKey($apiKey)) {
-                        $roxOptionsBuilder->setDisableSignatureVerification(true);
-                    }
                     $roxOptions = new RoxOptions($roxOptionsBuilder);
                 }
 
