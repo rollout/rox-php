@@ -74,9 +74,15 @@ class ConfigurationParser
      * @param array $configData
      * @return bool
      */
-    protected function isVerifiedSignature($configData)
+    protected function isVerifiedSignature($configData, $apiKey = null)
     {
-        if ($this->_roxOptions->isSignatureDisabled()) {
+        // Check if signature verification is explicitly disabled
+        if ($this->_roxOptions !== null && $this->_roxOptions->isSignatureDisabled()) {
+            return true;
+        }
+
+        // Auto-disable signature verification for CBP/Unify keys (they don't send signature_v0)
+        if ($apiKey !== null && \Rox\Core\Utils\ApiKeyHelpers::isCBPApiKey($apiKey)) {
             return true;
         }
 
@@ -107,16 +113,17 @@ class ConfigurationParser
     {
         try {
             $json = $fetchResult->getParsedData();
+            $apiKey = $sdkSettings !== null ? $sdkSettings->getApiKey() : null;
 
-            if (!$this->isVerifiedSignature($json)) {
+            if (!$this->isVerifiedSignature($json, $apiKey)) {
                 $this->_configurationFetchedInvoker->invokeWithError(FetcherError::SignatureVerificationError);
                 $this->_errorReporter->report(
                     "Failed to validate signature",
                     new Exception(
                         sprintf(
                             "Data : %s Signature : %s",
-                            (string) $json["data"],
-                            (string) $json["signature_v0"]
+                            (string) ($json["data"] ?? ""),
+                            (string) ($json["signature_v0"] ?? "")
                         )
                     )
                 );

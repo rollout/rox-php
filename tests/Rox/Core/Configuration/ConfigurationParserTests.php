@@ -99,7 +99,7 @@ class ConfigurationParserTests extends RoxTestCase
     "nodata":"{\"application\":\"12345\",\"targetGroups\":[{\"condition\":\"eq(true,true)\",\"_id\":\"12345\"},{\"_id\":\"123456\",\"condition\":\"eq(true,true)\"}],\"experiments\":[{\"deploymentConfiguration\":{\"condition\":\"ifThen(and(true, true)\"},\"featureFlags\":[{\"name\":\"FeatureFlags.isFeatureFlagsEnabled\"}],\"archived\":false,\"name\":\"Feature Flags Drawer Item\",\"_id\":\"1\"},{\"deploymentConfiguration\":{\"condition\":\"ifThen(and(true, true)\"},\"featureFlags\":[{\"name\":\"Invitations.isInvitationsEnabled\"}],\"archived\":false,\"name\":\"Enable Modern Invitations\",\"_id\":\"2\"}] } ",
     "signature_v0":"K/bEQCkRXa6+uFr5H2jCRCaVgmtsTwbgfrFGVJ9NebfMH8CgOhCDIvF4TM1Vyyl0bGS9a4r4Qgi/g63NDBWk0ZbRrKAUkVG56V3/bI2GDHxFvRNrNbiPmFv/wmLLuwgh1mdzU0EwLG4M7yXoNXtMr6Jli8t4xfBOaWW1g0QpASkiWa7kdTamVip/1QygyUuhX5hOyUMpy4Ny9Hi/QPvVBn6GDMxQtxpLfTavU9cBly2D7Ex8Z7sUUOKeoEJcdsoF1QzH14XvA2HQSICESz7D/uld0PNdG0tMj9NlAZfki8eY2KuUe/53Z0Og5WrqQUxiAdPuJoZr6+kSqlASZrrkYw==",
     "signed_date":"2018-01-09T19:02:00.720Z"
-}           
+}
 EOT;
 
         $configFetchResult = new ConfigurationFetchResult(json_decode($json, true), ConfigurationSource::CDN);
@@ -110,7 +110,9 @@ EOT;
         $this->assertNull($conf);
 
         $this->assertNotNull($this->_cfiEvent);
-        $this->assertEquals(FetcherError::Unknown, $this->_cfiEvent->getErrorDetails());
+        // Fixed: Now properly returns SignatureVerificationError when data field is missing
+        // instead of letting it throw an exception that gets caught as Unknown
+        $this->assertEquals(FetcherError::SignatureVerificationError, $this->_cfiEvent->getErrorDetails());
     }
 
     public function testWillReturnNullWhenWrongSignature()
@@ -201,5 +203,65 @@ EOT;
         $this->assertEquals(count($conf->getExperiments()[1]->getLabels()), 0);
 
         $this->assertNull($this->_cfiEvent);
+    }
+
+    public function testWillReturnNullWhenSignatureMissingAndVerificationNotDisabled()
+    {
+        $json = <<<EOT
+{
+    "data":"{\"application\":\"12345\", \"targetGroups\": [], \"experiments\": []}",
+    "signed_date":"2018-01-09T19:02:00.720Z"
+}
+EOT;
+
+        $this->_mockedOptions->shouldReceive('isSignatureDisabled')
+            ->andReturn(false);
+
+        $configFetchResult = new ConfigurationFetchResult(json_decode($json, true), ConfigurationSource::API);
+
+        $cp = new ConfigurationParser($this->_sf, $this->_kf, $this->_errRe, $this->_cfi, $this->_mockedOptions);
+        $this->assertNull($cp->parse($configFetchResult, $this->_sdk));
+        $this->assertNotNull($this->_cfiEvent);
+        $this->assertEquals(FetcherError::SignatureVerificationError, $this->_cfiEvent->getErrorDetails());
+    }
+
+    public function testWillParseSuccessfullyWhenSignatureMissingButVerificationDisabled()
+    {
+        $json = <<<EOT
+{
+    "data":"{\"application\":\"12345\", \"targetGroups\": [], \"experiments\": []}",
+    "signed_date":"2018-01-09T19:02:00.720Z"
+}
+EOT;
+
+        $this->_mockedOptions->shouldReceive('isSignatureDisabled')
+            ->andReturn(true);
+
+        $configFetchResult = new ConfigurationFetchResult(json_decode($json, true), ConfigurationSource::API);
+
+        $cp = new ConfigurationParser($this->_sf, $this->_kf, $this->_errRe, $this->_cfi, $this->_mockedOptions);
+        $conf = $cp->parse($configFetchResult, $this->_sdk);
+
+        $this->assertNotNull($conf);
+        $this->assertEquals(count($conf->getTargetGroups()), 0);
+        $this->assertEquals(count($conf->getExperiments()), 0);
+    }
+
+    public function testWillHandleNullRoxOptionsGracefully()
+    {
+        $json = <<<EOT
+{
+    "data":"{\"application\":\"12345\", \"targetGroups\": [], \"experiments\": []}",
+    "signed_date":"2018-01-09T19:02:00.720Z"
+}
+EOT;
+
+        $configFetchResult = new ConfigurationFetchResult(json_decode($json, true), ConfigurationSource::API);
+
+        // Pass null for roxOptions - this should not crash
+        $cp = new ConfigurationParser($this->_sf, $this->_kf, $this->_errRe, $this->_cfi, null);
+
+        // Should return null because signature is missing and we can't check if verification is disabled
+        $this->assertNull($cp->parse($configFetchResult, $this->_sdk));
     }
 }
