@@ -314,6 +314,46 @@ class ConfigurationFetcherTests extends RoxTestCase
         $this->assertEquals(0, $numberOfTimerCalled[0]);
     }
 
+    public function testWillReturnIsFromCacheTrueWhenCDNResponseIsFromCache()
+    {
+        $confFetchInvoker = new ConfigurationFetchedInvoker(Mockery::mock(UserspaceUnhandledErrorInvokerInterface::class));
+
+        // Simulate Guzzle cache middleware returning a HIT response (isFromCache = true)
+        $response = new TestHttpResponse(200, "{\"a\": \"cached\"}", true);
+
+        $request = Mockery::mock(HttpClientInterface::class)
+            ->shouldReceive('sendGet')
+            ->andReturn($response)
+            ->getMock();
+
+        $confFetcher = new ConfigurationFetcher($request, $this->_bu, $this->_dp, $confFetchInvoker, $this->_errorReporter, $this->_environment);
+        $result = $confFetcher->fetch();
+
+        $this->assertNotNull($result);
+        $this->assertEquals("cached", $result->getParsedData()["a"]);
+        $this->assertTrue($result->isFromCache());
+    }
+
+    public function testWillReturnIsFromCacheFalseWhenCDNResponseIsFromNetwork()
+    {
+        $confFetchInvoker = new ConfigurationFetchedInvoker(Mockery::mock(UserspaceUnhandledErrorInvokerInterface::class));
+
+        // Simulate a real network response (isFromCache = false, the default)
+        $response = new TestHttpResponse(200, "{\"a\": \"fresh\"}");
+
+        $request = Mockery::mock(HttpClientInterface::class)
+            ->shouldReceive('sendGet')
+            ->andReturn($response)
+            ->getMock();
+
+        $confFetcher = new ConfigurationFetcher($request, $this->_bu, $this->_dp, $confFetchInvoker, $this->_errorReporter, $this->_environment);
+        $result = $confFetcher->fetch();
+
+        $this->assertNotNull($result);
+        $this->assertEquals("fresh", $result->getParsedData()["a"]);
+        $this->assertFalse($result->isFromCache());
+    }
+
     public function testWillReturnNullDataWhenBothNotFound()
     {
         $confFetchInvoker = new ConfigurationFetchedInvoker(Mockery::mock(UserspaceUnhandledErrorInvokerInterface::class));

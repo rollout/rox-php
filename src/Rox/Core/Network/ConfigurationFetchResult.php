@@ -16,14 +16,21 @@ class ConfigurationFetchResult
     private $_parsedData;
 
     /**
+     * @var bool $_isFromCache
+     */
+    private $_isFromCache;
+
+    /**
      * ConfigurationFetchResult constructor.
      * @param array $parsedData
      * @param int $source
+     * @param bool $isFromCache
      */
-    public function __construct($parsedData, $source)
+    public function __construct($parsedData, $source, $isFromCache = false)
     {
         $this->_source = $source;
         $this->_parsedData = $parsedData;
+        $this->_isFromCache = $isFromCache;
     }
 
     /**
@@ -40,6 +47,14 @@ class ConfigurationFetchResult
     public function getParsedData()
     {
         return $this->_parsedData;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isFromCache()
+    {
+        return $this->_isFromCache;
     }
 
     /**

@@ -26,6 +26,15 @@ class Psr7ResponseWrapper extends AbstractHttpResponse
     }
 
     /**
+     * @return bool
+     */
+    function isFromCache()
+    {
+        $header = $this->_response->getHeader('X-Kevinrob-Cache');
+        return !empty($header) && $header[0] === 'HIT';
+    }
+
+    /**
      * @return HttpResponseContentInterface
      */
     function getContent()

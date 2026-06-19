@@ -32,7 +32,8 @@ class RoxE2ETests extends RoxTestCase
 
         $options = new RoxOptions((new RoxOptionsBuilder())
             ->setConfigurationFetchedHandler(function (ConfigurationFetchedArgs $args) {
-                if ($args->getFetcherStatus() == FetcherStatus::AppliedFromNetwork) {
+                if ($args->getFetcherStatus() == FetcherStatus::AppliedFromNetwork ||
+                    $args->getFetcherStatus() == FetcherStatus::AppliedFromLocalStorage) {
                     TestVars::$configurationFetchedCount++;
                 }
             })

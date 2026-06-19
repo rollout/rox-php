@@ -24,13 +24,7 @@ class ServerProperties extends DeviceProperties
     {
         parent::__construct($sdkSettings, $roxOptions);
         $this->_distinctId = getenv(self::INSTANCE_ID_ENV_VAR_NAME)
-            ?: md5(join('.', [
-                getmyuid(),
-                getmygid(),
-                get_current_user(),
-                getmyinode(),
-                getlastmod()
-            ]));
+            ?: md5($sdkSettings->getApiKey());
     }
 
     function getLibVersion()

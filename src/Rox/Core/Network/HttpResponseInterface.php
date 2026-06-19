@@ -19,6 +19,11 @@ interface HttpResponseInterface
     function isSuccessfulStatusCode();
 
     /**
+     * @return bool
+     */
+    function isFromCache();
+
+    /**
      * @return HttpResponseContentInterface
      */
     function getContent();
