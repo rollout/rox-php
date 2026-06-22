@@ -92,8 +92,8 @@ class ConfigurationFetcherTests extends RoxTestCase
         $this->assertEquals($reqData[0]->getUrl(), "https://conf.rollout.io/123/buid");
 
         $qp = $reqData[0]->getQueryParams();
-        $this->assertEquals(count($qp), 5);
-        $this->assertEquals($qp[PropertyType::getDistinctId()->getName()], "id");
+        $this->assertEquals(count($qp), 4);
+        $this->assertArrayNotHasKey(PropertyType::getDistinctId()->getName(), $qp);
         $this->assertEquals($qp['realPlatform'], "PHP-test");
         $this->assertEquals($qp['sdkVersion'], "1.2.3");
         $this->assertEquals($qp['platformVersion'], php_sapi_name());
@@ -318,7 +318,6 @@ class ConfigurationFetcherTests extends RoxTestCase
     {
         $confFetchInvoker = new ConfigurationFetchedInvoker(Mockery::mock(UserspaceUnhandledErrorInvokerInterface::class));
 
-        // Simulate Guzzle cache middleware returning a HIT response (isFromCache = true)
         $response = new TestHttpResponse(200, "{\"a\": \"cached\"}", true);
 
         $request = Mockery::mock(HttpClientInterface::class)
@@ -338,7 +337,6 @@ class ConfigurationFetcherTests extends RoxTestCase
     {
         $confFetchInvoker = new ConfigurationFetchedInvoker(Mockery::mock(UserspaceUnhandledErrorInvokerInterface::class));
 
-        // Simulate a real network response (isFromCache = false, the default)
         $response = new TestHttpResponse(200, "{\"a\": \"fresh\"}");
 
         $request = Mockery::mock(HttpClientInterface::class)

@@ -23,8 +23,6 @@ class ConfigurationFetcher extends ConfigurationFetcherBase
     private function _fetchFromCDN(array $properties)
     {
         return $this->_request->sendGet(new RequestData($this->_getCDNUrl($properties), [
-            PropertyType::getDistinctId()->getName() =>
-                (string)$properties[PropertyType::getDistinctId()->getName()],
             'realPlatform' =>
                 (string)@$properties['platform'],
             'sdkVersion' =>
