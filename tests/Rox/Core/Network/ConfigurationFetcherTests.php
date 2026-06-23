@@ -92,8 +92,8 @@ class ConfigurationFetcherTests extends RoxTestCase
         $this->assertEquals($reqData[0]->getUrl(), "https://conf.rollout.io/123/buid");
 
         $qp = $reqData[0]->getQueryParams();
-        $this->assertEquals(count($qp), 4);
-        $this->assertArrayNotHasKey(PropertyType::getDistinctId()->getName(), $qp);
+        $this->assertEquals(count($qp), 5);
+        $this->assertEquals($qp[PropertyType::getDistinctId()->getName()], "id");
         $this->assertEquals($qp['realPlatform'], "PHP-test");
         $this->assertEquals($qp['sdkVersion'], "1.2.3");
         $this->assertEquals($qp['platformVersion'], php_sapi_name());
