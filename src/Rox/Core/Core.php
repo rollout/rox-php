@@ -141,11 +141,6 @@ final class Core
     private $_errorReporter;
 
     /**
-     * @var ConfigurationFetchResult $_lastConfigurations
-     */
-    private $_lastConfigurations = null;
-
-    /**
      * @var InternalFlagsInterface $_internalFlags
      */
     private $_internalFlags;
@@ -350,8 +345,7 @@ final class Core
             $this->_targetGroupRepository->setTargetGroups($configuration->getTargetGroups());
             $this->_flagSetter->setExperiments();
 
-            $hasChanges = ($this->_lastConfigurations == null || !$this->_lastConfigurations->equals($result));
-            $this->_lastConfigurations = $result;
+            $hasChanges = $this->_detectAndPersistConfigChanges($result);
             $fetcherStatus = $result->isFromCache()
                 ? FetcherStatus::AppliedFromLocalStorage
                 : FetcherStatus::AppliedFromNetwork;
@@ -403,6 +397,38 @@ final class Core
     public function dynamicApi(EntitiesProviderInterface $entitiesProvider)
     {
         return new DynamicApi($this->_flagRepository, $entitiesProvider);
+    }
+
+    /**
+     * Compares the fetched config against the last known hash stored on disk.
+     * Returns true if the config changed (or is seen for the first time).
+     * Persists the new hash so the next process can compare against it.
+     *
+     * @param ConfigurationFetchResult $result
+     * @return bool
+     */
+    private function _detectAndPersistConfigChanges(ConfigurationFetchResult $result)
+    {
+        $currentHash = md5(json_encode($result->getParsedData()));
+        $hashFile = join(DIRECTORY_SEPARATOR, [
+            sys_get_temp_dir(),
+            'rollout',
+            'cache',
+            'config_hash_' . md5($this->_sdkSettings->getApiKey()) . '.txt'
+        ]);
+
+        $lastHash = @file_get_contents($hashFile);
+        $hasChanges = ($lastHash === false || $lastHash !== $currentHash);
+
+        if ($hasChanges) {
+            $dir = dirname($hashFile);
+            if (!is_dir($dir)) {
+                @mkdir($dir, 0755, true);
+            }
+            @file_put_contents($hashFile, $currentHash);
+        }
+
+        return $hasChanges;
     }
 
     /**
