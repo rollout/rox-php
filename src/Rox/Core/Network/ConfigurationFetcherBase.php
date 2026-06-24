@@ -79,10 +79,11 @@ abstract class ConfigurationFetcherBase implements ConfigurationFetcherInterface
     /**
      * @param string $data
      * @param int $source
+     * @param bool $isFromCache
      * @return ConfigurationFetchResult|null
      * @see ConfigurationSource
      */
-    protected function createConfigurationResult($data, $source)
+    protected function createConfigurationResult($data, $source, $isFromCache = false)
     {
         if (!$data) {
             $this->_configurationFetchedInvoker->invokeWithError(FetcherError::EmptyJson);
@@ -99,7 +100,7 @@ abstract class ConfigurationFetcherBase implements ConfigurationFetcherInterface
             return null;
         }
 
-        return new ConfigurationFetchResult($decoded, $source);
+        return new ConfigurationFetchResult($decoded, $source, $isFromCache);
     }
 
     /**

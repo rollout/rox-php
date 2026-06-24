@@ -12,4 +12,12 @@ abstract class AbstractHttpResponse implements HttpResponseInterface
         return $this->getStatusCode() >= 200 &&
             $this->getStatusCode() <= 299;
     }
+
+    /**
+     * @return bool
+     */
+    function isFromCache()
+    {
+        return false;
+    }
 }

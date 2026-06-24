@@ -51,7 +51,7 @@ class ConfigurationFetcher extends ConfigurationFetcherBase
 
             if ($fetchResult->isSuccessfulStatusCode()) {
                 $responseAsString = $fetchResult->getContent()->readAsString();
-                $configurationFetchResult = $this->createConfigurationResult($responseAsString, $source);
+                $configurationFetchResult = $this->createConfigurationResult($responseAsString, $source, $fetchResult->isFromCache());
 
                 if ($configurationFetchResult == null || $configurationFetchResult->getParsedData() == null) {
                     return null;
