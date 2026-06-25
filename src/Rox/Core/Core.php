@@ -345,7 +345,7 @@ final class Core
             $this->_targetGroupRepository->setTargetGroups($configuration->getTargetGroups());
             $this->_flagSetter->setExperiments();
 
-            $hasChanges = $this->_detectAndPersistConfigChanges($result);
+            $hasChanges = !$result->isFromCache();
             $fetcherStatus = $result->isFromCache()
                 ? FetcherStatus::AppliedFromLocalStorage
                 : FetcherStatus::AppliedFromNetwork;
@@ -397,35 +397,6 @@ final class Core
     public function dynamicApi(EntitiesProviderInterface $entitiesProvider)
     {
         return new DynamicApi($this->_flagRepository, $entitiesProvider);
-    }
-
-    /**
-     * Compares the fetched config against the last known hash stored on disk.
-     * Returns true if the config changed (or is seen for the first time).
-     * Persists the new hash so the next process can compare against it.
-     *
-     * @param ConfigurationFetchResult $result
-     * @return bool
-     */
-    private function _detectAndPersistConfigChanges(ConfigurationFetchResult $result)
-    {
-        $currentHash = md5(json_encode($result->getParsedData()));
-        $cacheKey = 'config_hash_' . $this->_sdkSettings->getApiKey();
-
-        $cache = new FilesystemCache(join(DIRECTORY_SEPARATOR, [
-            sys_get_temp_dir(),
-            'rollout',
-            'cache'
-        ]));
-
-        $lastHash = $cache->fetch($cacheKey);
-        $hasChanges = ($lastHash === false || $lastHash !== $currentHash);
-
-        if ($hasChanges) {
-            $cache->save($cacheKey, $currentHash);
-        }
-
-        return $hasChanges;
     }
 
     /**
