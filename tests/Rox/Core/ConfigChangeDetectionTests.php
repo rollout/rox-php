@@ -2,36 +2,36 @@
 
 namespace Rox\Core;
 
+use Doctrine\Common\Cache\FilesystemCache;
 use Rox\Core\Client\SdkSettingsInterface;
 use Rox\Core\Network\ConfigurationFetchResult;
 use Rox\Core\Network\ConfigurationSource;
 use Rox\RoxTestCase;
 
+const TEST_API_KEY = 'aaaaaaaaaaaaaaaaaaaaaaaa';
+const TEST_CACHE_KEY = 'config_hash_' . TEST_API_KEY;
+
 class ConfigChangeDetectionTests extends RoxTestCase
 {
     /**
-     * @var string
+     * @var FilesystemCache
      */
-    private $_hashFile;
+    private $_cache;
 
     protected function setUp(): void
     {
         parent::setUp();
-
-        // Use a predictable hash file path matching what Core produces for the test api key
-        $this->_hashFile = join(DIRECTORY_SEPARATOR, [
+        $this->_cache = new FilesystemCache(join(DIRECTORY_SEPARATOR, [
             sys_get_temp_dir(),
             'rollout',
-            'cache',
-            'config_hash_' . md5('aaaaaaaaaaaaaaaaaaaaaaaa') . '.txt'
-        ]);
-
-        @unlink($this->_hashFile);
+            'cache'
+        ]));
+        $this->_cache->delete(TEST_CACHE_KEY);
     }
 
     protected function tearDown(): void
     {
-        @unlink($this->_hashFile);
+        $this->_cache->delete(TEST_CACHE_KEY);
         parent::tearDown();
     }
 
@@ -90,14 +90,13 @@ class ConfigChangeDetectionTests extends RoxTestCase
         $this->assertTrue($this->_callDetect($core2, $newResult));
     }
 
-    public function testHashFileIsWrittenOnChange()
+    public function testHashIsPersistedOnChange()
     {
         $core = $this->_makeCore();
         $result = new ConfigurationFetchResult(['flag' => 'on'], ConfigurationSource::CDN);
 
         $this->_callDetect($core, $result);
 
-        $this->assertFileExists($this->_hashFile);
-        $this->assertEquals(md5(json_encode(['flag' => 'on'])), file_get_contents($this->_hashFile));
+        $this->assertEquals(md5(json_encode(['flag' => 'on'])), $this->_cache->fetch(TEST_CACHE_KEY));
     }
 }

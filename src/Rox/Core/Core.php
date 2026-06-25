@@ -410,22 +410,19 @@ final class Core
     private function _detectAndPersistConfigChanges(ConfigurationFetchResult $result)
     {
         $currentHash = md5(json_encode($result->getParsedData()));
-        $hashFile = join(DIRECTORY_SEPARATOR, [
+        $cacheKey = 'config_hash_' . $this->_sdkSettings->getApiKey();
+
+        $cache = new FilesystemCache(join(DIRECTORY_SEPARATOR, [
             sys_get_temp_dir(),
             'rollout',
-            'cache',
-            'config_hash_' . md5($this->_sdkSettings->getApiKey()) . '.txt'
-        ]);
+            'cache'
+        ]));
 
-        $lastHash = @file_get_contents($hashFile);
+        $lastHash = $cache->fetch($cacheKey);
         $hasChanges = ($lastHash === false || $lastHash !== $currentHash);
 
         if ($hasChanges) {
-            $dir = dirname($hashFile);
-            if (!is_dir($dir)) {
-                @mkdir($dir, 0755, true);
-            }
-            @file_put_contents($hashFile, $currentHash);
+            $cache->save($cacheKey, $currentHash);
         }
 
         return $hasChanges;
