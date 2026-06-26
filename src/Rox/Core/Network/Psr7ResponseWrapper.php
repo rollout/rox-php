@@ -3,6 +3,7 @@
 namespace Rox\Core\Network;
 
 use Psr\Http\Message\ResponseInterface;
+use Rox\Core\Network\CacheStatus;
 
 class Psr7ResponseWrapper extends AbstractHttpResponse
 {
@@ -26,12 +27,15 @@ class Psr7ResponseWrapper extends AbstractHttpResponse
     }
 
     /**
-     * @return bool
+     * @return string
      */
-    function isFromCache()
+    function getCacheStatus()
     {
         $header = $this->_response->getHeader('X-Kevinrob-Cache');
-        return !empty($header) && $header[0] === 'HIT';
+        $value = !empty($header) ? $header[0] : CacheStatus::MISS;
+        return in_array($value, [CacheStatus::HIT, CacheStatus::REVALIDATED], true)
+            ? $value
+            : CacheStatus::MISS;
     }
 
     /**
