@@ -345,7 +345,7 @@ final class Core
             $this->_targetGroupRepository->setTargetGroups($configuration->getTargetGroups());
             $this->_flagSetter->setExperiments();
 
-            $hasChanges = !$result->isFromCache();
+            $hasChanges = !$result->isContentUnchanged();
             $fetcherStatus = $result->isFromCache()
                 ? FetcherStatus::AppliedFromLocalStorage
                 : FetcherStatus::AppliedFromNetwork;

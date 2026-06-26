@@ -15,21 +15,22 @@ class TestHttpResponse extends AbstractHttpResponse
     private $_content;
 
     /**
-     * @var bool $_isFromCache
+     * @var string $_cacheStatus
      */
-    private $_isFromCache;
+    private $_cacheStatus;
 
     /**
      * TestHttpResponse constructor.
      * @param int $status
      * @param string $content
-     * @param bool $isFromCache
+     * @param string $cacheStatus
+     * @see CacheStatus
      */
-    public function __construct($status, $content = "", $isFromCache = false)
+    public function __construct($status, $content = "", $cacheStatus = CacheStatus::MISS)
     {
         $this->_status = $status;
         $this->_content = $content;
-        $this->_isFromCache = $isFromCache;
+        $this->_cacheStatus = $cacheStatus;
     }
 
     /**
@@ -41,11 +42,11 @@ class TestHttpResponse extends AbstractHttpResponse
     }
 
     /**
-     * @return bool
+     * @return string
      */
-    function isFromCache()
+    function getCacheStatus()
     {
-        return $this->_isFromCache;
+        return $this->_cacheStatus;
     }
 
     /**

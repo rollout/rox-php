@@ -16,21 +16,23 @@ class ConfigurationFetchResult
     private $_parsedData;
 
     /**
-     * @var bool $_isFromCache
+     * @var string $_cacheStatus
+     * @see CacheStatus
      */
-    private $_isFromCache;
+    private $_cacheStatus;
 
     /**
      * ConfigurationFetchResult constructor.
      * @param array $parsedData
      * @param int $source
-     * @param bool $isFromCache
+     * @param string $cacheStatus
+     * @see CacheStatus
      */
-    public function __construct($parsedData, $source, $isFromCache = false)
+    public function __construct($parsedData, $source, $cacheStatus = CacheStatus::MISS)
     {
         $this->_source = $source;
         $this->_parsedData = $parsedData;
-        $this->_isFromCache = $isFromCache;
+        $this->_cacheStatus = $cacheStatus;
     }
 
     /**
@@ -54,16 +56,14 @@ class ConfigurationFetchResult
      */
     public function isFromCache()
     {
-        return $this->_isFromCache;
+        return CacheStatus::isFromCache($this->_cacheStatus);
     }
 
     /**
-     * @param ConfigurationFetchResult $other
      * @return bool
      */
-    public function equals(ConfigurationFetchResult $other)
+    public function isContentUnchanged()
     {
-        return $this->_parsedData != null && $other->_parsedData != null &&
-            json_encode($this->_parsedData) === json_encode($other->_parsedData);
+        return CacheStatus::isContentUnchanged($this->_cacheStatus);
     }
 }

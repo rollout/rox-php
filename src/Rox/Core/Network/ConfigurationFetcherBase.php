@@ -4,6 +4,7 @@ namespace Rox\Core\Network;
 
 use Exception;
 use Psr\Log\LoggerInterface;
+use Rox\Core\Network\CacheStatus;
 use Rox\Core\Client\BUIDInterface;
 use Rox\Core\Client\DevicePropertiesInterface;
 use Rox\Core\Configuration\ConfigurationFetchedInvokerInterface;
@@ -79,11 +80,12 @@ abstract class ConfigurationFetcherBase implements ConfigurationFetcherInterface
     /**
      * @param string $data
      * @param int $source
-     * @param bool $isFromCache
+     * @param string $cacheStatus
      * @return ConfigurationFetchResult|null
      * @see ConfigurationSource
+     * @see CacheStatus
      */
-    protected function createConfigurationResult($data, $source, $isFromCache = false)
+    protected function createConfigurationResult($data, $source, $cacheStatus = CacheStatus::MISS)
     {
         if (!$data) {
             $this->_configurationFetchedInvoker->invokeWithError(FetcherError::EmptyJson);
@@ -100,7 +102,7 @@ abstract class ConfigurationFetcherBase implements ConfigurationFetcherInterface
             return null;
         }
 
-        return new ConfigurationFetchResult($decoded, $source, $isFromCache);
+        return new ConfigurationFetchResult($decoded, $source, $cacheStatus);
     }
 
     /**

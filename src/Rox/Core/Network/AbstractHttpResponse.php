@@ -14,10 +14,26 @@ abstract class AbstractHttpResponse implements HttpResponseInterface
     }
 
     /**
+     * @return string
+     */
+    function getCacheStatus()
+    {
+        return CacheStatus::MISS;
+    }
+
+    /**
      * @return bool
      */
-    function isFromCache()
+    final function isFromCache()
     {
-        return false;
+        return CacheStatus::isFromCache($this->getCacheStatus());
+    }
+
+    /**
+     * @return bool
+     */
+    final function isContentUnchanged()
+    {
+        return CacheStatus::isContentUnchanged($this->getCacheStatus());
     }
 }
