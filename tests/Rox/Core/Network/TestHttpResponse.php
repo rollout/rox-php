@@ -15,14 +15,22 @@ class TestHttpResponse extends AbstractHttpResponse
     private $_content;
 
     /**
+     * @var string $_cacheStatus
+     */
+    private $_cacheStatus;
+
+    /**
      * TestHttpResponse constructor.
      * @param int $status
      * @param string $content
+     * @param string $cacheStatus
+     * @see CacheStatus
      */
-    public function __construct($status, $content = "")
+    public function __construct($status, $content = "", $cacheStatus = CacheStatus::MISS)
     {
         $this->_status = $status;
         $this->_content = $content;
+        $this->_cacheStatus = $cacheStatus;
     }
 
     /**
@@ -31,6 +39,14 @@ class TestHttpResponse extends AbstractHttpResponse
     function getStatusCode()
     {
         return $this->_status;
+    }
+
+    /**
+     * @return string
+     */
+    function getCacheStatus()
+    {
+        return $this->_cacheStatus;
     }
 
     /**

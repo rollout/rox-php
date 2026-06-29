@@ -10,6 +10,7 @@ use GuzzleHttp\Psr7\Uri;
 use GuzzleHttp\RequestOptions;
 use Psr\Log\LoggerInterface;
 use Rox\Core\Logging\LoggerFactory;
+use Rox\Core\Network\CacheStatus;
 
 class GuzzleHttpClient implements HttpClientInterface
 {
@@ -90,12 +91,16 @@ class GuzzleHttpClient implements HttpClientInterface
                 $cacheState = $response->getHeader("X-Kevinrob-Cache");
                 if (is_array($cacheState) && !empty($cacheState)) {
                     switch ($cacheState[0]) {
-                        case 'HIT':
+                        case CacheStatus::HIT:
                             $this->_log->debug("{$request->getUri()}: HIT");
                             break;
 
-                        case 'MISS':
+                        case CacheStatus::MISS:
                             $this->_log->debug("{$request->getUri()}: MISS");
+                            break;
+
+                        case CacheStatus::REVALIDATED:
+                            $this->_log->debug("{$request->getUri()}: REVALIDATED");
                             break;
                     }
                 }

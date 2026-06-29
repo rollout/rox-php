@@ -6,9 +6,10 @@ use Doctrine\Common\Cache\FilesystemCache;
 use Kevinrob\GuzzleCache\Storage\DoctrineCacheStorage;
 use Monolog\Handler\StreamHandler;
 use Monolog\Logger;
-use Rox\Core\Consts\Environment;
 use Rox\Core\Logging\LoggerFactory;
 use Rox\Core\Logging\MonologLoggerFactory;
+use Rox\Core\Configuration\ConfigurationFetchedArgs;
+use Rox\Core\Configuration\FetcherStatus;
 use Rox\Server\Flags\RoxFlag;
 use Rox\Server\Rox;
 use Rox\Server\RoxOptions;
@@ -33,16 +34,19 @@ $apiKey = getenv('ROLLOUT_API_KEY') ?: DEFAULT_API_KEY;
 
 $devModeKey = getenv('ROLLOUT_DEV_MODE_KEY') ?: DEFAULT_DEV_MODE_KEY;
 
+$fetchInfo = ['status' => 'not fired', 'hasChanges' => null];
+
 $roxOptionsBuilder = (new RoxOptionsBuilder())
     ->setDevModeKey($devModeKey)
-    ->setNetworkConfigurationsOptions(new NetworkConfigurationsOptions(
-        'https://api.test.rollout.io/device/get_configuration',
-        'https://rox-conf.test.rollout.io',
-        'https://api.test.rollout.io/device/update_state_store',
-        'https://rox-state.test.rollout.io',
-        'https://analytic.test.rollout.io',
-        'https://notify.bugsnag.com'
-    ));
+    ->setConfigurationFetchedHandler(function (ConfigurationFetchedArgs $args) use (&$fetchInfo) {
+        $statusMap = [
+            FetcherStatus::AppliedFromNetwork       => 'AppliedFromNetwork',
+            FetcherStatus::AppliedFromLocalStorage  => 'AppliedFromLocalStorage',
+            FetcherStatus::ErrorFetchedFailed       => 'ErrorFetchedFailed',
+        ];
+        $fetchInfo['status']     = $statusMap[$args->getFetcherStatus()] ?? $args->getFetcherStatus();
+        $fetchInfo['hasChanges'] = $args->isHasChanges() ? 'true' : 'false';
+    });
 
 echo '<pre>';
 
@@ -86,7 +90,7 @@ if (!isset($_GET['nocache'])) {
         ->setCacheStorage(new DoctrineCacheStorage(
             new ChainCache([
                 new ArrayCache(),
-                new FilesystemCache('/tmp/rollout/cache'),
+                new FilesystemCache(join(DIRECTORY_SEPARATOR, [sys_get_temp_dir(), 'rollout', 'cache'])),
             ])
         ))
         ->setLogCacheHitsAndMisses(true)
@@ -108,5 +112,11 @@ if ($con->demoFlag->isEnabled()) {
 } else {
     echo "demo.demoFlag: FEATURE IS OFF\n";
 }
+
+echo "\n--- Configuration Fetch Info ---\n";
+echo "Status:     {$fetchInfo['status']}\n";
+echo "hasChanges: {$fetchInfo['hasChanges']}\n";
+echo "--------------------------------\n";
+echo "(Refresh the page - second load should show AppliedFromLocalStorage and hasChanges: false)\n";
 
 echo '</pre>';

@@ -19,6 +19,12 @@ interface HttpResponseInterface
     function isSuccessfulStatusCode();
 
     /**
+     * Returns the Guzzle cache state: 'HIT', 'MISS', or 'REVALIDATED'.
+     * @return string
+     */
+    function getCacheStatus();
+
+    /**
      * @return HttpResponseContentInterface
      */
     function getContent();

@@ -314,6 +314,66 @@ class ConfigurationFetcherTests extends RoxTestCase
         $this->assertEquals(0, $numberOfTimerCalled[0]);
     }
 
+    public function testWillReturnIsFromCacheTrueWhenCDNResponseIsFromCache()
+    {
+        $confFetchInvoker = new ConfigurationFetchedInvoker(Mockery::mock(UserspaceUnhandledErrorInvokerInterface::class));
+
+        $response = new TestHttpResponse(200, "{\"a\": \"cached\"}", CacheStatus::HIT);
+
+        $request = Mockery::mock(HttpClientInterface::class)
+            ->shouldReceive('sendGet')
+            ->andReturn($response)
+            ->getMock();
+
+        $confFetcher = new ConfigurationFetcher($request, $this->_bu, $this->_dp, $confFetchInvoker, $this->_errorReporter, $this->_environment);
+        $result = $confFetcher->fetch();
+
+        $this->assertNotNull($result);
+        $this->assertEquals("cached", $result->getParsedData()["a"]);
+        $this->assertTrue($result->isFromCache());
+    }
+
+    public function testWillReturnIsFromCacheFalseWhenCDNResponseIsFromNetwork()
+    {
+        $confFetchInvoker = new ConfigurationFetchedInvoker(Mockery::mock(UserspaceUnhandledErrorInvokerInterface::class));
+
+        $response = new TestHttpResponse(200, "{\"a\": \"fresh\"}");
+
+        $request = Mockery::mock(HttpClientInterface::class)
+            ->shouldReceive('sendGet')
+            ->andReturn($response)
+            ->getMock();
+
+        $confFetcher = new ConfigurationFetcher($request, $this->_bu, $this->_dp, $confFetchInvoker, $this->_errorReporter, $this->_environment);
+        $result = $confFetcher->fetch();
+
+        $this->assertNotNull($result);
+        $this->assertEquals("fresh", $result->getParsedData()["a"]);
+        $this->assertFalse($result->isFromCache());
+    }
+
+    public function testRevalidatedResponseIsNotFromCacheButContentIsUnchanged()
+    {
+        // REVALIDATED = server returned 304 Not Modified; content is identical to cached copy.
+        // isFromCache() must be false (we hit the network), but isContentUnchanged() must be
+        // true (no changes to apply) so hasChanges is correctly reported as false.
+        $confFetchInvoker = new ConfigurationFetchedInvoker(Mockery::mock(UserspaceUnhandledErrorInvokerInterface::class));
+
+        $response = new TestHttpResponse(200, "{\"a\": \"same\"}", CacheStatus::REVALIDATED);
+
+        $request = Mockery::mock(HttpClientInterface::class)
+            ->shouldReceive('sendGet')
+            ->andReturn($response)
+            ->getMock();
+
+        $confFetcher = new ConfigurationFetcher($request, $this->_bu, $this->_dp, $confFetchInvoker, $this->_errorReporter, $this->_environment);
+        $result = $confFetcher->fetch();
+
+        $this->assertNotNull($result);
+        $this->assertFalse($result->isFromCache());
+        $this->assertTrue($result->isContentUnchanged());
+    }
+
     public function testWillReturnNullDataWhenBothNotFound()
     {
         $confFetchInvoker = new ConfigurationFetchedInvoker(Mockery::mock(UserspaceUnhandledErrorInvokerInterface::class));

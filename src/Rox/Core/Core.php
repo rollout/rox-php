@@ -141,11 +141,6 @@ final class Core
     private $_errorReporter;
 
     /**
-     * @var ConfigurationFetchResult $_lastConfigurations
-     */
-    private $_lastConfigurations = null;
-
-    /**
      * @var InternalFlagsInterface $_internalFlags
      */
     private $_internalFlags;
@@ -350,10 +345,12 @@ final class Core
             $this->_targetGroupRepository->setTargetGroups($configuration->getTargetGroups());
             $this->_flagSetter->setExperiments();
 
-            $hasChanges = ($this->_lastConfigurations == null || $this->_lastConfigurations->equals($result));
-            $this->_lastConfigurations = $result;
+            $hasChanges = !$result->isContentUnchanged();
+            $fetcherStatus = $result->isFromCache()
+                ? FetcherStatus::AppliedFromLocalStorage
+                : FetcherStatus::AppliedFromNetwork;
             $this->_configurationFetchedInvoker->invoke(
-                FetcherStatus::AppliedFromNetwork,
+                $fetcherStatus,
                 $configuration->getSignatureDate(),
                 $hasChanges
             );
