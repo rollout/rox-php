@@ -87,21 +87,33 @@ class GuzzleHttpClient implements HttpClientInterface
             $response = $this->_client->send($request, [
                 RequestOptions::TIMEOUT => $this->_timeout,
             ]);
-            if (!$noCache && $this->_logCacheHitsAndMisses) {
+            if (!$noCache) {
                 $cacheState = $response->getHeader("X-Kevinrob-Cache");
                 if (is_array($cacheState) && !empty($cacheState)) {
-                    switch ($cacheState[0]) {
-                        case CacheStatus::HIT:
-                            $this->_log->debug("{$request->getUri()}: HIT");
-                            break;
+                    $status = $cacheState[0];
+                    if ($status === CacheStatus::STALE) {
+                        // Not gated behind _logCacheHitsAndMisses: this means a live fetch just
+                        // failed and we're serving a stale cached config instead, which is worth
+                        // surfacing on its own rather than only as debug-level cache metrics.
+                        $this->_log->warning(
+                            "{$request->getUri()}: serving stale cached config after a live fetch "
+                            . "failure - override the grace window via "
+                            . "RoxOptionsBuilder::setStaleIfErrorSeconds() if needed."
+                        );
+                    } elseif ($this->_logCacheHitsAndMisses) {
+                        switch ($status) {
+                            case CacheStatus::HIT:
+                                $this->_log->debug("{$request->getUri()}: HIT");
+                                break;
 
-                        case CacheStatus::MISS:
-                            $this->_log->debug("{$request->getUri()}: MISS");
-                            break;
+                            case CacheStatus::MISS:
+                                $this->_log->debug("{$request->getUri()}: MISS");
+                                break;
 
-                        case CacheStatus::REVALIDATED:
-                            $this->_log->debug("{$request->getUri()}: REVALIDATED");
-                            break;
+                            case CacheStatus::REVALIDATED:
+                                $this->_log->debug("{$request->getUri()}: REVALIDATED");
+                                break;
+                        }
                     }
                 }
             }
