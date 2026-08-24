@@ -18,7 +18,7 @@ class CdnCacheStrategy extends GreedyCacheStrategy
     // Default grace window, past a cache entry's normal TTL, during which a stale config is
     // still served if a live fetch fails (transport error or 5xx from the CDN). Sized around the
     // CDN blips actually observed (short, infrequent) rather than a worst-case outage. Overridable
-    // via RoxOptionsBuilder::setStaleIfErrorSeconds() - see SECO-5672 / CBP-58247.
+    // via RoxOptionsBuilder::setStaleIfErrorSeconds().
     const DEFAULT_STALE_IF_ERROR_SECONDS = 1800;
 
     /**
