@@ -53,6 +53,11 @@ final class RoxOptions implements RoxOptionsInterface
     private $_configFetchIntervalInSeconds;
 
     /**
+     * @var int|null
+     */
+    private $_staleIfErrorSeconds;
+
+    /**
      * @var int
      */
     private $_timeout = 0;
@@ -90,6 +95,7 @@ final class RoxOptions implements RoxOptionsInterface
         $this->_cacheStorage = $roxOptionsBuilder->getCacheStorage();
         $this->_logCacheHitsAndMisses = $roxOptionsBuilder->isLogCacheHitsAndMisses();
         $this->_configFetchIntervalInSeconds = $roxOptionsBuilder->getConfigFetchIntervalInSeconds();
+        $this->_staleIfErrorSeconds = $roxOptionsBuilder->getStaleIfErrorSeconds();
         $this->_timeout = $roxOptionsBuilder->getTimeout();
         $this->_networkConfigurationsOptions = $roxOptionsBuilder->getNetworkConfigurationsOptions();
         $this->_disableSignatureVerification = $roxOptionsBuilder->getDisableSignatureVerification();
@@ -165,6 +171,14 @@ final class RoxOptions implements RoxOptionsInterface
     function getConfigFetchIntervalInSeconds()
     {
         return $this->_configFetchIntervalInSeconds;
+    }
+
+    /**
+     * @return int|null
+     */
+    function getStaleIfErrorSeconds()
+    {
+        return $this->_staleIfErrorSeconds;
     }
 
     /**

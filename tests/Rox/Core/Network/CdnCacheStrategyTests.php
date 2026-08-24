@@ -28,13 +28,14 @@ class CdnCacheStrategyTests extends RoxTestCase
 {
     /**
      * @param \Exception|Response $secondResponse
+     * @param int|null $staleIfErrorSeconds
      * @return Client
      */
-    private function _clientWithStaleCacheAndFailingSecondRequest($secondResponse)
+    private function _clientWithStaleCacheAndFailingSecondRequest($secondResponse, $staleIfErrorSeconds = null)
     {
         $storage = new VolatileRuntimeStorage();
         // Negative TTL: the entry is stale the instant it's cached, no sleep needed.
-        $strategy = new CdnCacheStrategy($storage, -1);
+        $strategy = new CdnCacheStrategy($storage, -1, null, $staleIfErrorSeconds);
 
         $mock = new MockHandler([
             new Response(200, [], '{"ok":true}'),
@@ -77,5 +78,24 @@ class CdnCacheStrategyTests extends RoxTestCase
 
         $second = $client->get('https://rox-conf.test/config');
         $this->assertEquals('{"ok":true}', (string) $second->getBody());
+    }
+
+    public function testShouldNotServeStaleResponseOnceStaleIfErrorWindowHasElapsed()
+    {
+        // staleIfErrorSeconds=0: the grace window is exhausted the instant the entry
+        // goes stale, so the fallback should never kick in and the failure should propagate.
+        $client = $this->_clientWithStaleCacheAndFailingSecondRequest(
+            new ConnectException(
+                'simulated network blip',
+                new Request('GET', 'https://rox-conf.test/config')
+            ),
+            0
+        );
+
+        $first = $client->get('https://rox-conf.test/config');
+        $this->assertEquals('{"ok":true}', (string) $first->getBody());
+
+        $this->expectException(ConnectException::class);
+        $client->get('https://rox-conf.test/config');
     }
 }

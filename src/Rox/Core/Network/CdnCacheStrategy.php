@@ -5,6 +5,7 @@ namespace Rox\Core\Network;
 use DateTime;
 use Kevinrob\GuzzleCache\CacheEntry;
 use Kevinrob\GuzzleCache\KeyValueHttpHeader;
+use Kevinrob\GuzzleCache\Storage\CacheStorageInterface;
 use Kevinrob\GuzzleCache\Strategy\GreedyCacheStrategy;
 use Psr\Http\Message\RequestInterface;
 use Psr\Http\Message\ResponseInterface;
@@ -14,9 +15,28 @@ use Psr\Http\Message\ResponseInterface;
 
 class CdnCacheStrategy extends GreedyCacheStrategy
 {
-    // How much longer, past its normal TTL, a cached config is still served if a live
-    // fetch fails (transport error or 5xx from the CDN) - see SECO-5672 / CBP-58247.
-    const STALE_IF_ERROR_SECONDS = 86400;
+    // Default grace window, past a cache entry's normal TTL, during which a stale config is
+    // still served if a live fetch fails (transport error or 5xx from the CDN). Sized around the
+    // CDN blips actually observed (short, infrequent) rather than a worst-case outage. Overridable
+    // via RoxOptionsBuilder::setStaleIfErrorSeconds() - see SECO-5672 / CBP-58247.
+    const DEFAULT_STALE_IF_ERROR_SECONDS = 1800;
+
+    /**
+     * @var int
+     */
+    private $_staleIfErrorSeconds;
+
+    /**
+     * @param CacheStorageInterface|null $cache
+     * @param int $defaultTtl
+     * @param KeyValueHttpHeader|null $varyHeaders
+     * @param int|null $staleIfErrorSeconds
+     */
+    public function __construct(CacheStorageInterface $cache = null, $defaultTtl, KeyValueHttpHeader $varyHeaders = null, $staleIfErrorSeconds = null)
+    {
+        parent::__construct($cache, $defaultTtl, $varyHeaders);
+        $this->_staleIfErrorSeconds = $staleIfErrorSeconds !== null ? $staleIfErrorSeconds : self::DEFAULT_STALE_IF_ERROR_SECONDS;
+    }
 
     protected function getCacheKey(RequestInterface $request, KeyValueHttpHeader $varyHeaders = null)
     {
@@ -44,7 +64,7 @@ class CdnCacheStrategy extends GreedyCacheStrategy
 
         $staleAt = $cacheEntry->getStaleAt();
         $staleIfErrorTo = (new DateTime('@'.$staleAt->getTimestamp()))
-            ->setTimestamp($staleAt->getTimestamp() + self::STALE_IF_ERROR_SECONDS);
+            ->setTimestamp($staleAt->getTimestamp() + $this->_staleIfErrorSeconds);
 
         return new CacheEntry(
             $cacheEntry->getOriginalRequest(),
