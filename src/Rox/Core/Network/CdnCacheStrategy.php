@@ -2,6 +2,8 @@
 
 namespace Rox\Core\Network;
 
+use DateTime;
+use Kevinrob\GuzzleCache\CacheEntry;
 use Kevinrob\GuzzleCache\KeyValueHttpHeader;
 use Kevinrob\GuzzleCache\Strategy\GreedyCacheStrategy;
 use Psr\Http\Message\RequestInterface;
@@ -12,6 +14,10 @@ use Psr\Http\Message\ResponseInterface;
 
 class CdnCacheStrategy extends GreedyCacheStrategy
 {
+    // How much longer, past its normal TTL, a cached config is still served if a live
+    // fetch fails (transport error or 5xx from the CDN) - see SECO-5672 / CBP-58247.
+    const STALE_IF_ERROR_SECONDS = 86400;
+
     protected function getCacheKey(RequestInterface $request, KeyValueHttpHeader $varyHeaders = null)
     {
         // Key on path only so that per-instance query params (e.g. distinct_id)
@@ -31,6 +37,23 @@ class CdnCacheStrategy extends GreedyCacheStrategy
             }
         }
 
-        return parent::getCacheObject($request, $response);
+        if (!array_key_exists($response->getStatusCode(), $this->statusAccepted)) {
+            return null;
+        }
+
+        $ttl = $this->defaultTtl;
+        if ($request->hasHeader(self::HEADER_TTL)) {
+            $ttlHeaderValues = $request->getHeader(self::HEADER_TTL);
+            $ttl = (int)reset($ttlHeaderValues);
+        }
+
+        $response = $response->withoutHeader('Etag')->withoutHeader('Last-Modified');
+
+        return new CacheEntry(
+            $request->withoutHeader(self::HEADER_TTL),
+            $response,
+            new DateTime(sprintf('+%d seconds', $ttl)),
+            new DateTime(sprintf('+%d seconds', $ttl + self::STALE_IF_ERROR_SECONDS))
+        );
     }
 }
