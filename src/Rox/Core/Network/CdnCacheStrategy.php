@@ -37,23 +37,20 @@ class CdnCacheStrategy extends GreedyCacheStrategy
             }
         }
 
-        if (!array_key_exists($response->getStatusCode(), $this->statusAccepted)) {
+        $cacheEntry = parent::getCacheObject($request, $response);
+        if ($cacheEntry === null) {
             return null;
         }
 
-        $ttl = $this->defaultTtl;
-        if ($request->hasHeader(self::HEADER_TTL)) {
-            $ttlHeaderValues = $request->getHeader(self::HEADER_TTL);
-            $ttl = (int)reset($ttlHeaderValues);
-        }
-
-        $response = $response->withoutHeader('Etag')->withoutHeader('Last-Modified');
+        $staleAt = $cacheEntry->getStaleAt();
+        $staleIfErrorTo = (new DateTime('@'.$staleAt->getTimestamp()))
+            ->setTimestamp($staleAt->getTimestamp() + self::STALE_IF_ERROR_SECONDS);
 
         return new CacheEntry(
-            $request->withoutHeader(self::HEADER_TTL),
-            $response,
-            new DateTime(sprintf('+%d seconds', $ttl)),
-            new DateTime(sprintf('+%d seconds', $ttl + self::STALE_IF_ERROR_SECONDS))
+            $cacheEntry->getOriginalRequest(),
+            $cacheEntry->getOriginalResponse(),
+            $staleAt,
+            $staleIfErrorTo
         );
     }
 }
