@@ -63,8 +63,7 @@ class CdnCacheStrategy extends GreedyCacheStrategy
         }
 
         $staleAt = $cacheEntry->getStaleAt();
-        $staleIfErrorTo = (new DateTime('@'.$staleAt->getTimestamp()))
-            ->setTimestamp($staleAt->getTimestamp() + $this->_staleIfErrorSeconds);
+        $staleIfErrorTo = new DateTime('@'.($staleAt->getTimestamp() + $this->_staleIfErrorSeconds));
 
         return new CacheEntry(
             $cacheEntry->getOriginalRequest(),
