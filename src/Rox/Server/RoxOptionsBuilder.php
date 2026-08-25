@@ -52,6 +52,11 @@ final class RoxOptionsBuilder
     private $_configFetchIntervalInSeconds;
 
     /**
+     * @var int|null $_staleIfErrorSeconds
+     */
+    private $_staleIfErrorSeconds;
+
+    /**
      * @var int
      */
     private $_timeout = 0;
@@ -226,6 +231,27 @@ final class RoxOptionsBuilder
     public function setConfigFetchIntervalInSeconds($configFetchIntervalInSeconds)
     {
         $this->_configFetchIntervalInSeconds = $configFetchIntervalInSeconds;
+        return $this;
+    }
+
+    /**
+     * @return int|null
+     */
+    public function getStaleIfErrorSeconds()
+    {
+        return $this->_staleIfErrorSeconds;
+    }
+
+    /**
+     * How long, past the normal config-fetch cache TTL, a stale cached config is still
+     * served if a live CDN fetch fails (network error or 5xx). Defaults to 30 minutes
+     * (CdnCacheStrategy::DEFAULT_STALE_IF_ERROR_SECONDS) if not set.
+     * @param int|null $staleIfErrorSeconds
+     * @return RoxOptionsBuilder
+     */
+    public function setStaleIfErrorSeconds($staleIfErrorSeconds)
+    {
+        $this->_staleIfErrorSeconds = $staleIfErrorSeconds;
         return $this;
     }
 

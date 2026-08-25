@@ -52,6 +52,11 @@ interface RoxOptionsInterface
     function getConfigFetchIntervalInSeconds();
 
     /**
+     * @return int|null
+     */
+    function getStaleIfErrorSeconds();
+
+    /**
      * @return NetworkConfigurationsOptions|null
      */
     function getNetworkConfigurationsOptions();

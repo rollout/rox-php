@@ -430,7 +430,9 @@ final class Core
             new CdnRequestMatcher($this->_environment),
             new CdnCacheStrategy(
                 $cacheStorage,
-                max($cacheTtl ?: self::MIN_CACHE_TTL_SECONDS, self::MIN_CACHE_TTL_SECONDS)
+                max($cacheTtl ?: self::MIN_CACHE_TTL_SECONDS, self::MIN_CACHE_TTL_SECONDS),
+                null,
+                $options ? $options->getStaleIfErrorSeconds() : null
             )
         );
         $httpClientOptions->addMiddleware(new CacheMiddleware($strategy), 'cache');

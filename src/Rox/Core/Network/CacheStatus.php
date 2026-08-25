@@ -7,6 +7,7 @@ final class CacheStatus
     const HIT = 'HIT';
     const MISS = 'MISS';
     const REVALIDATED = 'REVALIDATED';
+    const STALE = 'STALE';
 
     static function isFromCache(string $status): bool
     {
