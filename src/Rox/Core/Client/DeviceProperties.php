@@ -8,7 +8,7 @@ use Rox\Core\Consts\PropertyType;
 
 class DeviceProperties implements DevicePropertiesInterface
 {
-    const DEFAULT_LIB_VERSION = '6.0.4';
+    const DEFAULT_LIB_VERSION = '6.0.5';
     const DEFAULT_DISTINCT_ID = 'stam'; // FIXME: what?
     const BUILD_NUMBER = "50"; // FIXME: fix the build number
 
