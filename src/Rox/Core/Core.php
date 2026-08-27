@@ -21,7 +21,6 @@ use Rox\Core\Client\SdkSettingsInterface;
 use Rox\Core\Configuration\ConfigurationFetchedInvoker;
 use Rox\Core\Configuration\ConfigurationFetchedInvokerInterface;
 use Rox\Core\Configuration\ConfigurationParser;
-use Rox\Core\Configuration\FetcherStatus;
 use Rox\Core\Context\ContextInterface;
 use Rox\Core\CustomProperties\CustomProperty;
 use Rox\Core\CustomProperties\CustomPropertyRepository;
@@ -346,11 +345,8 @@ final class Core
             $this->_flagSetter->setExperiments();
 
             $hasChanges = !$result->isContentUnchanged();
-            $fetcherStatus = $result->isFromCache()
-                ? FetcherStatus::AppliedFromLocalStorage
-                : FetcherStatus::AppliedFromNetwork;
             $this->_configurationFetchedInvoker->invoke(
-                $fetcherStatus,
+                $result->getFetcherStatus(),
                 $configuration->getSignatureDate(),
                 $hasChanges
             );
