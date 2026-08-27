@@ -33,7 +33,7 @@ class Psr7ResponseWrapper extends AbstractHttpResponse
     {
         $header = $this->_response->getHeader('X-Kevinrob-Cache');
         $value = !empty($header) ? $header[0] : CacheStatus::MISS;
-        return in_array($value, [CacheStatus::HIT, CacheStatus::REVALIDATED], true)
+        return in_array($value, [CacheStatus::HIT, CacheStatus::REVALIDATED, CacheStatus::STALE], true)
             ? $value
             : CacheStatus::MISS;
     }

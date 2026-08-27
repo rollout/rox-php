@@ -2,6 +2,8 @@
 
 namespace Rox\Core\Network;
 
+use Rox\Core\Configuration\FetcherStatus;
+
 class ConfigurationFetchResult
 {
     /**
@@ -65,5 +67,28 @@ class ConfigurationFetchResult
     public function isContentUnchanged()
     {
         return CacheStatus::isContentUnchanged($this->_cacheStatus);
+    }
+
+    /**
+     * @return bool
+     */
+    public function isStale()
+    {
+        return $this->_cacheStatus === CacheStatus::STALE;
+    }
+
+    /**
+     * @return int
+     * @see FetcherStatus
+     */
+    public function getFetcherStatus()
+    {
+        if ($this->isStale()) {
+            return FetcherStatus::AppliedFromStaleCache;
+        }
+        if ($this->isFromCache()) {
+            return FetcherStatus::AppliedFromLocalStorage;
+        }
+        return FetcherStatus::AppliedFromNetwork;
     }
 }

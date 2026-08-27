@@ -8,6 +8,7 @@ use Rox\Core\Client\BUIDInterface;
 use Rox\Core\Client\DevicePropertiesInterface;
 use Rox\Core\Configuration\ConfigurationFetchedArgs;
 use Rox\Core\Configuration\ConfigurationFetchedInvoker;
+use Rox\Core\Configuration\FetcherStatus;
 use Rox\Core\Consts\PropertyType;
 use Rox\Core\ErrorHandling\UserspaceUnhandledErrorInvokerInterface;
 use Rox\Core\Reporting\ErrorReporterInterface;
@@ -331,6 +332,7 @@ class ConfigurationFetcherTests extends RoxTestCase
         $this->assertNotNull($result);
         $this->assertEquals("cached", $result->getParsedData()["a"]);
         $this->assertTrue($result->isFromCache());
+        $this->assertEquals(FetcherStatus::AppliedFromLocalStorage, $result->getFetcherStatus());
     }
 
     public function testWillReturnIsFromCacheFalseWhenCDNResponseIsFromNetwork()
@@ -350,6 +352,7 @@ class ConfigurationFetcherTests extends RoxTestCase
         $this->assertNotNull($result);
         $this->assertEquals("fresh", $result->getParsedData()["a"]);
         $this->assertFalse($result->isFromCache());
+        $this->assertEquals(FetcherStatus::AppliedFromNetwork, $result->getFetcherStatus());
     }
 
     public function testRevalidatedResponseIsNotFromCacheButContentIsUnchanged()
@@ -372,6 +375,33 @@ class ConfigurationFetcherTests extends RoxTestCase
         $this->assertNotNull($result);
         $this->assertFalse($result->isFromCache());
         $this->assertTrue($result->isContentUnchanged());
+        $this->assertEquals(FetcherStatus::AppliedFromNetwork, $result->getFetcherStatus());
+    }
+
+    public function testStaleResponseIsStaleAndContentIsUnchanged()
+    {
+        // STALE = a live fetch failed (transport error or CDN 5xx) after the cached entry's TTL
+        // expired, so the last known-good cached config was served instead of failing outright.
+        // isStale() and isFromCache() must both be true, isContentUnchanged() true (same body
+        // re-served, hasChanges=false), and the reported FetcherStatus must be distinct from a
+        // plain cache hit or a fresh network fetch.
+        $confFetchInvoker = new ConfigurationFetchedInvoker(Mockery::mock(UserspaceUnhandledErrorInvokerInterface::class));
+
+        $response = new TestHttpResponse(200, "{\"a\": \"stale\"}", CacheStatus::STALE);
+
+        $request = Mockery::mock(HttpClientInterface::class)
+            ->shouldReceive('sendGet')
+            ->andReturn($response)
+            ->getMock();
+
+        $confFetcher = new ConfigurationFetcher($request, $this->_bu, $this->_dp, $confFetchInvoker, $this->_errorReporter, $this->_environment);
+        $result = $confFetcher->fetch();
+
+        $this->assertNotNull($result);
+        $this->assertTrue($result->isFromCache());
+        $this->assertTrue($result->isStale());
+        $this->assertTrue($result->isContentUnchanged());
+        $this->assertEquals(FetcherStatus::AppliedFromStaleCache, $result->getFetcherStatus());
     }
 
     public function testWillReturnNullDataWhenBothNotFound()

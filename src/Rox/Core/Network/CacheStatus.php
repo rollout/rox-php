@@ -11,11 +11,11 @@ final class CacheStatus
 
     static function isFromCache(string $status): bool
     {
-        return $status === self::HIT;
+        return $status === self::HIT || $status === self::STALE;
     }
 
     static function isContentUnchanged(string $status): bool
     {
-        return $status === self::HIT || $status === self::REVALIDATED;
+        return $status === self::HIT || $status === self::REVALIDATED || $status === self::STALE;
     }
 }
